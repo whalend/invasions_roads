@@ -1,0 +1,23 @@
+---
+title: "Effects of roads and forest successional age on species in an experimental plant invasion"
+date: "r format(Sys.time(), '%d %B, %Y')`"
+output: 
+  word_document: null
+  html_document:
+    toc: yes
+---
+
+```{r set options, include=F, echo=F}
+
+knitr::opts_chunk$set(fig.width = 7.5)
+knitr::opts_chunk$set(dpi = 600)
+knitr::opts_chunk$set(echo = F)
+knitr::opts_chunk$set(warning = F)
+knitr::opts_chunk$set(message = F)
+# knitr::opts_chunk$set(eval = F)
+
+# options(na.action = "na.fail")# global model setting for using multimodel inference 'dredge' function
+
+```
+
+

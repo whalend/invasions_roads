@@ -1,0 +1,9 @@
+Name,Plot_name,Description
+site,Site,"name of the forest site, BB, Griffy, Dugdale, Cicada = Cicada Hill, Dubois, Hdqtrs = Headquarters, SR45 = State Route 45, Duckworth = Duckworth Road, TC = T.C. Steele (Yellowood), Lilly = Lilley-Dickey, Forest = Forest Road, Parker = Parker Road"
+age,Forest age,young (<40 years) or mature (>60 years) forest
+distance,Distance from road,distance from roadway edge (meters)
+species,Species,species identification of the seedling
+native_exotic,Species origin,native (N) or exotic-nonnative (E) species
+number29,,
+number2,,
+eaten,Seeds predated,"number of seeds missing, presumed predated"

@@ -1,0 +1,7 @@
+"Name","Plot_name","Description"
+"site","Site","name of the forest site, BB, GR = Griffy, DUG = Dugdale, CH = Cicada Hill, DUB = Dubois, HQ = Headquarters, SR45 = State Route 45, DUCK = Duckworth Road, TC = T.C. Steele, LD = Lilley-Dickey, FR = Forest Road, PR = Parker Road"
+"age","Forest age","young (<40 years) or mature (>60 years) forest"
+"distance","Distance from road","distance from roadway edge (meters)"
+"in","",""
+"area","",""
+"litter","Litter (g)","mass of dried litter (grams)"

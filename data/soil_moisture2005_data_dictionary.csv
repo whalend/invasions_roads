@@ -1,0 +1,8 @@
+Name,Plot_name,Description
+site,Site,"name of the forest site, BB, GR = Griffy, DUG = Dugdale, CH = Cicada Hill, DUB = Dubois, HQ = Headquarters, SR45 = State Route 45, DUCK = Duckworth Road, TC = T.C. Steele, LD = Lilley-Dickey, FR = Forest Road, PR = Parker Road"
+age,Forest age,young (<40 years) or mature (>60 years) forest
+distance,Distance from road,distance from roadway edge (meters)
+can_wt,,weight of can used to hold soil (grams)
+wet_wt,Wet weight,wet weight of soil (grams)
+dry_wt,Dry weight,weight of soil after drying (grams)
+pct_moisture,Soil moisture (%),percent moisture content of the soil
