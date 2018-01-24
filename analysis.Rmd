@@ -1,10 +1,10 @@
 ---
 title: "Effects of roads and forest successional age on species in an experimental plant invasion"
-date: "r format(Sys.time(), '%d %B, %Y')`"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
-  word_document: null
   html_document:
     toc: yes
+  word_document: null
 ---
 
 ```{r set options, include=F, echo=F}
@@ -19,5 +19,98 @@ knitr::opts_chunk$set(message = F)
 # options(na.action = "na.fail")# global model setting for using multimodel inference 'dredge' function
 
 ```
+
+```{r load packages}
+# library(lme4); library(car); library(sciplot); library(lmerTest); 
+# library(MuMIn)
+library(plyr); library(dplyr); library(tidyr); library(readr)
+library(ggplot2)
+library(knitr)
+```
+
+```{r load data}
+seedling_data <- read_csv("data/seedling_growth_survival_data.csv")
+germination_data <- read_csv("data/germination_data.csv")
+forest_data <- read_csv("data/forest_trees.csv")
+light_data <- read_csv("data/light2005_data.csv")
+litter_data <- read_csv("data/litter.csv")
+soil_moisture_data <- read_csv("data/soil_moisture2005_data.csv")
+```
+
+# 
+
+```{r check data}
+# summary(seedling_data)
+# unique(seedling_data$species)
+seedling_data <- filter(seedling_data, is.na(species)=="FALSE")
+# filter(seedling_data, rgr_ht<0)
+seedling_data <- seedling_data %>% 
+  mutate(rgr_ht = (final_ht06 - initial_ht)/initial_ht)
+## There are 97 negative values in this growth rate. Values are sometimes very inconsistent from the spring 2006 measurement to the final measurement
+
+# summary(germination_data)
+# unique(germination_data$species)
+# filter(germination_data, is.na(seeds_germinated))$comments
+germination_data <- germination_data %>% 
+  mutate(pct_germinated = 100*(seeds_germinated/seeds_present),
+         common_name = "",
+         status = native_exotic)
+
+# summary(forest_data)
+# unique(forest_data$species)
+# filter(forest_data, is.na(species))
+
+# summary(light_data)
+
+# summary(litter_data)
+
+# summary(soil_moisture_data)
+
+# xtabs(~ species + native_exotic, germination_data)
+```
+
+```{r make species table}
+germination_data$common_name[germination_data$species=="D"] <- "Dogwood"
+germination_data$common_name[germination_data$species=="A"] <- "Autumn olive"
+germination_data$common_name[germination_data$species=="H"] <- "Honeysuckle"
+germination_data$common_name[germination_data$species=="P"] <- "Privet"
+germination_data$common_name[germination_data$species=="R"] <- "Redbud"
+germination_data$common_name[germination_data$species=="S"] <- "Spicebush"
+
+germination_data$status[germination_data$status=="N"] <- "Native"
+germination_data$status[germination_data$status=="E"] <- "Non-native"
+
+species_table <- germination_data %>% 
+  filter(site=="BB", distance==0) %>%
+  select(species, status, common_name)
+  
+kable(species_table %>% 
+        select(Species = common_name, Status = status) %>%
+        arrange(Status)
+      )
+```
+
+
+## Experiment A: Seed germination
+
+* Ten seeds from each of six species (3 invaders, 3 natives) were placed at each distance
+
+
+## Experiment B: Seedling survival and growth
+
+* Seedlings of six species (3 invaders, 3 natives) were planted at 12 forest sites classified as mature (>60 years) or young (<40 years).  
+
+* Four seedlings of each species at distances of 0, 5, 10, 20, 40, and 60 meters from the roadway edge. 
+
+* All seedlings were 10-15cm tall when planted
+
+**H1:** There is a negative effect on survival and growth for all species moving from edge to interior
+
+* Performance will also be poorer in mature versus young forests
+    
+
+**H2:** Non-native species perform relatively better near the edge and in young forests.
+
+* Native species perform relatively better in interior locations and in mature forests
 
 
