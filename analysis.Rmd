@@ -80,6 +80,8 @@ soil_moisture_data <- mutate(soil_moisture_data, habitat_type = if_else(distance
 
 ```
 
+***
+
 ```{r make species table}
 germination_data$common_name[germination_data$species=="D"] <- "Dogwood"
 germination_data$common_name[germination_data$species=="A"] <- "Autumn olive"
@@ -101,19 +103,23 @@ kable(species_table %>%
       )
 ```
 
+***
 
-## Experiment A: Seed germination
+# Experiment A: Seed germination
 
 * Ten seeds from each of six species (3 invaders, 3 natives) were placed at each distance
 
+***
 
-## Experiment B: Seedling survival and growth
+# Experiment B: Seedling survival and growth
 
 * Seedlings of six species (3 invaders, 3 natives) were planted at 12 forest sites classified as mature (>60 years) or young (<40 years).  
 
 * Four seedlings of each species at distances of 0, 5, 10, 20, 40, and 60 meters from the roadway edge. 
 
 * All seedlings were 10-15cm tall when planted
+
+***
 
 **H1:** There is a negative effect on survival and growth for all species moving from edge to interior
 
@@ -124,10 +130,12 @@ kable(species_table %>%
 
 * Native species perform relatively better in interior locations and in mature forests
 
-## Site data
+***
+
+# Site data
 We measured environmental and forest structure characteristics at each distance along each transect at each site.
 
-### Trees
+## Trees
 A 10-BAF wedge prism was used to quantify basal area. We identified and measured the DBH of the five nearest trees that were counted as "in" using the wedge prism.
 
 ```{r trees}
@@ -146,14 +154,20 @@ ggplot(forest_data, aes(distance, dbh_cm, shape = age, color = age)) +
   scale_shape_manual(values = c(16,15)) +
   stat_summary(fun.data = "mean_se", geom = "pointrange", size = .7) +
   scale_color_manual(values = c("grey50", "grey80")) +
-  theme_classic()
+  theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("Distance from road (m)") +
+  ylab("DBH (cm)")
 
 ## Basal area plot
 ggplot(forest_data, aes(distance, basal_area_m2_ha, shape = age, color = age)) +
   scale_shape_manual(values = c(16,15)) +
   stat_summary(fun.data = "mean_se", geom = "pointrange", size = .7) +
   scale_color_manual(values = c("grey50", "grey80")) +
-  theme_classic()
+  theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("Distance from road (m)") +
+  ylab(expression(paste("Basal area (", {m}^2, "  ", {ha}^-1, ")")))
 
 ## Summarise mean and SE into new dataframe
 avg_forest_data <- forest_data %>%
@@ -172,6 +186,8 @@ ggplot(avg_forest_data, aes(age, avg_dbh, fill = habitat_type)) +
   geom_errorbar(aes(ymin = avg_dbh - se_dbh, ymax = avg_dbh + se_dbh), width = 0, position = position_dodge(width = .9)) +
   scale_fill_manual(values = c("grey50", "grey90")) +
   theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("") +
   ylab("DBH (cm)")
 
 ggplot(avg_forest_data, aes(age, avg_basal_area, fill = habitat_type)) +
@@ -179,7 +195,10 @@ ggplot(avg_forest_data, aes(age, avg_basal_area, fill = habitat_type)) +
   geom_errorbar(aes(ymin = avg_basal_area - se_basal_area, ymax = avg_basal_area + se_basal_area), width = 0, position = position_dodge(width = .9)) +
   scale_fill_manual(values = c("grey50", "grey90")) +
   theme_classic() +
-  ylab(expression(paste("Basal area (", {m}^2, " ", {ha}^-1, ")")))
+  theme(legend.title = element_blank()) +
+  xlab("") +
+  ylab(expression(paste("Basal area (", {m}^2, "  ", {ha}^-1, ")")))
+
 ```
 
 ```{r tree models, eval=F}
@@ -196,7 +215,7 @@ summary(basal_area_lm2)
 
 ```
 
-### Light availability
+## Light availability
 In the summer of 2005, photosynthetically active radiation (PAR) was measured at five locations at each distance at each site along a 5 m long transect parallel to the road. From these measurements, we calculated the percent available light using the ratio of the PAR value to the PAR value measured in open sun.
 
 ```{r light}
@@ -208,7 +227,10 @@ ggplot(light_data, aes(distance, pct_light, shape = age, color = age)) +
   scale_shape_manual(values = c(16,15)) +
   stat_summary(fun.data = "mean_se", geom = "pointrange", size = .7) +
   scale_color_manual(values = c("grey50", "grey80")) +
-  theme_classic()
+  theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("Distance from road (m)") +
+  ylab("Light (%)")
 
 
 avg_light_data <- light_data %>% 
@@ -221,7 +243,10 @@ ggplot(avg_light_data, aes(age, avg_pct_light, fill = habitat_type)) +
   geom_errorbar(aes(ymin = avg_pct_light - se_pct_light, ymax = avg_pct_light + se_pct_light), width = 0, position = position_dodge(width = .9)) +
   scale_fill_manual(values = c("grey50", "grey90")) +
   theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("") +
   ylab("Light (%)")
+
 ```
 
 ```{r light models, eval=F}
@@ -233,7 +258,7 @@ summary(light_lm2)
 
 ```
 
-### Soil moisture
+## Soil moisture
 In the summer of 2005, we also collected 125 cm^3^ mineral soil samples at the center of each 5 m transect to measure gravimetric water content.
 
 ```{r soil}
@@ -246,7 +271,11 @@ ggplot(soil_moisture_data, aes(distance, pct_moisture, shape = age, color = age)
   stat_summary(fun.data = "mean_se", geom = "pointrange", size = .7) +
   # geom_smooth(method = "lm", se = F, show.legend = F) +
   scale_color_manual(values = c("grey50", "grey80")) +
-  theme_classic()
+  theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("Distance from road (m)") +
+  ylab("Soil moisture (%)")
+
 
 # ggplot(soil_moisture_data, aes(age, pct_moisture, fill = habitat_type)) +
 #   geom_boxplot(notch = F) +
@@ -272,6 +301,8 @@ ggplot(avg_soil_data, aes(age, avg_pct_moisture, fill = habitat_type)) +
   geom_errorbar(aes(ymin = avg_pct_moisture - se_pct_moisture, ymax = avg_pct_moisture + se_pct_moisture), width = 0, position = position_dodge(width = .9)) +
   scale_fill_manual(values = c("grey50", "grey90")) +
   theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("") +
   ylab("Soil moisture (%)")
 
 # soil_lm <- lm(pct_moisture ~ habitat_type*age, data = soil_moisture_data)
@@ -280,14 +311,14 @@ ggplot(avg_soil_data, aes(age, avg_pct_moisture, fill = habitat_type)) +
 
 ```
 
-### Litter
+## Litter
 We collected leaf litter from within a 25 cm x 25 cm PVC frame at each of the six distances from roads at each site in December 2008
 
 ```{r litter}
 
 litter_data$age[litter_data$age=="M"] <- "Mature forest"
 litter_data$age[litter_data$age=="Y"] <- "Young forest"
-litter_data <- rename(litter_data, distance = dist)
+
 
 # .25*.25 = .0625 m^2
 # 1 g = .001 kg
@@ -299,7 +330,11 @@ ggplot(litter_data, aes(distance, litter_kg_m2, shape = age, color = age)) +
   stat_summary(fun.data = "mean_se", geom = "pointrange", size = .7) +
   # geom_smooth(method = "lm", se = F, show.legend = F) +
   scale_color_manual(values = c("grey50", "grey80")) +
-  theme_classic()
+  theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("Distance from road (m)") +
+  ylab(expression(paste("Litter (kg ", {m}^-2, ")")))
+
 
 avg_litter_data <- litter_data %>% 
   group_by(age, habitat_type) %>% 
@@ -311,6 +346,8 @@ ggplot(avg_litter_data, aes(age, avg_litter, fill = habitat_type)) +
   geom_errorbar(aes(ymin = avg_litter - se_litter, ymax = avg_litter + se_litter), width = 0, position = position_dodge(width = .9)) +
   scale_fill_manual(values = c("grey50", "grey90")) +
   theme_classic() +
+  theme(legend.title = element_blank()) +
+  xlab("") +
   ylab(expression(paste("Litter (kg ", {m}^-2, ")")))
 
 # litter_lm <- lm(litter_kg_m2 ~ distance*age, data = litter_data)
@@ -323,10 +360,11 @@ ggplot(avg_litter_data, aes(age, avg_litter, fill = habitat_type)) +
 
 ```
 
+*** 
 
-## Species data
+# Species data
 
-### Seed germination
+## Seed germination
 
 ```{r germination}
 
@@ -353,24 +391,24 @@ ggplot(germination_data, aes(distance, pct_germinated)) +
   
   scale_color_brewer(palette = "RdBu") +
   facet_wrap(~forest_age) +
-  ylab("Percent germination") +
-  xlab("Distance from road (m)") +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
-        legend.title = element_blank())
+        legend.title = element_blank()) +
+  ylab("Percent germination") +
+  xlab("Distance from road (m)")
 
 # ggsave("figures/pct_germinated.png", dpi = 600, width = 7, height = 3.5)
 
 ```
 
 
-### Seedling growth and survival
+## Seedling growth and survival
 
 ```{r seedling data manipulation}
 
 # names(seedling_data)
-
+seedling_data <- mutate(seedling_data, common_name = "")
 seedling_data$common_name[seedling_data$species=="D"] <- "Dogwood"
 seedling_data$common_name[seedling_data$species=="A"] <- "Autumn olive"
 seedling_data$common_name[seedling_data$species=="H"] <- "Honeysuckle"
@@ -386,8 +424,8 @@ seedling_data$status[seedling_data$status=="e"] <- "Non-native"
 
 seedling_data$status <- factor(seedling_data$status, levels = c("Native","Non-native"))
 
-seedling_data$forest_age[seedling_data$forest_age=="Y"] <- "Young forest"
-seedling_data$forest_age[seedling_data$forest_age=="M"] <- "Mature forest"
+seedling_data$forest_age[seedling_data$forest_age=="young"] <- "Young forest"
+seedling_data$forest_age[seedling_data$forest_age=="mature"] <- "Mature forest"
 
 ```
 
@@ -451,12 +489,71 @@ ggplot(seedling_data, aes(distance, 100*rgr_ht)) +
   scale_color_brewer(palette = "RdBu") +
   facet_wrap(~forest_age) +
   theme_bw() +
-  ylab("Relative growth (% of initial height)") +
-  xlab("Distance from road (m)") +
-  
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
-        legend.title = element_blank())
+        legend.title = element_blank()) +
+  ylab("Relative growth (% of initial height)") +
+  xlab("Distance from road (m)") 
 
 ```
 
+This calculation of relative growth is just the proportional difference between the initial height and final height (doesn't account for time, so no rate). There are (`r n_distinct(filter(seedling_data, rgr_ht<0))`) negative values (range (%) = `r range(100*filter(seedling_data, rgr_ht<0)$rgr_ht)`). 
+
+```{r herbivory, fig.height=8}
+
+# names(seedling_data)
+
+herbiv <- select(seedling_data, site_name:status, common_name, starts_with("herb"))
+herbiv <- herbiv %>% 
+  gather(year, herbivory, herbivory04:herbivory06)
+herbiv$year[herbiv$year=="herbivory04"] <- 2004
+herbiv$year[herbiv$year=="herbivory05"] <- 2005
+herbiv$year[herbiv$year=="herbivory06"] <- 2006
+
+ggplot(herbiv, aes(distance, herbivory)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_grid(year~forest_age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Herbivory") +
+  xlab("Distance from road (m)") 
+
+```
+
+Herbivory was categorized, where 1 = 1-25%, 2 = 26-50%, 3 = 51-75%.
+
+
+```{r survival, fig.height=8}
+
+surv <- select(seedling_data, site_name:status, common_name, starts_with("surv"))
+surv <- surv %>% gather(year, survival, survival04:survival06)
+surv$year[surv$year=="survival04"] <- 2004
+surv$year[surv$year=="survival05"] <- 2005
+surv$year[surv$year=="survival06"] <- 2006
+
+surv <- surv %>% 
+  group_by(year, distance, forest_age, status, common_name) %>% 
+  filter(!is.na(survival)) %>% 
+  summarise(pct_survival = 100*sum(survival)/length(survival))
+
+ggplot(surv, aes(distance, pct_survival)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_grid(year~forest_age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Survival (%)") +
+  xlab("Distance from road (m)") 
+
+```
+
+Average proportional survival in each year.
