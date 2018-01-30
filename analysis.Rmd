@@ -2,9 +2,9 @@
 title: "Effects of roads and forest successional age on non-native species growth and survival in an experimental plant invasion"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
+  word_document: null
   html_document:
     toc: yes
-  word_document: null
 ---
 
 ```{r set options, include=F, echo=F}
@@ -44,28 +44,28 @@ names(sites) <- c("site_code","site_name")
 
 library(stringr)
 germination_data <- rename(germination_data, site_code = site)
-sort(unique(germination_data$site_code))
+# sort(unique(germination_data$site_code))
 germination_data$site_code <- germination_data$site_code %>%
   str_sub(., 1,3) %>% 
   str_replace_all(c("Cic"="CH","Dub"="DB","Duc"="DU","Dug"="DG","For"="FR","Gri"="GR","Hdq"="HQ","Lil"="LD","Par"="PR","SR4"="SR","Yel"="TC"))
 
 forest_data <- rename(forest_data, site_code = site)
-unique(forest_data$site_code)
+# unique(forest_data$site_code)
 forest_data$site_code <- forest_data$site_code %>% 
   str_replace_all(c("DUCK"="DU","DUB"="DB","DUG"="DG", "SR45"="SR"))
 
 light_data <- rename(light_data, site_code = site)
-unique(light_data$site_code)
+# unique(light_data$site_code)
 light_data$site_code <- light_data$site_code %>% 
   str_replace_all(c("DUCK"="DU","DUB"="DB","DUG"="DG", "SR45"="SR"))
 
 litter_data <- rename(litter_data, site_code = site)
-unique(litter_data$site_code)
+# unique(litter_data$site_code)
 litter_data$site_code <- litter_data$site_code %>% 
   str_replace_all(c("DUCK"="DU","DUB"="DB","DUG"="DG", "SR45"="SR"))
 
 soil_moisture_data <- rename(soil_moisture_data, site_code = site)
-unique(soil_moisture_data$site_code)
+# unique(soil_moisture_data$site_code)
 soil_moisture_data$site_code <- soil_moisture_data$site_code %>% 
   str_replace_all(c("Duck"="DU","DUB"="DB","DUG"="DG", "SR45"="SR","Griffy"="GR","YW"="TC"))
 
@@ -155,7 +155,7 @@ germination_data$status[germination_data$status=="N"] <- "Native"
 germination_data$status[germination_data$status=="E"] <- "Non-native"
 
 species_table <- germination_data %>% 
-  filter(site=="BB", distance==0) %>%
+  filter(site_code=="BB", distance==0) %>%
   select(species, status, common_name)
   
 kable(species_table %>% 
@@ -284,9 +284,12 @@ In the summer of 2005, photosynthetically active radiation (PAR) was measured at
 light_data$age[light_data$age=="M"] <- "Mature forest"
 light_data$age[light_data$age=="Y"] <- "Young forest"
 
-ggplot(light_data, aes(distance, pct_light, shape = age, color = age)) +
+# skimr::skim(light_data)
+
+ggplot(light_data, aes(distance, (pct_light), shape = age, color = age)) +
   scale_shape_manual(values = c(16,15)) +
   stat_summary(fun.data = "mean_se", geom = "pointrange", size = .7) +
+  geom_smooth(method = "lm", alpha = .2, se = F) +
   scale_color_manual(values = c("grey50", "grey80")) +
   theme_classic() +
   theme(legend.title = element_blank()) +
@@ -312,10 +315,13 @@ ggplot(avg_light_data, aes(age, avg_pct_light, fill = habitat_type)) +
 
 ```{r light models, eval=F}
 
-light_lm <- lm(pct_light ~ distance*age, data = light_data)
+light_lm <- glm(log10(pct_light) ~ distance, data = light_data)
 summary(light_lm)
-light_lm2 <- lm(pct_light ~ habitat_type*age, data = light_data)
-summary(light_lm2)
+
+summary(MASS::glm.nb(pct_light ~ distance, data = light_data))
+
+# light_lm2 <- lm(pct_light ~ habitat_type*age, data = light_data)
+# summary(light_lm2)
 
 ```
 
@@ -425,13 +431,15 @@ ggplot(avg_litter_data, aes(age, avg_litter, fill = habitat_type)) +
 
 # Species data
 
+For all of these, the solid-fill symbols are the non-native species.
+
 ## Seed germination
 
 ```{r germination}
 
 # names(germination_data)
-germination_data$forest_age[germination_data$forest_age=="Y"] <- "Young forest"
-germination_data$forest_age[germination_data$forest_age=="M"] <- "Mature forest"
+germination_data$age[germination_data$age=="Y"] <- "Young forest"
+germination_data$age[germination_data$age=="M"] <- "Mature forest"
 
 germination_data$common_name <- factor(
   germination_data$common_name, levels = c("Autumn olive","Honeysuckle","Privet","Dogwood","Redbud","Spicebush"))
@@ -451,7 +459,7 @@ ggplot(germination_data, aes(distance, pct_germinated)) +
   scale_linetype_manual(values = c(2,1)) +
   
   scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~forest_age) +
+  facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -485,8 +493,8 @@ seedling_data$status[seedling_data$status=="e"] <- "Non-native"
 
 seedling_data$status <- factor(seedling_data$status, levels = c("Native","Non-native"))
 
-seedling_data$forest_age[seedling_data$forest_age=="young"] <- "Young forest"
-seedling_data$forest_age[seedling_data$forest_age=="mature"] <- "Mature forest"
+seedling_data$age[seedling_data$age=="young"] <- "Young forest"
+seedling_data$age[seedling_data$age=="mature"] <- "Mature forest"
 
 ```
 
@@ -497,16 +505,13 @@ ggplot(seedling_data, aes(distance, final_ht06)) +
   geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~forest_age) +
+  facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
   ylab("Height (cm)") +
   xlab("Distance from road (m)")
-
-light_data
-ggplot(seedling_data, aes(pct_light, final_ht06)) +
 
 ```
 
@@ -517,7 +522,7 @@ ggplot(seedling_data, aes(distance, diameter06)) +
   geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~forest_age) +
+  facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -534,7 +539,7 @@ ggplot(seedling_data, aes(distance, tot_biomass)) +
   geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~forest_age) +
+  facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -551,7 +556,7 @@ ggplot(seedling_data, aes(distance, 100*rgr_ht)) +
   geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~forest_age) +
+  facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -579,7 +584,7 @@ ggplot(herbiv, aes(distance, herbivory)) +
   geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
-  facet_grid(year~forest_age) +
+  facet_grid(year~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -601,16 +606,16 @@ surv$year[surv$year=="survival05"] <- 2005
 surv$year[surv$year=="survival06"] <- 2006
 
 surv <- surv %>% 
-  group_by(year, distance, forest_age, status, common_name) %>% 
+  group_by(year, distance, age, status, common_name) %>% 
   filter(!is.na(survival)) %>% 
   summarise(pct_survival = 100*sum(survival)/length(survival))
 
-ggplot(surv, aes(distance, pct_survival)) +
+ggplot(filter(surv, year == 2006), aes(distance, pct_survival)) +
   stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  # geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   scale_linetype_manual(values = c(2,1)) +
-  scale_color_brewer(palette = "RdBu") +
-  facet_grid(year~forest_age) +
+  # scale_color_brewer(palette = "RdBu") +
+  # facet_grid(year~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -620,4 +625,4 @@ ggplot(surv, aes(distance, pct_survival)) +
 
 ```
 
-Average proportional survival in each year.
+Average seedling survival by 2006.
