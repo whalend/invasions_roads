@@ -1,5 +1,5 @@
 ---
-title: "Effects of roads and forest successional age on non-native species growth and survival in an experimental plant invasion"
+title: "Forest successional age and edge effects on species growth and survival in an experimental plant invasion"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   word_document: null
@@ -277,7 +277,7 @@ summary(basal_area_lm2)
 ```
 
 ## Light availability
-In the summer of 2005, photosynthetically active radiation (PAR) was measured at five locations at each distance at each site along a 5 m long transect parallel to the road. From these measurements, we calculated the percent available light using the ratio of the PAR value to the PAR value measured in open sun.
+In the summer of 2005, photosynthetically active radiation (PAR) was measured as photosynthetic photon flux density (PPFD) at five locations at each distance at each site along a 5 m long transect parallel to the road. From these measurements, we calculated the percent available light at each location as the ratio of the PAR value to the PAR value measured in open sun.
 
 ```{r light}
 
