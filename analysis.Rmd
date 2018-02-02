@@ -151,18 +151,35 @@ germination_data$common_name[germination_data$species=="P"] <- "Privet"
 germination_data$common_name[germination_data$species=="R"] <- "Redbud"
 germination_data$common_name[germination_data$species=="S"] <- "Spicebush"
 
+germination_data$sci_name[germination_data$species=="A"] <- "Elaeagnus umbellata"
+germination_data$sci_name[germination_data$species=="H"] <- "Lonicera maackii"
+germination_data$sci_name[germination_data$species=="P"] <- "Ligustrum obtusifolium"
+germination_data$sci_name[germination_data$species=="D"] <- "Cornus florida"
+germination_data$sci_name[germination_data$species=="R"] <- "Cercis canadensis"
+germination_data$sci_name[germination_data$species=="S"] <- "Lindera benzoin"
+
 germination_data$status[germination_data$status=="N"] <- "Native"
 germination_data$status[germination_data$status=="E"] <- "Non-native"
 
 species_table <- germination_data %>% 
   filter(site_code=="BB", distance==0) %>%
-  select(species, status, common_name)
+  select(species, status, common_name, sci_name)
   
-kable(species_table %>% 
-        select(Species = common_name, Status = status) %>%
-        arrange(Status)
-      )
+# kable(species_table %>% 
+#         mutate(Species = paste(common_name, " ", "(", sci_name, ")", sep="")) %>% 
+#         select(Species, Status = status) %>%
+#         arrange(Status)
+#       )
 ```
+
+|Species                            |Status     |
+|:----------------------------------|:----------|
+|Dogwood (*Cornus florida*)           |Native     |
+|Redbud (*Cercis canadensis*)         |Native     |
+|Spicebush (*Lindera benzoin*)        |Native     |
+|Autumn olive (*Elaeagnus umbellata*) |Non-native |
+|Honeysuckle (*Lonicera maackii*)     |Non-native |
+|Privet (*Ligustrum obtusifolium*)    |Non-native |
 
 ***
 
