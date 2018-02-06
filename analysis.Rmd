@@ -1,5 +1,5 @@
 ---
-title: "Forest successional age and edge effects on species growth and survival in an experimental plant invasion"
+title: "Edge effects on species establishement, growth and survival in an experimental plant invasion"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   word_document: null
@@ -210,7 +210,7 @@ species_table <- germination_data %>%
 
 # Experiment A: Seed germination
 
-* Ten seeds from each of six species (3 invaders, 3 natives) were placed at each distance
+* Ten seeds from each of six species (3 invaders, 3 natives) were placed at each distance at each site.
 
 ***
 
@@ -304,7 +304,7 @@ ggplot(avg_forest_data, aes(age, avg_basal_area, fill = habitat_type)) +
 
 ```
 
-Basal area essentially defines young (<40 years) vs. mature forest (>60 years), although the difference is much smaller at the edges (i.e. 0 m).
+Basal area essentially defines young (<40 years) vs. mature forest (>60 years), although the difference is much smaller at the edge (i.e. 0 m).
 
 ```{r tree models, eval=F}
 skimr::skim(forest_data)
@@ -341,6 +341,7 @@ ggplot(light_data, aes(distance, (pct_light), shape = age, color = age)) +
   scale_shape_manual(values = c(16,15)) +
   stat_summary(fun.data = "mean_se", geom = "pointrange", size = .7) +
   geom_smooth(method = "lm", alpha = .2, se = F) +
+  # geom_line(aes(linetype = age)) +
   color_manual +
   theme_classic() +
   theme(legend.title = element_blank()) +
@@ -367,7 +368,9 @@ ggplot(avg_light_data, aes(habitat_type, avg_pct_light, fill = age)) +
 
 ```
 
-Light availability decreases with distance to road with no overall difference between forest age, however, there is substantial variation within and between forest age depending on the specific distance. Averaged across forest age, light availability was greater at the forest edge (0 m) compared to other distances. At mature forest sites, light availability was greatest at the forest edge (0 m), but at young forest sites it was greatest at 20 m from the edge.
+Light availability decreases with distance to road with no overall difference between forest age, however, there is substantial variation within and between forest age depending on the specific distance. Averaged across forest age, light availability was greater at the forest edge (0 m) compared to other distances. At mature forest sites, light availability was greatest at the forest edge (0 m), but at young forest sites it was greatest at 20 m from the edge. 
+
+Basically this is a noisy and non-linear relationship. What I would generally expect is relatively high light availability at the edge, then a rapid decline to a steady-state as you move into the forest. 
 
 ```{r light models, eval=F}
 
@@ -496,13 +499,14 @@ ggplot(avg_litter_data, aes(age, avg_litter, fill = habitat_type)) +
 
 ```
 
+Litter is greater in mature forests than young forests, but decreases with distance from edge after 5 meters in mature forests and increases with distance from edge in young forests. Litter may be especially important for modeling germination.
 
 
 *** 
 
 # Species data
 
-For all of these, the solid-fill symbols are the non-native species.
+For all of these, the solid-fill symbols should be the non-native species.
 
 ## Experiment 1: Seed germination
 
@@ -523,7 +527,7 @@ avg_germination_data <- germination_data %>%
 
 ggplot(germination_data, aes(distance, pct_germinated)) +
   stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey40", size = .8) +
   # scale_shape_manual(values = c(rep(16, 3), rep(17, 3))) +
   # scale_color_manual(values = c(brewer.pal(3, "RdBu"), brewer.pal(3, "RdBu"))) +
   scale_linetype_manual(values = c(2,1)) +
@@ -549,6 +553,17 @@ ggplot(avg_germination_data, aes(distance, avg_germinated)) +
   ylab("Percent germination") +
   xlab("Distance from road (m)")
 
+```
+
+Although the relationship between germination and distance from edge was non-linaer, germination was greater overall for non-native than native species and tended to increase with distance for both groups in mature forests. In young forests, germination of native species had a small negative relationship with distance from edge. The greater germination success of non-native species was driven by autumnn olive, which had the highest average germination rate in each forest age (mature: `r mean(filter(germination_data, species=="A", age=="Mature forest")$pct_germinated, na.rm=T)`, young: `r mean(filter(germination_data, species=="A", age=="Young forest")$pct_germinated, na.rm=T)`).
+
+```{r germination averages table, results='asis'}
+kable(germination_data %>% 
+  group_by(common_name, age, status) %>% 
+  summarise(avg_pct_germ = mean(pct_germinated, na.rm = T)) %>% 
+  spread(key = age, value = avg_pct_germ) %>% 
+  rename(Species = common_name, Status = status), 
+  digits = 2, caption = "Average germination (%) of seeds for each species in each forest age.")
 ```
 
 
@@ -578,128 +593,8 @@ seedling_data$age[seedling_data$age=="mature"] <- "Mature forest"
 
 ```
 
-```{r seedling_height}
 
-ggplot(seedling_data, aes(distance, final_ht06)) +
-  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
-  scale_linetype_manual(values = c(2,1)) +
-  scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~age) +
-  theme_bw() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        legend.title = element_blank()) +
-  ylab("Height (cm)") +
-  xlab("Distance from road (m)")
-
-```
-
-```{r seedling_diameter}
-
-ggplot(seedling_data, aes(distance, diameter06)) +
-  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
-  scale_linetype_manual(values = c(2,1)) +
-  scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~age) +
-  theme_bw() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        legend.title = element_blank()) +
-  ylab("Diameter (mm)") +
-  xlab("Distance from road (m)")
-
-```
-
-```{r seedling_biomass}
-
-ggplot(seedling_data, aes(distance, tot_biomass)) +
-  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "pointrange" ) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
-  scale_linetype_manual(values = c(2,1)) +
-  scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~age) +
-  theme_bw() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        legend.title = element_blank()) +
-  ylab("Biomass (g)") +
-  xlab("Distance from road (m)")
-
-biomass_data <- seedling_data %>% 
-  group_by(distance, status, age, common_name) %>% 
-  summarise(avg_biomass = mean(tot_biomass, na.rm = T),
-            avg_leaf_biomass = mean(leaf_biomass, na.rm = T),
-            avg_stem_biomass = mean(stem_biomass, na.rm = T),
-            avg_stem_leaf_ratio = mean(stem_biomass/leaf_biomass, na.rm = T))
-
-ggplot(biomass_data, aes(distance, avg_biomass)) +
-  geom_point(aes(shape = common_name)) +
-  geom_line(aes(linetype = common_name)) +
-  facet_wrap(~age) +
-  theme_bw() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        legend.title = element_blank()) +
-  ylab("Biomass (g)") +
-  xlab("Distance from road (m)")
-
-```
-
-
-
-```{r rel_growth}
-
-ggplot(seedling_data, aes(distance, rgr_ht_days)) +
-  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
-  scale_linetype_manual(values = c(2,1)) +
-  scale_color_brewer(palette = "RdBu") +
-  facet_wrap(~age) +
-  theme_bw() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        legend.title = element_blank()) +
-  ylab("Relative growth rate (% / day)") +
-  xlab("Distance from road (m)") 
-
-```
-
-
-```{r herbivory, fig.height=8}
-
-# names(seedling_data)
-
-herbiv <- select(seedling_data, site_name:status, common_name, starts_with("herb"))
-herbiv <- herbiv %>% 
-  gather(year, herbivory, herbivory04:herbivory06)
-herbiv$year[herbiv$year=="herbivory04"] <- 2004
-herbiv$year[herbiv$year=="herbivory05"] <- 2005
-herbiv$year[herbiv$year=="herbivory06"] <- 2006
-
-ggplot(filter(herbiv, year == 2006), aes(distance, herbivory)) +
-  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
-  scale_linetype_manual(values = c(2,1)) +
-  scale_color_brewer(palette = "RdBu") +
-  facet_grid(.~age) +
-  theme_bw() +
-  theme(strip.background = element_blank(),
-        panel.grid = element_blank(),
-        legend.title = element_blank()) +
-  ylab("Herbivory") +
-  xlab("Distance from road (m)") 
-
-```
-
-Increased with distance from edge for both native and non-native species in young forests, but decreased with distance from edge for native species in mature forests. There was relationship between distance from edge and herbivory for non-native species in mature forests. Herbivory was greater on native than non-native species in both forest types.
-
-Herbivory was categorized, where 1 = 1-25%, 2 = 26-50%, 3 = 51-75%.
-
-What kind of herbivory might this be? Deer? Defoliators?
-
-
+### Seedling survival
 ```{r survival}
 
 surv <- select(seedling_data, site_name:status, common_name, starts_with("surv"))
@@ -738,6 +633,135 @@ filter(surv, year == 2006) %>%
 Seedling survival over the duration of the experiment was high across sites and species (`r mean(surv$pct_survival)`). Autumn olive and dogwood had relatively low survival compared to the other species (AO: 49% mature, 50.7% young; DW: 60.4% mature, 41.7% young). Seedling survival for all other species averaged greater than 80%. In mature forests, autumn olive and dogwood both had lower survival with increasing distance from the edge, but in young forest autumn olive tended to have greater survival farther from the edge. 
 
 While these general linear trends with distance are present, the precise relationship with distance from edge is non-linear across all species. In mature forests, most species showed greatest survival at 5 and 10 m from the edge, with the exception of honeysuckle, which had greatest survival at distances of 20 m and greater. Honeysuckle also had the greatest proportion of overall surviving seedlings (94.8%). In contrast, seedling survival in young forests was overall lower for native than non-native species, and also lower at interior versus edge locations for native species, except for spicebush. 
+
+
+### Seedling height
+```{r seedling_height}
+
+ggplot(seedling_data, aes(distance, final_ht06)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Height (cm)") +
+  xlab("Distance from road (m)")
+
+```
+
+
+### Seedling diameter
+```{r seedling_diameter}
+
+ggplot(seedling_data, aes(distance, diameter06)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Diameter (mm)") +
+  xlab("Distance from road (m)")
+
+```
+
+
+### Seedling biomass
+```{r seedling_biomass}
+
+ggplot(seedling_data, aes(distance, tot_biomass)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "pointrange" ) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Biomass (g)") +
+  xlab("Distance from road (m)")
+
+biomass_data <- seedling_data %>% 
+  group_by(distance, status, age, common_name) %>% 
+  summarise(avg_biomass = mean(tot_biomass, na.rm = T),
+            avg_leaf_biomass = mean(leaf_biomass, na.rm = T),
+            avg_stem_biomass = mean(stem_biomass, na.rm = T),
+            avg_stem_leaf_ratio = mean(stem_biomass/leaf_biomass, na.rm = T))
+
+ggplot(biomass_data, aes(distance, avg_biomass)) +
+  geom_point(aes(shape = common_name)) +
+  geom_line(aes(linetype = common_name)) +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Biomass (g)") +
+  xlab("Distance from road (m)")
+
+```
+
+
+### Seedling relative growth rate
+```{r rel_growth}
+
+ggplot(seedling_data, aes(distance, rgr_ht_days)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Relative growth rate (% / day)") +
+  xlab("Distance from road (m)") 
+
+```
+
+
+### Seedling herbivory
+```{r herbivory}
+
+# names(seedling_data)
+
+herbiv <- select(seedling_data, site_name:status, common_name, starts_with("herb"))
+herbiv <- herbiv %>% 
+  gather(year, herbivory, herbivory04:herbivory06)
+herbiv$year[herbiv$year=="herbivory04"] <- 2004
+herbiv$year[herbiv$year=="herbivory05"] <- 2005
+herbiv$year[herbiv$year=="herbivory06"] <- 2006
+
+ggplot(filter(herbiv, year == 2006), aes(distance, herbivory)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_grid(.~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Herbivory") +
+  xlab("Distance from road (m)") 
+
+```
+
+Increased with distance from edge for both native and non-native species in young forests, but decreased with distance from edge for native species in mature forests. There was relationship between distance from edge and herbivory for non-native species in mature forests. Herbivory was greater on native than non-native species in both forest types.
+
+Herbivory was categorized, where 1 = 1-25%, 2 = 26-50%, 3 = 51-75%.
+
+What kind of herbivory might this be? Deer? Defoliators?
+
 
 
 # Models
