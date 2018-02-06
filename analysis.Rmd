@@ -2,9 +2,9 @@
 title: "Edge effects on species establishement, growth and survival in an experimental plant invasion"
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
-  word_document: null
   html_document:
     toc: yes
+  word_document: null
 ---
 
 ```{r set options, include=F, echo=F}
@@ -19,9 +19,6 @@ knitr::opts_chunk$set(fig.asp = .5)
 
 # options(na.action = "na.fail")# global model setting for using multimodel inference 'dredge' function
 
-
-fill_manual <- scale_fill_manual(values = c("grey90", "grey50"))
-color_manual <- scale_color_manual(values = c("grey50", "grey90"))
 ```
 
 ```{r load packages}
@@ -30,6 +27,9 @@ color_manual <- scale_color_manual(values = c("grey50", "grey90"))
 library(plyr); library(dplyr); library(tidyr); library(readr)
 library(ggplot2)
 library(knitr)
+
+fill_manual <- scale_fill_manual(values = c("grey90", "grey50"))
+color_manual <- scale_color_manual(values = c("grey50", "grey90"))
 ```
 
 ```{r load data}
@@ -603,14 +603,29 @@ surv$year[surv$year=="survival04"] <- 2004
 surv$year[surv$year=="survival05"] <- 2005
 surv$year[surv$year=="survival06"] <- 2006
 
-surv <- surv %>% 
+survival_data <- surv %>% 
   group_by(year, distance, age, status, common_name) %>% 
-  filter(!is.na(survival)) %>% 
+  filter(!is.na(survival), year==2006) %>% 
   summarise(pct_survival = 100*sum(survival)/length(survival))
 
-ggplot(filter(surv, year == 2006), aes(distance, pct_survival)) +
+ggplot(survival_data, aes(distance, pct_survival)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50", size = .8) +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_grid(.~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Survival (%)") +
+  xlab("Distance from road (m)") +
+  ggtitle("Average seedling survival to 2006")
+
+
+ggplot(survival_data, aes(distance, pct_survival)) +
   # geom_smooth(aes(linetype = common_name), method = "lm", se = F, show.legend = T, color = "grey50", size = .5) +
-  geom_point(aes(shape = common_name), size = 2, show.legend = F) +
+  geom_point(aes(shape = common_name), size = 2.5, show.legend = F) +
   geom_line(aes(linetype = common_name)) +
   # stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5, show.legend = F) +
   # scale_linetype_manual(values = c(2,1)) +
@@ -625,9 +640,9 @@ ggplot(filter(surv, year == 2006), aes(distance, pct_survival)) +
   ggtitle("Average seedling survival to 2006")
 
 
-filter(surv, year == 2006) %>% 
-  group_by(status, age) %>% 
-  summarise(avg_pct_survival = mean(pct_survival))
+# filter(surv, year == 2006) %>% 
+#   group_by(status, age) %>% 
+#   summarise(avg_pct_survival = mean(pct_survival))
 ```
 
 Seedling survival over the duration of the experiment was high across sites and species (`r mean(surv$pct_survival)`). Autumn olive and dogwood had relatively low survival compared to the other species (AO: 49% mature, 50.7% young; DW: 60.4% mature, 41.7% young). Seedling survival for all other species averaged greater than 80%. In mature forests, autumn olive and dogwood both had lower survival with increasing distance from the edge, but in young forest autumn olive tended to have greater survival farther from the edge. 
@@ -643,6 +658,22 @@ ggplot(seedling_data, aes(distance, final_ht06)) +
   geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Height (cm)") +
+  xlab("Distance from road (m)")
+
+height_data <- seedling_data %>% 
+  group_by(distance, status, age, common_name) %>% 
+  summarise(avg_height = mean(final_ht06, na.rm = T),
+            se_height = sd(final_ht06, na.rm = T)/sqrt(length(final_ht06)))
+
+ggplot(height_data, aes(distance, avg_height)) +
+  geom_point(aes(shape = common_name)) +
+  geom_line(aes(linetype = common_name)) +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -670,6 +701,22 @@ ggplot(seedling_data, aes(distance, diameter06)) +
   ylab("Diameter (mm)") +
   xlab("Distance from road (m)")
 
+diameter_data <- seedling_data %>% 
+  group_by(distance, status, age, common_name) %>% 
+  summarise(avg_diameter = mean(diameter06, na.rm = T),
+            se_diameter = sd(diameter06, na.rm = T)/sqrt(length(diameter06)))
+
+ggplot(diameter_data, aes(distance, avg_diameter)) +
+  geom_point(aes(shape = common_name)) +
+  geom_line(aes(linetype = common_name)) +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Diameter (mm)") +
+  xlab("Distance from road (m)")
+
 ```
 
 
@@ -677,8 +724,8 @@ ggplot(seedling_data, aes(distance, diameter06)) +
 ```{r seedling_biomass}
 
 ggplot(seedling_data, aes(distance, tot_biomass)) +
-  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "pointrange" ) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50", size = .8) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point" ) +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
   facet_wrap(~age) +
@@ -692,13 +739,17 @@ ggplot(seedling_data, aes(distance, tot_biomass)) +
 biomass_data <- seedling_data %>% 
   group_by(distance, status, age, common_name) %>% 
   summarise(avg_biomass = mean(tot_biomass, na.rm = T),
+            se_biomass = sd(tot_biomass, na.rm = T)/sqrt(length(tot_biomass)),
             avg_leaf_biomass = mean(leaf_biomass, na.rm = T),
+            se_leaf_biomass = sd(leaf_biomass, na.rm = T)/sqrt(length(leaf_biomass)),
             avg_stem_biomass = mean(stem_biomass, na.rm = T),
-            avg_stem_leaf_ratio = mean(stem_biomass/leaf_biomass, na.rm = T))
+            se_stem_biomass = sd(stem_biomass, na.rm = T)/sqrt(length(stem_biomass)),
+            avg_stem_leaf_ratio = mean(stem_biomass/leaf_biomass, na.rm = T),
+            se_stem_leaf_ratio = sd(stem_biomass/leaf_biomass, na.rm = T)/sqrt(length(stem_biomass)),)
 
 ggplot(biomass_data, aes(distance, avg_biomass)) +
-  geom_point(aes(shape = common_name)) +
   geom_line(aes(linetype = common_name)) +
+  geom_point(aes(shape = common_name), size = 2.5) +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -718,6 +769,22 @@ ggplot(seedling_data, aes(distance, rgr_ht_days)) +
   geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Relative growth rate (% / day)") +
+  xlab("Distance from road (m)") 
+
+rgr_data <- seedling_data %>%
+  group_by(distance, status, age, common_name) %>% 
+  summarise(avg_rgr_ht = mean(rgr_ht_days, na.rm = T),
+            se_rgr_ht = sd(rgr_ht_days, na.rm = T)/sqrt(length(rgr_ht_days)))
+
+ggplot(rgr_data, aes(distance, avg_rgr_ht)) +
+  geom_point(aes(shape = common_name)) +
+  geom_line(aes(linetype = common_name)) +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -751,12 +818,29 @@ ggplot(filter(herbiv, year == 2006), aes(distance, herbivory)) +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
-  ylab("Herbivory") +
+  ylab("Herbivory score") +
   xlab("Distance from road (m)") 
+
+herbiv_data <- herbiv %>%
+  filter(year == "2006") %>%
+  group_by(distance, status, age, common_name) %>% 
+  summarise(avg_herbivory = mean(herbivory, na.rm = T),
+            se_herbivory = sd(herbivory, na.rm = T)/sqrt(length(herbivory)))
+
+ggplot(herbiv_data, aes(distance, avg_herbivory)) +
+  geom_line(aes(linetype = common_name), show.legend = F) +
+  geom_point(aes(shape = common_name), size = 2.5) +
+  facet_wrap(~age) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Herbivory score") +
+  xlab("Distance from road (m)")
 
 ```
 
-Increased with distance from edge for both native and non-native species in young forests, but decreased with distance from edge for native species in mature forests. There was relationship between distance from edge and herbivory for non-native species in mature forests. Herbivory was greater on native than non-native species in both forest types.
+In young forests, herbivory increased with distance from edge for both native and non-native species, but decreased with distance from edge for native species in mature forests. There was no relationship between distance from edge and herbivory for non-native species in mature forests. Herbivory was greater on native than non-native species in both forest types.
 
 Herbivory was categorized, where 1 = 1-25%, 2 = 26-50%, 3 = 51-75%.
 
