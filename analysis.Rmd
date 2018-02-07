@@ -1019,12 +1019,3 @@ confint(biomass_m4, method="Wald")
 # (1 + distance|species) +
 ```
 
-```{r}
-
-d1 <- grouped_seedling_data %>% 
-  mutate(habitat_type = ifelse(distance<10,0,ifelse(distance>20, 2, 1)))
-
-
-
-```
-
