@@ -1073,8 +1073,24 @@ xtabs(~site_code + distance + common_name, data = site_grouped_data)
 
 We lost all seedlings at the 0 meter distance from the FR and HQ sites (n = 12), which means we have 10 instead of 12 observations for plants at 0 meters.
 
-```{r site-grouped-models, eval=F}
+
+```{r load-modeling-packages}
 library(lme4)
+library(lmerTest)
+
+
+## Calculate site-level averages
+site_grouped_data <- site_grouped_data %>%
+  mutate(site_avg_light = mean(avg_pct_light),
+         site_avg_basal_area = mean(avg_basal_area),
+         site_avg_litter = mean(litter_kg_m2),
+         site_avg_moisture = mean(pct_moisture))
+
+```
+
+## Biomass model
+```{r biomass-model, eval=F}
+
 # names(grouped_seedling_data)
 # summary(grouped_seedling_data)
 # grouped_seedling_data
@@ -1084,15 +1100,6 @@ library(lme4)
 library(GGally)
 ggpairs(select(site_grouped_data, avg_biomass, distance, tree_richness, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture, age), aes(color = age, alpha = .2))
 #relatively strong correlation between basal area and litter; the major differences are related to forest age
-
-# modeling biomass ----
-
-## Calculate site-level averages
-site_grouped_data <- site_grouped_data %>%
-  mutate(site_avg_light = mean(avg_pct_light),
-         site_avg_basal_area = mean(avg_basal_area),
-         site_avg_litter = mean(litter_kg_m2),
-         site_avg_moisture = mean(pct_moisture))
 
 
 ## Try get an idea of what is contributing to explaining the variance
@@ -1152,7 +1159,7 @@ summary(biomass_mod5)
 # There's some notable correlation between the slop and intercept, but the random slope doesn't capture much variance, so I'm inclined to work eith model 4.
 
 # 3. Check explanatory power of the variables in the fixed component, e.g. p-values or confidence intervals. For me this means refitting using lmerTest because calculating confidence intervals for all of these estimates would take awhile. Keeping in mind that the t-test or F-tests are approximate, therefore p-values near .05 should not be interpreted as convincing
-library(lmerTest)
+# library(lmerTest)
 biomass_mod4 <- lmer(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(biomass_mod4)
 # Use likelihood ratio test to check significance of "weak" variables
@@ -1201,7 +1208,8 @@ m4.b <- update(m4.full, .~. -avg_basal_area)
 anova(m4.full, m4.b)
 ```
 
-```{r final-biomass- model}
+```{r final-biomass-model}
+
 Form <- formula(log(avg_biomass) ~ distance + avg_pct_light + age + distance*pct_moisture + (1|site_code) + (1|common_name))
 m4.full <- lmer(Form, data = site_grouped_data, REML = F)
 summary(m4.full)
@@ -1223,6 +1231,7 @@ summary(biomass_mod4b)
 # m5 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + age + distance*pct_moisture +  + (1|common_name) + (1|site_code) + (distance||site_code), data = site_grouped_data)
 # summary(m5)
 # anova(m5,m4.full)
+
 
 # Check fitted biomass model ------- 
 biomass_model <- m4.full
@@ -1260,6 +1269,9 @@ model_summary <- summary(biomass_model)
 # plot(m5$lme)
 # summary(m5$lme)
 
+## Scaled "continuous" predictors biomass model
+scaled_biomass_model <- lmer(log(avg_biomass) ~ scale(distance)*scale(pct_moisture) + scale(avg_pct_light) + age + (1 | site_code) + (1 | common_name), data = site_grouped_data)
+summary(scaled_biomass_model)
 
 # confint(biomass_model)
 ```
@@ -1271,18 +1283,21 @@ lattice::qqmath(ranef(biomass_model, condVar = T))
 
 biomass_coefs <- coef(biomass_model)
 species_coefs <- (coef(biomass_model)[[2]])
-dim(biomass_coefs)
-biomass_coefs[1,1]
-str(as.data.frame(model_summary$coefficients))
+# dim(biomass_coefs)
+# biomass_coefs[1,1]
+# str(as.data.frame(model_summary$coefficients))
 
 # library(sjPlot)
 # plot_model(biomass_model) + theme_classic
 
 ```
 
+
+## Diameter model
 ```{r find diameter model, eval=F}
-# modeling diameter ----
+# find random component ----
 hist(log(site_grouped_data$avg_diameter))
+# log transformation improves normality
 
 diam_mod1 <- nlme::gls(log(avg_diameter) ~ distance*avg_pct_light + distance*age + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture, data = filter(site_grouped_data, is.na(avg_diameter)=="FALSE"), method = "REML")
 
@@ -1297,9 +1312,10 @@ diam_mod5 <- lmer(log(avg_diameter) ~ distance*avg_pct_light + avg_basal_area*ag
 AIC(diam_mod1)
 AIC(diam_mod2)
 AIC(diam_mod3)
-AIC(diam_mod4)# best model based on AIC
+AIC(diam_mod4)# best random effects model based on AIC
 AIC(diam_mod5)
 
+# find fixed component -----
 summary(diam_mod4)
 Form <- formula(log(avg_diameter) ~ distance + avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (1|common_name))
 diam_mod4a <- lmer(Form, data = site_grouped_data, REML = F)
@@ -1326,17 +1342,118 @@ summary(diam_mod4e)
 
 diam_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + distance*pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(diam_model)
+
+# model diagnostics - residual plots ----
 plot(diam_model)
+
+E2 <- resid(diam_model, type = "pearson")
+# plot(diam_model@frame$distance, E2)
+boxplot(E2 ~ distance, data = diam_model@frame)
+boxplot(E2 ~ age, data = diam_model@frame)
+plot(diam_model@frame$avg_pct_light, E2)
+# maybe some pattern here with light availability, but difficult to make out
+plot(diam_model@frame$pct_moisture, E2)
+
+
+# model with scaled predictors ----
+scaled_diam_model <- lmer(log(avg_diameter) ~ scale(distance)*scale(pct_moisture) + scale(avg_pct_light) + age + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(scaled_diam_model)
+
+```
+
+
+## Relative growth rate model
+The units of relative growth rate are percent change per day (I think).
+
+```{r find rgr model, eval=F}
+
+hist(site_grouped_data$avg_rgr_ht)# looks normally distributed
+
+# find random component ----
+rgr_mod1 <- nlme::gls((avg_rgr_ht) ~ distance*avg_pct_light + distance*age + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture, data = filter(site_grouped_data, is.na(avg_rgr_ht)=="FALSE"), method = "REML")
+
+rgr_mod2 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + distance*age + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code), data = site_grouped_data)
+
+rgr_mod3 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code), data = site_grouped_data)
+
+rgr_mod4 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+
+rgr_mod5 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code) + (1|common_name), data = site_grouped_data)
+
+rgr_mod6 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (distance|common_name), data = site_grouped_data)
+
+AIC(rgr_mod1)
+AIC(rgr_mod2)
+AIC(rgr_mod3)
+AIC(rgr_mod4)# 2nd best model, and small diff in AIC
+AIC(rgr_mod5)# best random effects model based on AIC
+AIC(rgr_mod6)
+anova(rgr_mod4,rgr_mod5)
+anova(rgr_mod4,rgr_mod6)
+anova(rgr_mod5,rgr_mod6)
+# reinforcing that the difference between models isn't especially strong
+
+# find fixed component ----
+rgr_mod4_ML <- refitML(rgr_mod4)
+form <- formula(avg_rgr_ht ~ avg_pct_light + avg_basal_area * age + distance * litter_kg_m2 + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+rgr_mod4a <- lmer(form, data = site_grouped_data, REML = F)
+anova(rgr_mod4_ML, rgr_mod4a)
+summary(rgr_mod4a)
+
+form <- formula(avg_rgr_ht ~ avg_pct_light + avg_basal_area + age + distance * litter_kg_m2 + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+rgr_mod4b <- lmer(form, data = site_grouped_data, REML = F)
+anova(rgr_mod4_ML, rgr_mod4b)
+summary(rgr_mod4b)
+
+form <- formula(avg_rgr_ht ~ avg_pct_light + avg_basal_area + age + litter_kg_m2 + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+rgr_mod4c <- lmer(form, data = site_grouped_data, REML = F)
+anova(rgr_mod4_ML, rgr_mod4c)
+summary(rgr_mod4c)
+
+form <- formula(avg_rgr_ht ~ avg_pct_light + avg_basal_area + age + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+rgr_mod4d <- lmer(form, data = site_grouped_data, REML = F)
+anova(rgr_mod4_ML, rgr_mod4d)
+summary(rgr_mod4d)
+
+form <- formula(avg_rgr_ht ~ avg_pct_light + age + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+rgr_mod4e <- lmer(form, data = site_grouped_data, REML = F)
+anova(rgr_mod4_ML, rgr_mod4e)
+summary(rgr_mod4e)
+# percent moisture is not terribly convincing at p = .044, but the interaction with distance is pretty strong statistically
+
+```
+
+Do we actually want to test/know what the slope/intercept interaction is between distance and species as a rondom component??
+
+```{r final rgr model}
+rgr_model <- rgr_mod4e
+
+# model diagnostics ----
+plot(rgr_model)
+
+E2 <- resid(rgr_model, type = "pearson")
+# plot(diam_model@frame$distance, E2)
+boxplot(E2 ~ distance, data = rgr_model@frame)
+boxplot(E2 ~ age, data = rgr_model@frame)
+plot(rgr_model@frame$avg_pct_light, E2)
+# maybe some pattern here with light availability, but difficult to make out
+plot(rgr_model@frame$pct_moisture, E2)
+
+# plot model ----
+
+lattice::dotplot(ranef(rgr_model, condVar = T))
+lattice::qqmath(ranef(rgr_model, condVar = T))
+
+rgr_coefs <- coef(rgr_model)
+rgr_species_coefs <- (coef(rgr_model)[[2]])
+
+lattice::dotplot(ranef(rgr_mod5, condVar = T))
 
 ```
 
 
 
 ```{r more modeling}
-
-# modeling RGR ----
-
-
 # modeling height ----
 
 
