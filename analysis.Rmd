@@ -1062,7 +1062,7 @@ What kind of herbivory might this be? Deer? Defoliators?
 
 
 
-# Models
+# Modeling
 
 ## Species/distance/site level grouping
 This grouping of data would theoretically gives an average data point of the performance of each species at each distance at each site (n = `r 12*6*6`). What we actually have is 420 observations, so we have 12 that were missing, I believe lost due to mowing at the edge.
@@ -1108,7 +1108,7 @@ biomass_m1 <- lmer(log(avg_biomass) ~ (1|site_code) + (1|status/common_name) + (
 plot(biomass_m1)
 summary(biomass_m1)
 # confint(biomass_m1)
-biomass_m1a <- lmer(log(avg_biomass) ~ (1|site_code) + (1|status/common_name) + (1|distance), data = site_grouped_data)
+biomass_m1a <- lmer(log(avg_biomass) ~ (1|site_code) + (1|common_name) + (1|distance), data = site_grouped_data)
 ## this tells us something, but we could use distance as a continuous variable
 biomass_m1b <- lmer(log(avg_biomass) ~ (distance|site_code) + (1|status/common_name),  data = site_grouped_data)# we maybe don't need status per se in the model because it would be implied by the species, and is really more interesting if your just contrasting the native vs. non-native.
 biomass_m1c <- lmer(log(avg_biomass) ~ (distance|site_code) + (1|common_name), data = site_grouped_data)# status not as a random effect, maybe not used in this model focused on species response? I think the species effect would then pick up most of the variance attributed to the status grouping
@@ -1147,13 +1147,25 @@ biomass_mod4 <- lmer(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*
 
 biomass_mod5 <- lmer(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code) + (1|common_name), data = site_grouped_data)
 
+biomass_mod6 <- lmer(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code/common_name), data = site_grouped_data)
+
+biomass_mod6a <- lmer(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code/common_name) + (1|common_name), data = site_grouped_data)
+
+
+
 # 2. compare AIC (or BIC) values from the different models
 AIC(biomass_mod1)
 AIC(biomass_mod2)
 AIC(biomass_mod3)
 AIC(biomass_mod4)
 AIC(biomass_mod5)
+AIC(biomass_mod6)
+AIC(biomass_mod6a)
+anova(biomass_mod6, biomass_mod6a)
+anova(biomass_mod5, biomass_mod6a)
 # mod 4 and 5 are preferred based on lowest AIC, corresponding to either random intercepts for both site and species, or random slope/intercept between distance and site, and a random intercept term for species.
+anova(biomass_mod4, biomass_mod5)
+
 summary(biomass_mod4)
 summary(biomass_mod5)
 # There's some notable correlation between the slop and intercept, but the random slope doesn't capture much variance, so I'm inclined to work eith model 4.
@@ -1270,11 +1282,13 @@ model_summary <- summary(biomass_model)
 # summary(m5$lme)
 
 ## Scaled "continuous" predictors biomass model
-scaled_biomass_model <- lmer(log(avg_biomass) ~ scale(distance)*scale(pct_moisture) + scale(avg_pct_light) + age + (1 | site_code) + (1 | common_name), data = site_grouped_data)
-summary(scaled_biomass_model)
+# scaled_biomass_model <- lmer(log(avg_biomass) ~ scale(distance)*scale(pct_moisture) + scale(avg_pct_light) + age + (1 | site_code) + (1 | common_name), data = site_grouped_data)
+# summary(scaled_biomass_model)
 
 # confint(biomass_model)
 ```
+
+
 
 ```{r plot-biomass-model}
 # lattice::dotplot(fixef(biomass_model))
@@ -1289,6 +1303,35 @@ species_coefs <- (coef(biomass_model)[[2]])
 
 # library(sjPlot)
 # plot_model(biomass_model) + theme_classic
+
+lattice::dotplot(ranef(biomass_mod6, condVar = T))
+lattice::qqmath(ranef(biomass_mod6, condVar = T))
+
+```
+
+Site-level biomass production was greater at CH, PR, LD, and SR, while lower at DG, FR, and GR. The intercepts for the other five sites all had confidence error estimates crossing zero, with absolute values of the intercepts <0.12.
+
+The native species generated less biomass than non-native species, with spicebush and dogwood performing particularly poorly. Privet and autumn olive were especially good at amassing biomass, with honeysuckle performing slightly less well. Only privet and spicebush had intercepts where the estimated error didn't cross zero.
+
+
+What about fitting a separate models for each species? I don't think this is necessary unless we want to be able to say something specific about the relationship between the response and specific predictors for each species. I think it is reasonable to assume that the plants generally respond similarly to things like soil moisture and light availability.
+```{r species-level-model, eval = F}
+
+ao_biomass <- lmer(log(avg_biomass) ~ avg_pct_light + age + distance*pct_moisture + (distance | site_code), data = filter(site_grouped_data, common_name == "Autumn olive"))
+summary(ao_biomass)
+plot(ao_biomass)
+
+(.498^2)/(.498^2 + .702^2)
+# ~33.5% of the residual variance in autumn olive biomass is explained by the site-level random effect
+
+ao_biomass2 <- lmer(log(avg_biomass) ~ f_habitat*age + avg_pct_light + (distance | site_code), data = filter(site_grouped_data, common_name == "Autumn olive"))
+summary(ao_biomass2)
+
+ao_biomass3 <- lmer(log(avg_biomass) ~ f_habitat + (distance | site_code), data = filter(site_grouped_data, common_name == "Autumn olive", age == "Mature forest"))
+summary(ao_biomass3)
+
+lattice::dotplot(ranef(ao_biomass, condVar = T))
+
 
 ```
 
@@ -1378,19 +1421,24 @@ rgr_mod3 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + di
 
 rgr_mod4 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
 
+rgr_mod4a <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code/common_name), data = site_grouped_data)
+
+rgr_mod4b <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code/common_name), data = site_grouped_data)
+
 rgr_mod5 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code) + (1|common_name), data = site_grouped_data)
 
-rgr_mod6 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (distance|common_name), data = site_grouped_data)
+# rgr_mod6 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (distance|common_name), data = site_grouped_data)
 
 AIC(rgr_mod1)
 AIC(rgr_mod2)
 AIC(rgr_mod3)
 AIC(rgr_mod4)# 2nd best model, and small diff in AIC
 AIC(rgr_mod5)# best random effects model based on AIC
-AIC(rgr_mod6)
+# AIC(rgr_mod6)
 anova(rgr_mod4,rgr_mod5)
-anova(rgr_mod4,rgr_mod6)
-anova(rgr_mod5,rgr_mod6)
+anova(rgr_mod4, rgr_mod4a)
+anova(rgr_mod4,rgr_mod4b)
+anova(rgr_mod4a,rgr_mod4b)
 # reinforcing that the difference between models isn't especially strong
 
 # find fixed component ----
@@ -1447,7 +1495,15 @@ lattice::qqmath(ranef(rgr_model, condVar = T))
 rgr_coefs <- coef(rgr_model)
 rgr_species_coefs <- (coef(rgr_model)[[2]])
 
-lattice::dotplot(ranef(rgr_mod5, condVar = T))
+lattice::dotplot(ranef(rgr_mod4a, condVar = T))
+lattice::qqmath(ranef(rgr_mod4a, condVar = T))
+
+lattice::dotplot(ranef(rgr_mod4b, condVar = T))
+lattice::qqmath(ranef(rgr_mod4b, condVar = T))
+
+lattice::dotplot(ranef(rgr_mod6, condVar = T))
+lattice::qqmath(ranef(rgr_mod6, condVar = T))
+
 
 ```
 
