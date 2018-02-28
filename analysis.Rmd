@@ -3,8 +3,8 @@ title: "Edge effects on species establishement, growth and survival in an experi
 date: "`r format(Sys.time(), '%d %B, %Y')`"
 output: 
   html_document:
+    self_contained: no
     toc: yes
-  word_document: null
 ---
 
 ```{r set options, include=F, echo=F}
