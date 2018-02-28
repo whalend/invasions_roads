@@ -1293,7 +1293,7 @@ model_summary <- summary(biomass_model)
 ```{r plot-biomass-model}
 # lattice::dotplot(fixef(biomass_model))
 lattice::dotplot(ranef(biomass_model, condVar = T))
-lattice::qqmath(ranef(biomass_model, condVar = T))
+# lattice::qqmath(ranef(biomass_model, condVar = T))
 
 biomass_coefs <- coef(biomass_model)
 species_coefs <- (coef(biomass_model)[[2]])
@@ -1304,8 +1304,8 @@ species_coefs <- (coef(biomass_model)[[2]])
 # library(sjPlot)
 # plot_model(biomass_model) + theme_classic
 
-lattice::dotplot(ranef(biomass_mod6, condVar = T))
-lattice::qqmath(ranef(biomass_mod6, condVar = T))
+# lattice::dotplot(ranef(biomass_model, condVar = T))
+# lattice::qqmath(ranef(biomass_model, condVar = T))
 
 ```
 
@@ -1404,6 +1404,12 @@ summary(scaled_diam_model)
 
 ```
 
+```{r plot diameter model}
+
+lattice::dotplot(ranef(diam_model, condVar = T))
+# lattice::qqmath(ranef(biomass_model, condVar = T))
+
+```
 
 ## Relative growth rate model
 The units of relative growth rate are percent change per day (I think).
@@ -1474,7 +1480,9 @@ summary(rgr_mod4e)
 Do we actually want to test/know what the slope/intercept interaction is between distance and species as a rondom component??
 
 ```{r final rgr model}
-rgr_model <- rgr_mod4e
+
+form <- formula(avg_rgr_ht ~ avg_pct_light + age + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+rgr_model <- lmer(form, data = site_grouped_data, REML = F)
 
 # model diagnostics ----
 plot(rgr_model)
@@ -1487,22 +1495,24 @@ plot(rgr_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
 plot(rgr_model@frame$pct_moisture, E2)
 
-# plot model ----
+```
+
+```{r plot rgr model}
 
 lattice::dotplot(ranef(rgr_model, condVar = T))
-lattice::qqmath(ranef(rgr_model, condVar = T))
+# lattice::qqmath(ranef(rgr_model, condVar = T))
 
 rgr_coefs <- coef(rgr_model)
 rgr_species_coefs <- (coef(rgr_model)[[2]])
-
-lattice::dotplot(ranef(rgr_mod4a, condVar = T))
-lattice::qqmath(ranef(rgr_mod4a, condVar = T))
-
-lattice::dotplot(ranef(rgr_mod4b, condVar = T))
-lattice::qqmath(ranef(rgr_mod4b, condVar = T))
-
-lattice::dotplot(ranef(rgr_mod6, condVar = T))
-lattice::qqmath(ranef(rgr_mod6, condVar = T))
+# 
+# lattice::dotplot(ranef(rgr_mod4a, condVar = T))
+# lattice::qqmath(ranef(rgr_mod4a, condVar = T))
+# 
+# lattice::dotplot(ranef(rgr_mod4b, condVar = T))
+# lattice::qqmath(ranef(rgr_mod4b, condVar = T))
+# 
+# lattice::dotplot(ranef(rgr_mod6, condVar = T))
+# lattice::qqmath(ranef(rgr_mod6, condVar = T))
 
 
 ```
