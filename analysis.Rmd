@@ -1065,14 +1065,18 @@ What kind of herbivory might this be? Deer? Defoliators?
 # Modeling
 
 ## Species/distance/site level grouping
-This grouping of data would theoretically gives an average data point of the performance of each species at each distance at each site (n = `r 12*6*6`). What we actually have is 420 observations, so we have 12 that were missing, I believe lost due to mowing at the edge.
+This grouping of data would theoretically gives an average data point of the performance of each species at each distance at each site (n = `r 12*6*6`). What we actually have is 420 observations, so we have 12 that were missing, I believe lost due to mowing at the edge. Upon investigating where observations were missing, we lost all seedlings at the 0 meter distance at the FR and HQ sites (n = 12), which means we have 10 instead of 12 observations for plants at 0 meters, but effectively equal observations of each species.
 
-```{r where observations are missing}
+```{r where observations are missing, eval=F}
 xtabs(~site_code + distance + common_name, data = site_grouped_data)
 ```
 
-We lost all seedlings at the 0 meter distance from the FR and HQ sites (n = 12), which means we have 10 instead of 12 observations for plants at 0 meters.
+We calculated the average biomass accumulated, height, and relative growth rate for height acros the four replicates of each species at each distance at each site. These average values were used as the response variables in regression models. 
 
+response variable for each species as the average value at for that species at each distance and site, e.g., 
+
+
+We calculated the average of each response variable  
 
 ```{r load-modeling-packages}
 library(lme4)
@@ -1220,25 +1224,27 @@ m4.b <- update(m4.full, .~. -avg_basal_area)
 anova(m4.full, m4.b)
 ```
 
+### Diagnostic plots 
 ```{r final-biomass-model}
 
 Form <- formula(log(avg_biomass) ~ distance + avg_pct_light + age + distance*pct_moisture + (1|site_code) + (1|common_name))
-m4.full <- lmer(Form, data = site_grouped_data, REML = F)
-summary(m4.full)
+# m4.full <- lmer(Form, data = site_grouped_data, REML = F)
+# summary(m4.full)
 # This model now has only variables the a significant effect in the fixed component. Now the model needs to be refit with REML
 m4.full <- lmer(Form, data = site_grouped_data, REML = T)
-summary(m4.full)
-AIC(m4.full)
+# summary(m4.full)
+# AIC(m4.full)
+
 # This model is somewhat better than the one below where I omitted age in an earlier iteration
-biomass_mod4a <- lmer(log(avg_biomass) ~ distance + avg_pct_light + distance*pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
-summary(biomass_mod4a)
-AIC(biomass_mod4a)
-anova(biomass_mod4a, m4.full)
+# biomass_mod4a <- lmer(log(avg_biomass) ~ distance + avg_pct_light + distance*pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+# summary(biomass_mod4a)
+# AIC(biomass_mod4a)
+# anova(biomass_mod4a, m4.full)
 # So, use the m4.full model for interpretation. I think I can shorten this by relying on the summary() command for most models, especially if p-values are rather large (maybe greater than >0.2?).
 
-# In the model below I use that factored habitat instead of distance
-biomass_mod4b <- lmer(log(avg_biomass) ~ f_habitat + avg_pct_light + age + pct_moisture*f_habitat + (1|site_code) + (1|common_name), data = site_grouped_data)
-summary(biomass_mod4b)
+# In the model below I use the factored habitat instead of distance
+# biomass_mod4b <- lmer(log(avg_biomass) ~ f_habitat + avg_pct_light + age + pct_moisture*f_habitat + (1|site_code) + (1|common_name), data = site_grouped_data)
+# summary(biomass_mod4b)
 
 # m5 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + age + distance*pct_moisture +  + (1|common_name) + (1|site_code) + (distance||site_code), data = site_grouped_data)
 # summary(m5)
@@ -1261,9 +1267,12 @@ plot(biomass_model@frame$pct_moisture, E2)
 
 model_summary <- summary(biomass_model)
 # correlation between observations from the same site
-(.404^2)/(.404^2 + .217^2 + .614^2 )
+# (.404^2)/(.404^2 + .217^2 + .614^2 )
 ## and of the same species
-(.217^2)/(.217^2 + .404^2 + .614^2 )
+# (.217^2)/(.217^2 + .404^2 + .614^2 )
+
+biomass_model_scaled <- lmer(log(avg_biomass) ~ scale(distance) + scale(avg_pct_light) + age + scale(distance)*scale(pct_moisture) + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(biomass_model_scaled)
 
 ## Checking for non-linearity using an additive mixed model
 # ggplot(filter(site_grouped_data, is.na(avg_biomass)=="FALSE"), 
@@ -1289,20 +1298,56 @@ model_summary <- summary(biomass_model)
 ```
 
 
-
+### Model coefficients
 ```{r plot-biomass-model}
+
 # lattice::dotplot(fixef(biomass_model))
-lattice::dotplot(ranef(biomass_model, condVar = T))
+biomass_ranef <- ranef(biomass_model, condVar = T)
+lattice::dotplot(biomass_ranef)
+
+biomass_ranef_df <- as.data.frame(biomass_ranef)
+ggplot(filter(biomass_ranef_df, grpvar=="common_name"), 
+       aes(y = grp, x = condval)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
+  geom_vline(xintercept = 0, color = "gray70") +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Species biomass intercepts")
+
+ggplot(filter(biomass_ranef_df, grpvar=="site_code"), 
+       aes(y = grp, x = condval)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
+  geom_vline(xintercept = 0, color = "gray70") +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Site biomass intercepts")  
+
+
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 
-biomass_coefs <- coef(biomass_model)
+biomass_fixef <- fixef(biomass_model)
+str(biomass_fixef)
+
+lattice::dotplot(coef(biomass_model_scaled))
 species_coefs <- (coef(biomass_model)[[2]])
+
+lattice::dotplot(ranef(biomass_model_scaled, condVar = T))
 # dim(biomass_coefs)
 # biomass_coefs[1,1]
 # str(as.data.frame(model_summary$coefficients))
 
 # library(sjPlot)
-# plot_model(biomass_model) + theme_classic
+# plot_model(biomass_model, mdrt.values = "all")
 
 # lattice::dotplot(ranef(biomass_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
@@ -1406,9 +1451,11 @@ summary(scaled_diam_model)
 
 ```{r plot diameter model}
 
+diam_ranef <- ranef(diam_model, condVar = T)
+
 lattice::dotplot(ranef(diam_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
-
+56
 ```
 
 ## Relative growth rate model
