@@ -1,6 +1,6 @@
 # Edge effects on species in an experimental plant invasion
 
-The data for this paper are from the experiment described in @Flory2010. They put these data in the context of how roads and forest successional age may affect plant invasions. They reported the data in aggregate, i.e., grouping the three native species and three non-native species. 
+The data for this paper are from the experiment described in @Flory2009. They put these data in the context of how roads and forest successional age may affect plant invasions. They reported the data in aggregate, i.e., grouping the three native species and three non-native species. 
 
 In this paper we want to provide the breakdown by species, which will provide insight into the (dis)similarity in species responses.
 
