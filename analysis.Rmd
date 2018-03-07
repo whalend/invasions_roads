@@ -1092,6 +1092,10 @@ site_grouped_data <- site_grouped_data %>%
 
 ```
 
+We fit mixed-effects models to each performance response variable - biomass, final height, and relative growth rate of height. Following methods described in Zuur et al. (2009), we first parameterized a "beyond optimal" model with all possible explanatory variables and potential interactions and used this to find the optimal structure of the random effects component. After finding the optimal random structure we found the optimal fixed structure by removing statistically insignificant interactions and then main effects. The single weakest explanatory variable was removed and the model refit to identify the next weakest explantory variable. This process was repeated until only statistically significant variables remained and accepted this as the final optimal model. We checked the residual plots of the final models to assure there was no major violation of homogeneity in the residual variance. Biomass and diameter responses were natural logarithm-transformed to improve homogeneity of residual variance and normality of the data. In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the "lme4" (@Bates2015) and "lmerTest" (@Kuznetsova2017) packages in the R statistical computing environment.
+
+The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.
+
 ## Biomass model
 ```{r biomass-model, eval=F}
 
@@ -1120,6 +1124,7 @@ biomass_m1d <- lmer(log(avg_biomass) ~ distance + (distance|site_code) + (1|comm
 
 
 # Determine best mixed effects model ----
+
 ## Following protocol described in Zuur 2009 MEMEER for fitting a mixed effects model. The first part is the effort to find the best random component
 
 biomass_lm <- lm(log(avg_biomass) ~ distance + avg_pct_light + distance*pct_moisture, data = site_grouped_data)
@@ -1271,7 +1276,15 @@ model_summary <- summary(biomass_model)
 ## and of the same species
 # (.217^2)/(.217^2 + .404^2 + .614^2 )
 
-biomass_model_scaled <- lmer(log(avg_biomass) ~ scale(distance) + scale(avg_pct_light) + age + scale(distance)*scale(pct_moisture) + (1|site_code) + (1|common_name), data = site_grouped_data)
+## For scaled models, dived by 2*sd, except for distance; rescale distance to be between 0 and 1.
+
+site_grouped_data <- site_grouped_data %>% 
+  mutate(scaled_distance = distance/max(distance),
+         scaled_pct_moisture = (pct_moisture-mean(pct_moisture, na.rm = T))/(2*sd(pct_moisture)),
+         scaled_pct_light = (avg_pct_light-mean(avg_pct_light, na.rm = T))/(2*sd(avg_pct_light)))
+
+
+biomass_model_scaled <- lmer(log(avg_biomass) ~ scaled_distance + scaled_pct_light + age + scaled_distance*scaled_pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(biomass_model_scaled)
 
 ## Checking for non-linearity using an additive mixed model
@@ -1303,23 +1316,10 @@ summary(biomass_model_scaled)
 
 # lattice::dotplot(fixef(biomass_model))
 biomass_ranef <- ranef(biomass_model, condVar = T)
-lattice::dotplot(biomass_ranef)
-
+# lattice::dotplot(biomass_ranef)
 biomass_ranef_df <- as.data.frame(biomass_ranef)
-ggplot(filter(biomass_ranef_df, grpvar=="common_name"), 
-       aes(y = grp, x = condval)) +
-  geom_point() +
-  geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
-  geom_vline(xintercept = 0, color = "gray70") +
-  theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
-        ) +
-  labs(x="", y="") +
-  ggtitle("Species biomass intercepts")
 
-ggplot(filter(biomass_ranef_df, grpvar=="site_code"), 
+(biomass_species_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="common_name"), 
        aes(y = grp, x = condval)) +
   geom_point() +
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
@@ -1330,18 +1330,80 @@ ggplot(filter(biomass_ranef_df, grpvar=="site_code"),
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Site biomass intercepts")  
+  ggtitle("Species biomass intercepts"))
+
+(biomass_site_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="site_code"), 
+       aes(y = grp, x = condval)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
+  geom_vline(xintercept = 0, color = "gray70") +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Site biomass intercepts"))  
 
 
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 
-biomass_fixef <- fixef(biomass_model)
-str(biomass_fixef)
 
-lattice::dotplot(coef(biomass_model_scaled))
-species_coefs <- (coef(biomass_model)[[2]])
+# biomass_fixef <- fixef(biomass_model)
+# str(biomass_fixef)
+biomass_summary <- summary(biomass_model)
+str(biomass_summary)
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
+biomass_fixed <- as.data.frame(biomass_summary$coefficients)
+biomass_fixed$var_names <- var_names
+biomass_confint <- as.data.frame(confint(biomass_model))
+biomass_confint <- biomass_confint[-c(1:3),]
+biomass_fixed <- cbind(biomass_fixed, biomass_confint)
+# str(biomass_fixed)
+(biomass_coef_plot <- ggplot(filter(biomass_fixed, var_names!="Intercept"), 
+       aes(y = var_names, x = Estimate)) +
+  # coord_flip() +
+  geom_vline(xintercept = 0, color = "gray70") +
+  geom_point(size = 2) +
+  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Means ± 95% confidence intervals - biomass"))  
 
-lattice::dotplot(ranef(biomass_model_scaled, condVar = T))
+# MuMIn::r.squaredGLMM(biomass_model)
+
+biomass_scaled_summary <- summary(biomass_model_scaled)
+str(biomass_scaled_summary)
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
+biomass_scaled_coef <- as.data.frame(biomass_scaled_summary$coefficients)
+biomass_scaled_coef$var_names <- var_names
+biomass_confint <- as.data.frame(confint(biomass_model_scaled))
+biomass_confint <- biomass_confint[-c(1:3),]
+biomass_scaled_coef <- cbind(biomass_scaled_coef, biomass_confint)
+
+(biomass_scaled_coef_plot <- ggplot(filter(biomass_scaled_coef, var_names!="Intercept"), 
+       aes(y = var_names, x = Estimate)) +
+  # coord_flip() +
+  geom_vline(xintercept = 0, color = "gray70") +
+  geom_point(size = 2) +
+  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("(Scaled) means ± 95% confidence intervals - biomass")
+  )
+
+# lattice::dotplot(coef(biomass_model_scaled))
+# species_coefs <- (coef(biomass_model)[[2]])
+
+# lattice::dotplot(ranef(biomass_model_scaled, condVar = T))
 # dim(biomass_coefs)
 # biomass_coefs[1,1]
 # str(as.data.frame(model_summary$coefficients))
@@ -1354,9 +1416,13 @@ lattice::dotplot(ranef(biomass_model_scaled, condVar = T))
 
 ```
 
+All species generated more aboveground biomass in young forests and at locations with greater light availability. Biomass production decreased with distance from the road/forest edge and (interestingly) with greater soil moisture, however, there was a significant interaction between distance and soil moisture indicating greater soil moisture at distances farther from the edge. This interaction suggests that the effect of distance is relatively stronger than the effect of soil moisture.
+
+The random intercepts for each species show that native species generated less biomass than non-native species, with spicebush and dogwood performing particularly poorly. For the non-native speceis, privet and autumn olive were especially good at amassing biomass, with honeysuckle performing slightly less well. Only privet and spicebush had intercepts where the estimated error didn't cross zero.
+
 Site-level biomass production was greater at CH, PR, LD, and SR, while lower at DG, FR, and GR. The intercepts for the other five sites all had confidence error estimates crossing zero, with absolute values of the intercepts <0.12.
 
-The native species generated less biomass than non-native species, with spicebush and dogwood performing particularly poorly. Privet and autumn olive were especially good at amassing biomass, with honeysuckle performing slightly less well. Only privet and spicebush had intercepts where the estimated error didn't cross zero.
+
 
 
 What about fitting a separate models for each species? I don't think this is necessary unless we want to be able to say something specific about the relationship between the response and specific predictors for each species. I think it is reasonable to assume that the plants generally respond similarly to things like soil moisture and light availability.
@@ -1455,7 +1521,33 @@ diam_ranef <- ranef(diam_model, condVar = T)
 
 lattice::dotplot(ranef(diam_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
-56
+
+
+diam_summary <- summary(diam_model)
+# str(diam_summary)
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
+diam_fixed <- as.data.frame(diam_summary$coefficients)
+diam_fixed$var_names <- var_names
+diam_confint <- as.data.frame(confint(diam_model))
+diam_confint <- diam_confint[-c(1:3),]
+diam_fixed <- cbind(diam_fixed, diam_confint)
+# str(diam_fixed)
+ggplot(filter(diam_fixed, var_names!="Intercept"), 
+       aes(y = var_names, x = Estimate)) +
+  # coord_flip() +
+  geom_vline(xintercept = 0, color = "gray70") +
+  geom_point(size = 2) +
+  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Means ± 95% confidence intervals - diameter") 
+
+MuMIn::r.squaredGLMM(diam_model)
+
 ```
 
 ## Relative growth rate model
