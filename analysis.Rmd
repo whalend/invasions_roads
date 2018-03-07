@@ -1513,7 +1513,7 @@ plot(diam_model@frame$pct_moisture, E2)
 
 # model with scaled predictors ----
 diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + age + scaled_distance*scaled_pct_moisture +  (1|site_code) + (1|common_name), data = site_grouped_data)
-summary(scaled_diam_model)
+summary(diam_model_scaled)
 
 ```
 
@@ -1575,7 +1575,7 @@ diam_fixed <- cbind(diam_fixed, diam_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Means ± 95% confidence intervals - diameter") 
+  ggtitle("Means ± 95% confidence intervals - diameter"))
 
 
 diam_scaled_summary <- summary(diam_model_scaled)
