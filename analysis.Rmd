@@ -1333,6 +1333,7 @@ summary(biomass_model_scaled)
 biomass_ranef <- ranef(biomass_model, condVar = T)
 # lattice::dotplot(biomass_ranef)
 biomass_ranef_df <- as.data.frame(biomass_ranef)
+write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
 
 (biomass_species_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="common_name"), 
        aes(y = grp, x = condval)) +
@@ -1415,6 +1416,7 @@ biomass_scaled_coef <- cbind(biomass_scaled_coef, biomass_confint)
   ggtitle("(Scaled) means ± 95% confidence intervals - biomass")
   )
 
+write_csv(biomass_scaled_coef, "model_output_data/biomass_fixed_coef.csv")
 # lattice::dotplot(coef(biomass_model_scaled))
 # species_coefs <- (coef(biomass_model)[[2]])
 
@@ -1539,6 +1541,7 @@ diam_ranef <- ranef(diam_model, condVar = T)
 # lattice::dotplot(ranef(diam_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 diam_ranef_df <- as.data.frame(diam_ranef)
+write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
 
 (diam_species_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="common_name"), 
        aes(y = grp, x = condval)) +
@@ -1565,6 +1568,7 @@ diam_ranef_df <- as.data.frame(diam_ranef)
         ) +
   labs(x="", y="") +
   ggtitle("Site diameter intercepts"))
+
 ```
 
 ```{r diameter-fixef-plot, cache=T}
@@ -1616,6 +1620,8 @@ diam_scaled_coef <- cbind(diam_scaled_coef, diam_confint)
   labs(x="", y="") +
   ggtitle("(Scaled) means ± 95% confidence intervals - diameter")
   )
+
+write_csv(diam_scaled_coef, "model_output_data/diam_fixed_coef.csv")
 
 ```
 
@@ -1721,6 +1727,7 @@ rgr_ranef <- ranef(rgr_model, condVar = T)
 # lattice::dotplot(ranef(rgr_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 rgr_ranef_df <- as.data.frame(rgr_ranef)
+write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 
 (rgr_species_ranef_plot <- ggplot(filter(rgr_ranef_df, grpvar=="common_name"), 
        aes(y = grp, x = condval)) +
@@ -1747,6 +1754,7 @@ rgr_ranef_df <- as.data.frame(rgr_ranef)
         ) +
   labs(x="", y="") +
   ggtitle("Site RGR intercepts"))
+
 ```
 
 ```{r rgr-fixef-plot, cache=T}
@@ -1798,6 +1806,8 @@ rgr_scaled_coef <- cbind(rgr_scaled_coef, rgr_confint)
   labs(x="", y="") +
   ggtitle("(Scaled) means ± 95% confidence intervals - RGR")
   )
+
+write.csv(rgr_scaled_coef, "model_output_data/rgr_fixed_coef.csv")
 
 ```
 
@@ -1925,6 +1935,7 @@ summary(germ_model_scaled)
 
 germ_ranef <- ranef(germ_model, condVar = T)
 germ_ranef_df <- as.data.frame(germ_ranef)
+write.csv(germ_ranef_df, "model_output_data/germ_ranef.csv")
 
 (germ_species_ranef_plot <- ggplot(filter(germ_ranef_df, grpvar=="common_name"), 
        aes(y = grp, x = condval)) +
@@ -2002,6 +2013,8 @@ germ_scaled_coef <- cbind(germ_scaled_coef, germ_confint)
   ggtitle("(Scaled) means ± 95% confidence intervals - germ")
   )
 
+write.csv(germ_scaled_coef, "model_output_data/germ_fixed_coef.csv")
+
 ```
 
 ## Seedling survival model
@@ -2011,7 +2024,7 @@ Logistic regression to estimate species-level survival probabilities.
 # find random component ----
 survival_2006 <- survival_2006 %>% 
   mutate(
-    scaled_distance = scale(distance),
+    scaled_distance = distance/max(distance),
     scaled_pct_light = scale(avg_pct_light),
     scaled_basal_area = scale(avg_basal_area),
     scaled_litter_kg_m2 = scale(litter_kg_m2),
@@ -2040,8 +2053,8 @@ AIC(surv_mod5)# best random effects model based on AIC
 # AIC(surv_mod6)
 anova(surv_mod4,surv_mod5)
 anova(surv_mod4, surv_mod4a)
-anova(surv_mod4,surv_mod4b)
-anova(surv_mod4a,surv_mod4b)
+# anova(surv_mod4,surv_mod4b)
+# anova(surv_mod4a,surv_mod4b)
 # mod4b is the best alternative based on AIC, but the BIC is actually greater
 # I'm not sure that I would be able to interpret this model
 
@@ -2120,6 +2133,7 @@ lines(lowess(e2~survival_2006$scaled_litter_kg_m2))
 
 surv_ranef <- ranef(surv_model, condVar = T)
 surv_ranef_df <- as.data.frame(surv_ranef)
+write.csv(surv_ranef_df, "model_output_data/survival_ranef.csv")
 
 (surv_species_ranef_plot <- 
     ggplot(filter(surv_ranef_df, grpvar=="common_name"), 
@@ -2161,30 +2175,7 @@ surv_confint <- surv_confint[-c(1:2),]
 surv_fixed <- cbind(surv_fixed, surv_confint)
 # str(surv_fixed)
 
-# (surv_coef_plot <- ggplot(filter(surv_fixed, var_names!="Intercept"), 
-#        aes(y = var_names, x = Estimate)) +
-#   # coord_flip() +
-#   geom_vline(xintercept = 0, color = "gray70") +
-#   geom_point(size = 2) +
-#   geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
-#   theme_classic() +
-#   theme(axis.text.y = element_text(size = 12),
-#         axis.text.x = element_text(size = 12),
-#         plot.title = element_text(hjust = .5, size = 18)
-#         ) +
-#   labs(x="", y="") +
-#   ggtitle("Means ± 95% confidence intervals - surv"))
-
-
-# surv_scaled_summary <- summary(surv_model_scaled)
-# # str(surv_scaled_summary)
-# surv_scaled_coef <- as.data.frame(surv_scaled_summary$coefficients)
-# surv_scaled_coef$var_names <- var_names
-# surv_confint <- as.data.frame(confint(surv_model_scaled))
-# surv_confint <- surv_confint[-c(1:2),]
-# surv_scaled_coef <- cbind(surv_scaled_coef, surv_confint)
-
-(surv_scaled_coef_plot <- ggplot(filter(surv_scaled_coef, var_names!="Intercept"), 
+(surv_coef_plot <- ggplot(filter(surv_fixed, var_names!="Intercept"),
        aes(y = var_names, x = Estimate)) +
   # coord_flip() +
   geom_vline(xintercept = 0, color = "gray70") +
@@ -2196,8 +2187,33 @@ surv_fixed <- cbind(surv_fixed, surv_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("(Scaled) means ± 95% confidence intervals - surv")
-  )
+  ggtitle("Scaled means ± 95% confidence intervals - surv"))
+
+write.csv(surv_fixed, "model_output_data/survival_fixed_coef.csv")
+
+
+# surv_scaled_summary <- summary(surv_model_scaled)
+# # str(surv_scaled_summary)
+# surv_scaled_coef <- as.data.frame(surv_scaled_summary$coefficients)
+# surv_scaled_coef$var_names <- var_names
+# surv_confint <- as.data.frame(confint(surv_model_scaled))
+# surv_confint <- surv_confint[-c(1:2),]
+# surv_scaled_coef <- cbind(surv_scaled_coef, surv_confint)
+
+# (surv_scaled_coef_plot <- ggplot(filter(surv_scaled_coef, var_names!="Intercept"), 
+#        aes(y = var_names, x = Estimate)) +
+#   # coord_flip() +
+#   geom_vline(xintercept = 0, color = "gray70") +
+#   geom_point(size = 2) +
+#   geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+#   theme_classic() +
+#   theme(axis.text.y = element_text(size = 12),
+#         axis.text.x = element_text(size = 12),
+#         plot.title = element_text(hjust = .5, size = 18)
+#         ) +
+#   labs(x="", y="") +
+#   ggtitle("(Scaled) means ± 95% confidence intervals - surv")
+#   )
 
 ```
 
