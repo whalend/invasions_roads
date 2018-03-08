@@ -25,7 +25,7 @@ knitr::opts_chunk$set(fig.asp = .5)
 # library(lme4); library(car); library(sciplot); library(lmerTest); 
 # library(MuMIn)
 library(plyr); library(dplyr); library(tidyr); library(readr)
-library(ggplot2)
+library(ggplot2);
 library(knitr)
 
 fill_manual <- scale_fill_manual(values = c("grey80", "grey60", "grey40"))
@@ -409,7 +409,12 @@ ggplot(forest_data, aes(distance, basal_area_m2_ha, shape = age, color = age)) +
   xlab("Distance from road (m)") +
   ylab(expression(paste("Basal area (", {m}^2, "  ", {ha}^-1, ")")))
 
-
+# ggplot(forest_data %>% group_by(age, species) %>% 
+#          summarise(count = length(species)), 
+#        aes(species, count, color = species)) +
+#   geom_point() +
+#   coord_flip() +
+#   facet_wrap(~age)
 
 ## Summarise mean and SE into new dataframe
 avg_forest_data <- forest_data %>%
@@ -662,6 +667,7 @@ germination_data$common_name <- factor(
   germination_data$common_name, levels = c("Autumn olive","Honeysuckle","Privet","Dogwood","Redbud","Spicebush"))
 germination_data$status <- factor(germination_data$status, levels = c("Native","Non-native"))
 
+
 germination_distance_data <- germination_data %>% 
   group_by(status, distance, common_name, age) %>% 
   summarise(avg_germinated = mean(pct_germinated, na.rm = T))
@@ -746,11 +752,22 @@ habitat_grouped_data$age[habitat_grouped_data$age=="M"] <- "Mature forest"
 ### Seedling survival
 ```{r survival}
 
-surv <- select(seedling_data, site_name:status, habitat_type, f_habitat, common_name, starts_with("surv"))
+surv <- select(seedling_data, site_name:status, habitat_type, f_habitat, common_name, starts_with("surv"), avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture)
 surv <- surv %>% gather(year, survival, survival04:survival06)
 surv$year[surv$year=="survival04"] <- 2004
 surv$year[surv$year=="survival05"] <- 2005
 surv$year[surv$year=="survival06"] <- 2006
+
+names(surv)
+
+# names(surv)
+survival_2006 <- surv %>% 
+  filter(year==2006) %>% 
+  group_by(site_code, age, distance, common_name, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture) %>% 
+  summarise(alive = sum(survival),
+            dead = length(survival) - alive) %>% 
+  ungroup(.)
+# names(survival_2006)
 
 survival_distance_data <- surv %>% 
   group_by(year, distance, age, status, common_name) %>% 
@@ -1092,9 +1109,7 @@ site_grouped_data <- site_grouped_data %>%
 
 ```
 
-We fit mixed-effects models to each performance response variable - biomass, final height, and relative growth rate of height. Following methods described in Zuur et al. (2009), we first parameterized a "beyond optimal" model with all possible explanatory variables and potential interactions and used this to find the optimal structure of the random effects component. After finding the optimal random structure we found the optimal fixed structure by removing statistically insignificant interactions and then main effects. The single weakest explanatory variable was removed and the model refit to identify the next weakest explantory variable. This process was repeated until only statistically significant variables remained and accepted this as the final optimal model. We checked the residual plots of the final models to assure there was no major violation of homogeneity in the residual variance. Biomass and diameter responses were natural logarithm-transformed to improve homogeneity of residual variance and normality of the data. In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the "lme4" (@Bates2015) and "lmerTest" (@Kuznetsova2017) packages in the R statistical computing environment.
-
-The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.
+We fit mixed-effects models to each performance response variable - biomass, final height, and relative growth rate of height. Following methods described in Zuur et al. (2009), we first parameterized a "beyond optimal" model with all possible explanatory variables and potential interactions and used this to find the optimal structure of the random effects component. After finding the optimal random structure we found the optimal fixed structure by removing statistically insignificant interactions and then main effects. The single weakest explanatory variable was removed and the model refit to identify the next weakest explantory variable. This process was repeated until only statistically significant variables remained and accepted this as the final optimal model. We checked the residual plots of the final models to assure there was no major violation of homogeneity in the residual variance. Biomass and diameter responses were natural logarithm-transformed to improve homogeneity of residual variance and normality of the data. In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the "lme4" (@Bates2015) and "lmerTest" (@Kuznetsova2017) packages in the R statistical computing environment. The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.
 
 ## Biomass model
 ```{r biomass-model, eval=F}
@@ -1349,7 +1364,7 @@ biomass_ranef_df <- as.data.frame(biomass_ranef)
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 ```
 
-```{r biomass-fixef-plot}
+```{r biomass-fixef-plot, cache=T}
 # biomass_fixef <- fixef(biomass_model)
 # str(biomass_fixef)
 biomass_summary <- summary(biomass_model)
@@ -1552,7 +1567,7 @@ diam_ranef_df <- as.data.frame(diam_ranef)
   ggtitle("Site diameter intercepts"))
 ```
 
-```{r diameter-fixef-plot}
+```{r diameter-fixef-plot, cache=T}
 diam_summary <- summary(diam_model)
 # str(diam_summary)
 var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
@@ -1734,7 +1749,7 @@ rgr_ranef_df <- as.data.frame(rgr_ranef)
   ggtitle("Site RGR intercepts"))
 ```
 
-```{r rgr-fixef-plot}
+```{r rgr-fixef-plot, cache=T}
 rgr_summary <- summary(rgr_model)
 # str(rgr_summary)
 var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
@@ -1786,7 +1801,6 @@ rgr_scaled_coef <- cbind(rgr_scaled_coef, rgr_confint)
 
 ```
 
-
 ```{r plot rgr model, eval=F}
 
 lattice::dotplot(ranef(rgr_model, condVar = T))
@@ -1807,89 +1821,383 @@ rgr_species_coefs <- (coef(rgr_model)[[2]])
 
 ```
 
+Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squaredGLMM(rgr_model_scaled)`
+
+The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.
+
 
 ## Percent germination model
 
-```{r find pct germination model, eval=F}
-germination_data
-germination_distance_data
-# germination_habitat_data
+Logistic regression with number of trials (seeds germinated:seeds recovered)
 
-hist(site_grouped_data)# looks normally distributed
+```{r find pct germination model, eval=F}
+
+hist((germination_data$pct_germinated))
+names(germination_data)
+
 
 # find random component ----
-rgr_mod1 <- nlme::gls((avg_rgr_ht) ~ distance*avg_pct_light + distance*age + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture, data = filter(site_grouped_data, is.na(avg_rgr_ht)=="FALSE"), method = "REML")
+germ_mod1 <- glm(cbind(seeds_germinated,seeds_present) ~ distance*avg_pct_light + distance*age + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture, family = "binomial", data = filter(germination_data, is.na(seeds_germinated)=="FALSE"))
 
-rgr_mod2 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + distance*age + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code), data = site_grouped_data)
+germ_mod2 <- glmer(cbind(seeds_germinated,seeds_present) ~ distance*avg_pct_light + distance*age + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code), data = germination_data, family = "binomial")
 
-rgr_mod3 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code), data = site_grouped_data)
+germ_mod3 <- glmer(cbind(seeds_germinated,seeds_present) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code), data = germination_data, family = "binomial")
 
-rgr_mod4 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+germ_mod4 <- glmer(cbind(seeds_germinated,seeds_present) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (1|common_name), data = germination_data, family = "binomial")
 
-rgr_mod4a <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code/common_name), data = site_grouped_data)
+germ_mod4a <- glmer(cbind(seeds_germinated,seeds_present) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code/common_name), data = germination_data, family = "binomial")
 
-rgr_mod4b <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code/common_name), data = site_grouped_data)
+germ_mod4b <- glmer(cbind(seeds_germinated,seeds_present) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code/common_name), data = germination_data, family = "binomial")
 
-rgr_mod5 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code) + (1|common_name), data = site_grouped_data)
+germ_mod5 <- glmer(cbind(seeds_germinated,seeds_present) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code) + (1|common_name), data = germination_data, family = "binomial")
 
 # rgr_mod6 <- lmer((avg_rgr_ht) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code) + (distance|common_name), data = site_grouped_data)
 
-AIC(rgr_mod1)
-AIC(rgr_mod2)
-AIC(rgr_mod3)
-AIC(rgr_mod4)# 2nd best model, and small diff in AIC
-AIC(rgr_mod5)# best random effects model based on AIC
-# AIC(rgr_mod6)
-anova(rgr_mod4,rgr_mod5)
-anova(rgr_mod4, rgr_mod4a)
-anova(rgr_mod4,rgr_mod4b)
-anova(rgr_mod4a,rgr_mod4b)
+AIC(germ_mod1)
+AIC(germ_mod2)
+AIC(germ_mod3)
+AIC(germ_mod4)# 2nd best model, and small diff in AIC
+AIC(germ_mod5)# best random effects model based on AIC
+# AIC(germ_mod6)
+anova(germ_mod4,germ_mod5)
+anova(germ_mod4, germ_mod4a)
+anova(germ_mod4,germ_mod4b)
+anova(germ_mod4a,germ_mod4b)
 # reinforcing that the difference between models isn't especially strong
 
 # find fixed component ----
-rgr_mod4_ML <- refitML(rgr_mod4)
-form <- formula(avg_rgr_ht ~ avg_pct_light + avg_basal_area * age + distance * litter_kg_m2 + distance * pct_moisture + (1 | site_code) + (1 | common_name))
-rgr_mod4a <- lmer(form, data = site_grouped_data, REML = F)
-anova(rgr_mod4_ML, rgr_mod4a)
-summary(rgr_mod4a)
+# germ_mod4_ML <- refitML(germ_mod4)
+form <- formula(cbind(seeds_germinated,seeds_present) ~ avg_pct_light + avg_basal_area * age + distance * litter_kg_m2 + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+germ_mod4a <- glmer(form, data = germination_data, family = "binomial")
+anova(germ_mod4, germ_mod4a)
+summary(germ_mod4a)
 
-form <- formula(avg_rgr_ht ~ avg_pct_light + avg_basal_area + age + distance * litter_kg_m2 + distance * pct_moisture + (1 | site_code) + (1 | common_name))
-rgr_mod4b <- lmer(form, data = site_grouped_data, REML = F)
-anova(rgr_mod4_ML, rgr_mod4b)
-summary(rgr_mod4b)
+form <- formula(cbind(seeds_germinated,seeds_present) ~ avg_pct_light + avg_basal_area * age + litter_kg_m2 + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+germ_mod4b <- glmer(form, data = germination_data, family = "binomial")
+anova(germ_mod4a, germ_mod4b)
+summary(germ_mod4b)
 
-form <- formula(avg_rgr_ht ~ avg_pct_light + avg_basal_area + age + litter_kg_m2 + distance * pct_moisture + (1 | site_code) + (1 | common_name))
-rgr_mod4c <- lmer(form, data = site_grouped_data, REML = F)
-anova(rgr_mod4_ML, rgr_mod4c)
-summary(rgr_mod4c)
+form <- formula(cbind(seeds_germinated,seeds_present) ~ distance + avg_pct_light + avg_basal_area * age + litter_kg_m2 + pct_moisture + (1 | site_code) + (1 | common_name))
+germ_mod4c <- glmer(form, data = germination_data, family = "binomial")
+anova(germ_mod4b, germ_mod4c)
+summary(germ_mod4c)
 
-form <- formula(avg_rgr_ht ~ avg_pct_light + avg_basal_area + age + distance * pct_moisture + (1 | site_code) + (1 | common_name))
-rgr_mod4d <- lmer(form, data = site_grouped_data, REML = F)
-anova(rgr_mod4_ML, rgr_mod4d)
-summary(rgr_mod4d)
-
-form <- formula(avg_rgr_ht ~ avg_pct_light + age + distance * pct_moisture + (1 | site_code) + (1 | common_name))
-rgr_mod4e <- lmer(form, data = site_grouped_data, REML = F)
-anova(rgr_mod4_ML, rgr_mod4e)
-summary(rgr_mod4e)
-# percent moisture is not terribly convincing at p = .044, but the interaction with distance is pretty strong statistically
+form <- formula(cbind(seeds_germinated,seeds_present) ~ distance + avg_pct_light + avg_basal_area * age + litter_kg_m2 + (1 | site_code) + (1 | common_name))
+germ_mod4d <- glmer(form, data = germination_data, family = "binomial")
+anova(germ_mod4c, germ_mod4d)
+summary(germ_mod4d)
 
 ```
 
-```{r model pct germination}
+```{r final germination model}
+
+germ_model <- glmer(cbind(seeds_germinated,seeds_present) ~ distance + avg_pct_light + avg_basal_area * age + litter_kg_m2 + (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
+summary(germ_model)
+
+plot(germ_model)
+
+
+# boxplot(E2 ~ distance, data = germ_model@frame)
+# boxplot(E2 ~ age, data = germ_model@frame)
+E2 <- resid(germ_model, type = "deviance")
+plot(fitted(germ_model),E2)
+
+plot(germ_model@frame$distance, E2)
+plot(germ_model@frame$avg_pct_light, E2)
+# maybe some pattern here with light availability, but difficult to make out
+plot(germ_model@frame$avg_basal_area, E2)
+plot(germ_model@frame$litter_kg_m2, E2)
+plot(germ_model@frame$age, E2)
+
+germination_data <- germination_data %>% 
+  mutate(scaled_distance = distance/max(distance),
+         scaled_pct_light = (avg_pct_light-mean(avg_pct_light))/(2*sd(avg_pct_light)),
+         scaled_basal_area = (avg_basal_area-mean(avg_basal_area))/(2*sd(avg_basal_area)),
+         scaled_litter_kg_m2 = (litter_kg_m2-mean(litter_kg_m2))/(2*sd(litter_kg_m2))
+         )
+
+germ_model_scaled <- glmer(cbind(seeds_germinated,seeds_present) ~ scaled_distance + scaled_pct_light + scaled_basal_area * age + scaled_litter_kg_m2 +  (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
+summary(germ_model_scaled)
 
 ```
 
+```{r germ-ranef-plot}
+
+germ_ranef <- ranef(germ_model, condVar = T)
+germ_ranef_df <- as.data.frame(germ_ranef)
+
+(germ_species_ranef_plot <- ggplot(filter(germ_ranef_df, grpvar=="common_name"), 
+       aes(y = grp, x = condval)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
+  geom_vline(xintercept = 0, color = "gray70") +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Species germination intercepts"))
+
+(germ_site_ranef_plot <- ggplot(filter(germ_ranef_df, grpvar=="site_code"), 
+       aes(y = grp, x = condval)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
+  geom_vline(xintercept = 0, color = "gray70") +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Site germination intercepts"))
+```
+
+```{r germ-fixef-plot, cache=T}
+germ_summary <- summary(germ_model)
+# str(germ_summary)
+var_names <- c("Intercept","Distance","Pct. light","Basal area","Forest age: young","Litter mass","Basal area:Forest age")
+germ_fixed <- as.data.frame(germ_summary$coefficients)
+germ_fixed$var_names <- var_names
+system.time(germ_confint <- as.data.frame(confint(germ_model)))
+germ_confint <- germ_confint[-c(1:2),]
+germ_fixed <- cbind(germ_fixed, germ_confint)
+# str(germ_fixed)
+
+(germ_coef_plot <- ggplot(filter(germ_fixed, var_names!="Intercept"), 
+       aes(y = var_names, x = Estimate)) +
+  # coord_flip() +
+  geom_vline(xintercept = 0, color = "gray70") +
+  geom_point(size = 2) +
+  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Means ± 95% confidence intervals - germ"))
 
 
-```{r more modeling}
-# modeling height ----
+germ_scaled_summary <- summary(germ_model_scaled)
+# str(germ_scaled_summary)
+germ_scaled_coef <- as.data.frame(germ_scaled_summary$coefficients)
+germ_scaled_coef$var_names <- var_names
+germ_confint <- as.data.frame(confint(germ_model_scaled))
+germ_confint <- germ_confint[-c(1:2),]
+germ_scaled_coef <- cbind(germ_scaled_coef, germ_confint)
+
+(germ_scaled_coef_plot <- ggplot(filter(germ_scaled_coef, var_names!="Intercept"), 
+       aes(y = var_names, x = Estimate)) +
+  # coord_flip() +
+  geom_vline(xintercept = 0, color = "gray70") +
+  geom_point(size = 2) +
+  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("(Scaled) means ± 95% confidence intervals - germ")
+  )
+
+```
+
+## Seedling survival model
+Logistic regression to estimate species-level survival probabilities.
+
+```{r find survival model}
+# find random component ----
+survival_2006 <- survival_2006 %>% 
+  mutate(
+    scaled_distance = scale(distance),
+    scaled_pct_light = scale(avg_pct_light),
+    scaled_basal_area = scale(avg_basal_area),
+    scaled_litter_kg_m2 = scale(litter_kg_m2),
+    scaled_pct_moisture = scale(pct_moisture)
+  )
+
+surv_mod1 <- glm(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture, data = survival_2006, family = "binomial")
+
+surv_mod2 <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture + (1|site_code), data = survival_2006, family = "binomial")
+
+surv_mod3 <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture + (distance|site_code), data = survival_2006, family = "binomial")
+
+surv_mod4 <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
+
+surv_mod4a <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture + (1|site_code/common_name), data = survival_2006, family = "binomial")
+
+# surv_mod4b <- glmer(cbind(alive,dead) ~ cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture + (scaled_distance|site_code/common_name), data = survival_2006, family = "binomial")
+
+surv_mod5 <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture + (scaled_distance|site_code) + (1|common_name), data = survival_2006, family = "binomial")
+
+AIC(surv_mod1)
+AIC(surv_mod2)
+AIC(surv_mod3)
+AIC(surv_mod4)# 2nd best model, and small diff in AIC
+AIC(surv_mod5)# best random effects model based on AIC
+# AIC(surv_mod6)
+anova(surv_mod4,surv_mod5)
+anova(surv_mod4, surv_mod4a)
+anova(surv_mod4,surv_mod4b)
+anova(surv_mod4a,surv_mod4b)
+# mod4b is the best alternative based on AIC, but the BIC is actually greater
+# I'm not sure that I would be able to interpret this model
+
+summary(surv_mod4)
+
+# find fixed component ----
+survival_2006 <- filter(survival_2006, !is.na(alive))
+surv_mod <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial", na.action = "na.fail")
+m4_dredge <- MuMIn::dredge(surv_mod)
+filter(m4_dredge, delta <3)
+## This model dredging indicated that the random-effects only model was actually the best, but the weighting across the models is rather small. The top 7 models have a change in AICc of less than 2
+
+# surv_mod4_ML <- refitML(surv_mod4)
+
+surv_mod_null <- glm(cbind(alive,dead) ~ 1, data = survival_2006, family="binomial")
+summary(surv_mod_null)
+surv_mod_ranef <- glmer(cbind(alive,dead) ~ (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
+## remove distance:moisture interaction
+surv_mod4a <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
+anova(surv_mod4, surv_mod4a)
+anova(surv_mod_ranef, surv_mod4a)
+summary(surv_mod4a)
+
+## remove unconvincing distance:litter interaction (testing on the boundary)
+form <- formula(cbind(alive,dead) ~ scale(distance)*scale(avg_pct_light) + scale(avg_basal_area)*age + scale(litter_kg_m2) + (1|site_code) + (1|common_name))
+surv_mod4b <- glmer(form, data = survival_2006, family = "binomial")
+anova(surv_mod4a, surv_mod4b)
+# mod4b isn't actually any better/different informationally than mod4a
+# summary(surv_mod4b)
+
+## remove the now unconvincing distance:light interaction
+form <- formula(cbind(alive,dead) ~ scale(distance) + scale(avg_pct_light) + scale(avg_basal_area)*age + scale(litter_kg_m2) + (1|site_code) + (1|common_name))
+surv_mod4c <- glmer(form, data = survival_2006, family = "binomial")
+anova(surv_mod4b, surv_mod4c)
+summary(surv_mod4c)
+## I'm kind of flailiing around here; I think it's most interesting ecologically if I use the same set of predictor variables as for the germination model. This enables a comparison of whether the same things affecting germinatino probability also affect survival probability.
+
+form <- formula(cbind(alive,dead) ~ distance + avg_pct_light + avg_basal_area * age + litter_kg_m2 + (1 | site_code) + (1 | common_name))
+surv_mod4d <- glmer(form, data = survival_2006, family = "binomial")
+anova(surv_mod4a, surv_mod4d)
+summary(surv_mod4d)
+# That doesn't really tell us much, except that the variables don't explain survival probability very well
+
+```
+
+```{r final survival model}
+
+surv_model <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
+
+summary(surv_model)
+plot(surv_model)
+
+e2 <- resid(surv_model, type = "deviance")
+
+ggplot(as.data.frame(cbind(fitted(surv_model),e2)),
+       aes(fitted(surv_model), e2)) +
+  geom_point() +
+  geom_smooth()
+
+plot(survival_2006$scaled_distance, e2)
+lines(lowess(e2~survival_2006$scaled_distance))
+plot(survival_2006$scaled_basal_area, e2)
+lines(lowess(e2~survival_2006$scaled_basal_area))
+plot(survival_2006$scaled_pct_light, e2)
+lines(lowess(e2~survival_2006$scaled_pct_light))
+plot(survival_2006$scaled_litter_kg_m2, e2)
+lines(lowess(e2~survival_2006$scaled_litter_kg_m2))
+
+# interplot::interplot(surv_model, "scaled_litter_kg_m2","scaled_distance")
+# interplot::interplot(surv_model, "scaled_pct_light","scaled_distance")
+# interplot::interplot(surv_model, "scaled_basal_area","age")
+
+```
+
+```{r surv-ranef-plot}
+
+surv_ranef <- ranef(surv_model, condVar = T)
+surv_ranef_df <- as.data.frame(surv_ranef)
+
+(surv_species_ranef_plot <- 
+    ggplot(filter(surv_ranef_df, grpvar=="common_name"), 
+       aes(y = grp, x = condval)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
+  geom_vline(xintercept = 0, color = "gray70") +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Species survival probability intercepts"))
+
+(surv_site_ranef_plot <- ggplot(filter(surv_ranef_df, grpvar=="site_code"), 
+       aes(y = grp, x = condval)) +
+  geom_point() +
+  geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
+  geom_vline(xintercept = 0, color = "gray70") +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("Site survival probability intercepts"))
+
+```
+
+```{r surv-fixef-plot, cache=T}
+surv_summary <- summary(surv_model)
+# str(surv_summary)
+var_names <- c("Intercept","Distance","Pct. light","Basal area","Forest age: young","Litter mass","Pct. light:Distance","Basal area:Forest age","Litter mass:Distance")
+surv_fixed <- as.data.frame(surv_summary$coefficients)
+surv_fixed$var_names <- var_names
+surv_confint <- as.data.frame(confint(surv_model))
+surv_confint <- surv_confint[-c(1:2),]
+surv_fixed <- cbind(surv_fixed, surv_confint)
+# str(surv_fixed)
+
+# (surv_coef_plot <- ggplot(filter(surv_fixed, var_names!="Intercept"), 
+#        aes(y = var_names, x = Estimate)) +
+#   # coord_flip() +
+#   geom_vline(xintercept = 0, color = "gray70") +
+#   geom_point(size = 2) +
+#   geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+#   theme_classic() +
+#   theme(axis.text.y = element_text(size = 12),
+#         axis.text.x = element_text(size = 12),
+#         plot.title = element_text(hjust = .5, size = 18)
+#         ) +
+#   labs(x="", y="") +
+#   ggtitle("Means ± 95% confidence intervals - surv"))
 
 
-# modeling survival ----
+# surv_scaled_summary <- summary(surv_model_scaled)
+# # str(surv_scaled_summary)
+# surv_scaled_coef <- as.data.frame(surv_scaled_summary$coefficients)
+# surv_scaled_coef$var_names <- var_names
+# surv_confint <- as.data.frame(confint(surv_model_scaled))
+# surv_confint <- surv_confint[-c(1:2),]
+# surv_scaled_coef <- cbind(surv_scaled_coef, surv_confint)
 
-
-
+(surv_scaled_coef_plot <- ggplot(filter(surv_scaled_coef, var_names!="Intercept"), 
+       aes(y = var_names, x = Estimate)) +
+  # coord_flip() +
+  geom_vline(xintercept = 0, color = "gray70") +
+  geom_point(size = 2) +
+  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+  theme_classic() +
+  theme(axis.text.y = element_text(size = 12),
+        axis.text.x = element_text(size = 12),
+        plot.title = element_text(hjust = .5, size = 18)
+        ) +
+  labs(x="", y="") +
+  ggtitle("(Scaled) means ± 95% confidence intervals - surv")
+  )
 
 ```
 
