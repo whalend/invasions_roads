@@ -1,0 +1,37 @@
+year,habitat_type,f_habitat,age,status,common_name,pct_survival
+2006,0,0-5 m,Mature forest,Native,Dogwood,60
+2006,0,0-5 m,Mature forest,Native,Redbud,95
+2006,0,0-5 m,Mature forest,Native,Spicebush,82.5
+2006,0,0-5 m,Mature forest,Non-native,Autumn olive,60
+2006,0,0-5 m,Mature forest,Non-native,Honeysuckle,87.5
+2006,0,0-5 m,Mature forest,Non-native,Privet,87.5
+2006,0,0-5 m,Young forest,Native,Dogwood,47.916666666666664
+2006,0,0-5 m,Young forest,Native,Redbud,85.41666666666667
+2006,0,0-5 m,Young forest,Native,Spicebush,79.16666666666667
+2006,0,0-5 m,Young forest,Non-native,Autumn olive,47.916666666666664
+2006,0,0-5 m,Young forest,Non-native,Honeysuckle,95.83333333333333
+2006,0,0-5 m,Young forest,Non-native,Privet,95.83333333333333
+2006,1,10-20 m,Mature forest,Native,Dogwood,70.83333333333333
+2006,1,10-20 m,Mature forest,Native,Redbud,91.66666666666667
+2006,1,10-20 m,Mature forest,Native,Spicebush,85.41666666666667
+2006,1,10-20 m,Mature forest,Non-native,Autumn olive,45.833333333333336
+2006,1,10-20 m,Mature forest,Non-native,Honeysuckle,97.91666666666667
+2006,1,10-20 m,Mature forest,Non-native,Privet,83.33333333333333
+2006,1,10-20 m,Young forest,Native,Dogwood,43.75
+2006,1,10-20 m,Young forest,Native,Redbud,79.16666666666667
+2006,1,10-20 m,Young forest,Native,Spicebush,95.83333333333333
+2006,1,10-20 m,Young forest,Non-native,Autumn olive,47.916666666666664
+2006,1,10-20 m,Young forest,Non-native,Honeysuckle,95.83333333333333
+2006,1,10-20 m,Young forest,Non-native,Privet,91.66666666666667
+2006,2,40-60 m,Mature forest,Native,Dogwood,52.083333333333336
+2006,2,40-60 m,Mature forest,Native,Redbud,89.58333333333333
+2006,2,40-60 m,Mature forest,Native,Spicebush,91.66666666666667
+2006,2,40-60 m,Mature forest,Non-native,Autumn olive,41.666666666666664
+2006,2,40-60 m,Mature forest,Non-native,Honeysuckle,100
+2006,2,40-60 m,Mature forest,Non-native,Privet,85.41666666666667
+2006,2,40-60 m,Young forest,Native,Dogwood,33.333333333333336
+2006,2,40-60 m,Young forest,Native,Redbud,77.08333333333333
+2006,2,40-60 m,Young forest,Native,Spicebush,89.58333333333333
+2006,2,40-60 m,Young forest,Non-native,Autumn olive,56.25
+2006,2,40-60 m,Young forest,Non-native,Honeysuckle,93.75
+2006,2,40-60 m,Young forest,Non-native,Privet,91.66666666666667

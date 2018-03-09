@@ -1,0 +1,37 @@
+status,f_habitat,habitat_type,common_name,age,avg_germinated
+Native,0-5 m,0,Dogwood,Mature forest,29.04040404040404
+Native,0-5 m,0,Dogwood,Young forest,7.291666666666667
+Native,0-5 m,0,Redbud,Mature forest,6.590909090909091
+Native,0-5 m,0,Redbud,Young forest,1.875
+Native,0-5 m,0,Spicebush,Mature forest,0
+Native,0-5 m,0,Spicebush,Young forest,2.5
+Native,10-20 m,1,Dogwood,Mature forest,15
+Native,10-20 m,1,Dogwood,Young forest,15.757575757575758
+Native,10-20 m,1,Redbud,Mature forest,3.3333333333333335
+Native,10-20 m,1,Redbud,Young forest,0.9090909090909091
+Native,10-20 m,1,Spicebush,Mature forest,2.7777777777777777
+Native,10-20 m,1,Spicebush,Young forest,25
+Native,40-60 m,2,Dogwood,Mature forest,27.94973544973545
+Native,40-60 m,2,Dogwood,Young forest,14.246031746031745
+Native,40-60 m,2,Redbud,Mature forest,4.523809523809524
+Native,40-60 m,2,Redbud,Young forest,0
+Native,40-60 m,2,Spicebush,Mature forest,3.75
+Native,40-60 m,2,Spicebush,Young forest,0
+Non-native,0-5 m,0,Autumn olive,Mature forest,66.20370370370371
+Non-native,0-5 m,0,Autumn olive,Young forest,36.994949494949495
+Non-native,0-5 m,0,Honeysuckle,Mature forest,34.629629629629626
+Non-native,0-5 m,0,Honeysuckle,Young forest,18.181818181818183
+Non-native,0-5 m,0,Privet,Mature forest,13.91053391053391
+Non-native,0-5 m,0,Privet,Young forest,1.1111111111111112
+Non-native,10-20 m,1,Autumn olive,Mature forest,58.75
+Non-native,10-20 m,1,Autumn olive,Young forest,43.506493506493506
+Non-native,10-20 m,1,Honeysuckle,Mature forest,22.668650793650794
+Non-native,10-20 m,1,Honeysuckle,Young forest,40.74074074074074
+Non-native,10-20 m,1,Privet,Mature forest,3.3333333333333335
+Non-native,10-20 m,1,Privet,Young forest,0
+Non-native,40-60 m,2,Autumn olive,Mature forest,76.62037037037037
+Non-native,40-60 m,2,Autumn olive,Young forest,51.08465608465609
+Non-native,40-60 m,2,Honeysuckle,Mature forest,32.66203703703704
+Non-native,40-60 m,2,Honeysuckle,Young forest,20.34391534391534
+Non-native,40-60 m,2,Privet,Mature forest,7.857142857142857
+Non-native,40-60 m,2,Privet,Young forest,2
