@@ -715,6 +715,8 @@ ggplot(germination_habitat_data, aes(f_habitat, avg_germinated)) +
         legend.title = element_blank()) +
   ylab("Percent germination") +
   xlab("Distance from road")
+write_csv(germination_habitat_data, "model_output_data/germination_raw_fig.csv")
+
 
 ```
 
@@ -725,6 +727,7 @@ kable(germination_data %>%
   group_by(common_name, age, status) %>% 
   summarise(avg_pct_germ = mean(pct_germinated, na.rm = T)) %>% 
   spread(key = age, value = avg_pct_germ) %>% 
+  mutate(Average = rowMeans(cbind(`Mature forest`, `Young forest`))) %>%
   rename(Species = common_name, Status = status), 
   digits = 2, caption = "Average germination (%) of seeds for each species in each forest age.")
 ```
@@ -763,7 +766,7 @@ names(surv)
 # names(surv)
 survival_2006 <- surv %>% 
   filter(year==2006) %>% 
-  group_by(site_code, age, distance, common_name, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture) %>% 
+  group_by(site_code, age, distance, common_name, status, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture) %>% 
   summarise(alive = sum(survival),
             dead = length(survival) - alive) %>% 
   ungroup(.)
@@ -823,11 +826,23 @@ ggplot(survival_habitat_data, aes(f_habitat, pct_survival)) +
   ylab("Survival (%)") +
   xlab("Distance from edge") +
   ggtitle("Average seedling survival to 2006")
-
+write_csv(survival_habitat_data, "model_output_data/survival_raw_fig.csv")
 # filter(surv, year == 2006) %>% 
 #   group_by(status, age) %>% 
 #   summarise(avg_pct_survival = mean(pct_survival))
 ```
+
+```{r survival averages table, results='asis'}
+kable(surv %>%
+        filter(!is.na(survival), year==2006) %>% 
+        group_by(common_name, status, age) %>%
+        summarise(pct_survival = 100*sum(survival)/length(survival)) %>% 
+        spread(key = age, value = pct_survival) %>% 
+        mutate(Average = rowMeans(cbind(`Mature forest`, `Young forest`))) %>%
+  rename(Species = common_name, Status = status), 
+  digits = 2, caption = "Proportion of seedlings of each species surviving to 2006")
+```
+
 
 Seedling survival over the duration of the experiment was high across sites and species (`r mean(surv$pct_survival)`). Autumn olive and dogwood had relatively low survival compared to the other species (AO: 49% mature, 50.7% young; DW: 60.4% mature, 41.7% young). Seedling survival for all other species averaged greater than 80%. In mature forests, autumn olive and dogwood both had lower survival with increasing distance from the edge, but in young forest autumn olive tended to have greater survival farther from the edge. 
 
@@ -919,6 +934,7 @@ ggplot(habitat_grouped_data, aes(f_habitat, avg_diameter)) +
         legend.title = element_blank()) +
   ylab("Diameter (mm)") +
   xlab("Distance")
+write_csv(habitat_grouped_data, "model_output_data/biomass_diam_rgr_raw_fig.csv")
 
 ```
 
@@ -1088,7 +1104,7 @@ This grouping of data would theoretically gives an average data point of the per
 xtabs(~site_code + distance + common_name, data = site_grouped_data)
 ```
 
-We calculated the average biomass accumulated, height, and relative growth rate for height acros the four replicates of each species at each distance at each site. These average values were used as the response variables in regression models. 
+We calculated the average of biomass accumulated, diameter, and relative growth rate for height across the four replicates of each species at each distance at each site. These average values were used as the response variables in regression models. 
 
 response variable for each species as the average value at for that species at each distance and site, e.g., 
 
@@ -1109,7 +1125,11 @@ site_grouped_data <- site_grouped_data %>%
 
 ```
 
-We fit mixed-effects models to each performance response variable - biomass, final height, and relative growth rate of height. Following methods described in Zuur et al. (2009), we first parameterized a "beyond optimal" model with all possible explanatory variables and potential interactions and used this to find the optimal structure of the random effects component. After finding the optimal random structure we found the optimal fixed structure by removing statistically insignificant interactions and then main effects. The single weakest explanatory variable was removed and the model refit to identify the next weakest explantory variable. This process was repeated until only statistically significant variables remained and accepted this as the final optimal model. We checked the residual plots of the final models to assure there was no major violation of homogeneity in the residual variance. Biomass and diameter responses were natural logarithm-transformed to improve homogeneity of residual variance and normality of the data. In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the "lme4" (@Bates2015) and "lmerTest" (@Kuznetsova2017) packages in the R statistical computing environment. The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.
+We fit linear mixed-effects regressions to model each performance response variable - biomass, final height, and relative growth rate of height. Following methods described in Zuur et al. (2009), we first parameterized a "beyond optimal" model with all possible explanatory variables and potential interactions and used this to find the optimal structure of the random effects component. After finding the optimal random structure we found the optimal fixed structure by removing statistically insignificant interactions and then main effects. The single weakest explanatory variable was removed and the model refit to identify the next weakest explantory variable. This process was repeated until only statistically significant variables remained and accepted this as the final optimal model. We checked the residual plots of the final models to assure there was no major violation of homogeneity in the residual variance. Biomass and diameter responses were natural logarithm-transformed to improve homogeneity of residual variance and normality of the data. 
+
+We used mixed-effects logistic regressions to model germination and survival probabilities for each species.
+
+In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the "lme4" (@Bates2015) and "lmerTest" (@Kuznetsova2017) packages in the R statistical computing environment. The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.
 
 ## Biomass model
 ```{r biomass-model, eval=F}
@@ -1346,7 +1366,7 @@ write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Species biomass intercepts"))
+  ggtitle("Biomass species intercepts"))
 
 (biomass_site_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
@@ -1359,7 +1379,7 @@ write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Site biomass intercepts"))  
+  ggtitle("Biomass site intercepts"))  
 
 
 # lattice::qqmath(ranef(biomass_model, condVar = T))
@@ -1389,7 +1409,7 @@ biomass_fixed <- cbind(biomass_fixed, biomass_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Means ± 95% confidence intervals - biomass"))  
+  ggtitle("Biomass means ± 95% CI"))  
 
 
 biomass_scaled_summary <- summary(biomass_model_scaled)
@@ -1413,7 +1433,7 @@ biomass_scaled_coef <- cbind(biomass_scaled_coef, biomass_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("(Scaled) means ± 95% confidence intervals - biomass")
+  ggtitle("Biomass means ± 95% CI")
   )
 
 write_csv(biomass_scaled_coef, "model_output_data/biomass_fixed_coef.csv")
@@ -1554,7 +1574,7 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Species diameter intercepts"))
+  ggtitle("Diameter species intercepts"))
 
 (diam_site_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
@@ -1567,7 +1587,7 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Site diameter intercepts"))
+  ggtitle("Diameter site intercepts"))
 
 ```
 
@@ -1594,7 +1614,7 @@ diam_fixed <- cbind(diam_fixed, diam_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Means ± 95% confidence intervals - diameter"))
+  ggtitle("Diameter eans ± 95% CI"))
 
 
 diam_scaled_summary <- summary(diam_model_scaled)
@@ -1618,7 +1638,7 @@ diam_scaled_coef <- cbind(diam_scaled_coef, diam_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("(Scaled) means ± 95% confidence intervals - diameter")
+  ggtitle("Diam means ± 95% CI")
   )
 
 write_csv(diam_scaled_coef, "model_output_data/diam_fixed_coef.csv")
@@ -1627,6 +1647,7 @@ write_csv(diam_scaled_coef, "model_output_data/diam_fixed_coef.csv")
 
 Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squaredGLMM(diam_model_scaled)`
 
+Seedling diameter increased with light availability and was greater in younger forests, but decreased with distance
 
 ## Relative growth rate model
 The units of relative growth rate are percent change per day (I think).
@@ -1724,6 +1745,8 @@ summary(rgr_model_scaled)
 
 rgr_ranef <- ranef(rgr_model, condVar = T)
 
+coef(rgr_model)$common_name
+
 # lattice::dotplot(ranef(rgr_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 rgr_ranef_df <- as.data.frame(rgr_ranef)
@@ -1740,7 +1763,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Species RGR intercepts"))
+  ggtitle("RGR species intercepts"))
 
 (rgr_site_ranef_plot <- ggplot(filter(rgr_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
@@ -1753,7 +1776,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Site RGR intercepts"))
+  ggtitle("RGR site intercepts"))
 
 ```
 
@@ -1780,7 +1803,7 @@ rgr_fixed <- cbind(rgr_fixed, rgr_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Means ± 95% confidence intervals - RGR"))
+  ggtitle("RGR means ± 95% CI"))
 
 
 rgr_scaled_summary <- summary(rgr_model_scaled)
@@ -1804,7 +1827,7 @@ rgr_scaled_coef <- cbind(rgr_scaled_coef, rgr_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("(Scaled) means ± 95% confidence intervals - RGR")
+  ggtitle("RGR means ± 95% CI")
   )
 
 write.csv(rgr_scaled_coef, "model_output_data/rgr_fixed_coef.csv")
@@ -1835,6 +1858,14 @@ Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squar
 
 The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.
 
+
+```{r gridded-results-figure, fig.height=10, fig.width=7}
+cowplot::plot_grid(plotlist = list(biomass_scaled_coef_plot, biomass_species_ranef_plot, diam_scaled_coef_plot, diam_species_ranef_plot, rgr_scaled_coef_plot, rgr_species_ranef_plot), nrow = 3,ncol = 2, axis = "lb")
+```
+
+
+## Growth performance results
+Seedling growth metrics of biomass, diameter, and relative growth rate of height  all responded similarly to edge effects, moisture and light availability, and forest successional age. Growth increased with light availability and was greater in young forests and decreased with distance from edge and moisture availability. The nonnative species generally performed better than the native species, however, there was species specific variability among growth metrics. The nonnative species privet, autumn olive, and honeysuckle had the best performance in terms of above-ground biomass relative to the overall average, while the native dogwood and spicebush generated relatively small amounts of biomass. The average biomass produced by the native redbud was close to the overall average across all the species. Privet also showed the greatest increase in diameter relative to the other species, while dogwood and especially spicebush had relatively small increases in diameter. Autumn olive and privet had the two highest relative growth rates in height and spicebush had the lowest. Relative growth rates of redbud, dogwood, and honeysuckle were similar, and near the overall average across all species.
 
 ## Percent germination model
 
@@ -1970,7 +2001,7 @@ germ_summary <- summary(germ_model)
 var_names <- c("Intercept","Distance","Pct. light","Basal area","Forest age: young","Litter mass","Basal area:Forest age")
 germ_fixed <- as.data.frame(germ_summary$coefficients)
 germ_fixed$var_names <- var_names
-system.time(germ_confint <- as.data.frame(confint(germ_model)))
+germ_confint <- as.data.frame(confint(germ_model))
 germ_confint <- germ_confint[-c(1:2),]
 germ_fixed <- cbind(germ_fixed, germ_confint)
 # str(germ_fixed)
@@ -2217,3 +2248,16 @@ write.csv(surv_fixed, "model_output_data/survival_fixed_coef.csv")
 
 ```
 
+<!-- `r MuMIn::r.squaredGLMM(surv_model_scaled)` -->
+
+## Germination and survival results
+The probability of germination increased with distance from edge, light availability, litter mass, and basal area, but the effect of basal area was moderated by forest successional age, with lower germination in young forests. Effects of measured site conditions on survival were relatively weak and predominantly due to interaction variables. Light availability had a significant positive effect on survival probability, but this decreased with distance from the edge (indicated by the negative interaction term). The positive interaction of distance and litter increased survival probability, although the main effects of distance and litter were statistically insignificant. The interaction of basal area and forest age was similar, but with a negative effect where seedlings at locations with lower basal area in younger forests had lower probability of survival. Variation in survival depended predominantly on species specific characteristics and unmeasured site characteristics as indicated by the variance accounted for by these random effects variables.
+
+Germination probability for the nonnative autumn olive and honeysuckle, and native dogwood was greater than the overall average; privet, redbud, and spicebush had below average germination, with spicebush being the lowest. In contrast, the transplanted autumn olive and dogwood seedlings had the lowest survival probability, while honeysuckle, privet, spicebush, and redbud seedlings all showed above average survival. Honeysuckle seedlings were particularly likely to persist to the end of the experiment.
+
+## Site-level effects
+Growth was relativley poor for all the metrics at the DG, FR, and GR, and tended to be greatest at the CH and PR sites. In addition to the CH and PR sites, seedlings at the LD and SR sites tended to perform well in terms of biomass; seedling diameters at the TC and SR sites were also greater than average, but lagged well-behind the CH site; relative-growth-rate tended to be greater than average at the BB and LD, but the PR site was the best for this variable. In terms of survival, the CH site was the most favorable, while seedling survival was similar and above average at the TC, DU, and PR sites. Probability of germination was close to the average across most of the site, but exceptionally greater at the DB site, and exceptionally lower at the DU site. 
+
+```{r gridded-site-ranef-fig}
+cowplot::plot_grid(plotlist = list(biomass_site_ranef_plot, diam_site_ranef_plot, rgr_site_ranef_plot, surv_site_ranef_plot, germ_site_ranef_plot))
+```
