@@ -1461,7 +1461,7 @@ biomass_coefs <- as.data.frame(unlist(coef(biomass_model)))
 # str(biomass_fixef)
 biomass_summary <- summary(biomass_model)
 # str(biomass_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young")
 biomass_fixed <- as.data.frame(biomass_summary$coefficients)
 biomass_fixed$var_names <- var_names
 biomass_confint <- as.data.frame(confint(biomass_model))
@@ -1486,7 +1486,7 @@ biomass_fixed <- cbind(biomass_fixed, biomass_confint)
 
 biomass_scaled_summary <- summary(biomass_model_scaled)
 # str(biomass_scaled_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young")
 biomass_scaled_coef <- as.data.frame(biomass_scaled_summary$coefficients)
 biomass_scaled_coef$var_names <- var_names
 biomass_confint <- as.data.frame(confint(biomass_model_scaled))
@@ -1653,11 +1653,11 @@ boxplot(E2 ~ distance, data = diam_model@frame)
 boxplot(E2 ~ age, data = diam_model@frame)
 plot(diam_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-plot(diam_model@frame$pct_moisture, E2)
+# plot(diam_model@frame$pct_moisture, E2)
 
 
 # model with scaled predictors ----
-diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + age + scaled_distance*scaled_pct_moisture +  (1|site_code) + (1|common_name), data = site_grouped_data)
+diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + age +  (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(diam_model_scaled)
 
 ```
@@ -1702,7 +1702,7 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
 ```{r diameter-fixef-plot, cache=T}
 diam_summary <- summary(diam_model)
 # str(diam_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young")
 diam_fixed <- as.data.frame(diam_summary$coefficients)
 diam_fixed$var_names <- var_names
 diam_confint <- as.data.frame(confint(diam_model))
@@ -1826,9 +1826,9 @@ rmod <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + (1|site_code) 
 
 anova(rmod, diam_mod4e)
 
-dmod_list <- list(
+rmod_list <- list(
   m1 <- lmer(pct_moisture ~ distance + (1|site_code), data = site_grouped_data),
-  m2 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + f_age + pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+  m2 <- lmer(avg_rgr_ht ~ distance + avg_pct_light + f_age + pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
 )
 
 piecewiseSEM::sem.basis.set(rmod_list)
@@ -1844,7 +1844,7 @@ Do we actually want to test/know what the slope/intercept interaction is between
 
 ```{r final rgr model}
 
-form <- formula(avg_rgr_ht ~ distance + avg_pct_light + age + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+form <- formula(avg_rgr_ht ~ distance + avg_pct_light + age + (1 | site_code) + (1 | common_name))
 rgr_model <- lmer(form, data = site_grouped_data, REML = T)
 summary(rgr_model)
 
@@ -1857,9 +1857,9 @@ boxplot(E2 ~ distance, data = rgr_model@frame)
 boxplot(E2 ~ age, data = rgr_model@frame)
 plot(rgr_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-plot(rgr_model@frame$pct_moisture, E2)
+# plot(rgr_model@frame$pct_moisture, E2)
 
-rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age + scaled_distance*scaled_pct_moisture + (1 | site_code) + (1 | common_name),
+rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age + (1 | site_code) + (1 | common_name),
                          data = site_grouped_data)
 summary(rgr_model_scaled)
 
@@ -1908,7 +1908,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 ```{r rgr-fixef-plot, cache=T}
 rgr_summary <- summary(rgr_model)
 # str(rgr_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young")
 rgr_fixed <- as.data.frame(rgr_summary$coefficients)
 rgr_fixed$var_names <- var_names
 rgr_confint <- as.data.frame(confint(rgr_model))
@@ -1933,7 +1933,6 @@ rgr_fixed <- cbind(rgr_fixed, rgr_confint)
 
 rgr_scaled_summary <- summary(rgr_model_scaled)
 # str(rgr_scaled_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
 rgr_scaled_coef <- as.data.frame(rgr_scaled_summary$coefficients)
 rgr_scaled_coef$var_names <- var_names
 rgr_confint <- as.data.frame(confint(rgr_model_scaled))
@@ -2053,11 +2052,25 @@ germ_mod4d <- glmer(form, data = germination_data, family = "binomial")
 anova(germ_mod4c, germ_mod4d)
 summary(germ_mod4d)
 
+# strong correlation among basal area and age; we know that basal area depends on age and don't have a biological explanation for basal area, so keeping age and excluding basal area makes sense I think
+
+germ_model1 <- glmer(cbind(seeds_germinated,seeds_present) ~ distance + avg_pct_light + age + litter_kg_m2 + (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
+summary(germ_model1)
+# pct light not very important
+germ_model2 <- glmer(cbind(seeds_germinated,seeds_present) ~ distance + age + litter_kg_m2 + (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
+summary(germ_model2)
+
+germ_model3 <- glmer(cbind(seeds_germinated,seeds_present) ~ distance + age + (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
+summary(germ_model3)
+
+anova(germ_model2,germ_model3)
+
+
 ```
 
 ```{r final germination model}
 
-germ_model <- glmer(cbind(seeds_germinated,seeds_present) ~ distance + avg_pct_light + avg_basal_area * age + litter_kg_m2 + (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
+germ_model <- glmer(cbind(seeds_germinated,seeds_present) ~ distance + age + litter_kg_m2 + (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
 summary(germ_model)
 
 plot(germ_model)
@@ -2069,9 +2082,9 @@ E2 <- resid(germ_model, type = "deviance")
 plot(fitted(germ_model),E2)
 
 plot(germ_model@frame$distance, E2)
-plot(germ_model@frame$avg_pct_light, E2)
+# plot(germ_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-plot(germ_model@frame$avg_basal_area, E2)
+# plot(germ_model@frame$avg_basal_area, E2)
 plot(germ_model@frame$litter_kg_m2, E2)
 plot(germ_model@frame$age, E2)
 
@@ -2082,7 +2095,7 @@ germination_data <- germination_data %>%
          scaled_litter_kg_m2 = (litter_kg_m2-mean(litter_kg_m2))/(2*sd(litter_kg_m2))
          )
 
-germ_model_scaled <- glmer(cbind(seeds_germinated,seeds_present) ~ scaled_distance + scaled_pct_light + scaled_basal_area * age + scaled_litter_kg_m2 +  (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
+germ_model_scaled <- glmer(cbind(seeds_germinated,seeds_present) ~ scaled_distance + age + scaled_litter_kg_m2 +  (1 | site_code) + (1 | common_name), data = germination_data, family = "binomial")
 summary(germ_model_scaled)
 
 ```
@@ -2123,7 +2136,7 @@ write.csv(germ_ranef_df, "model_output_data/germ_ranef.csv")
 ```{r germ-fixef-plot-data, cache=T, eval=F}
 # germ_summary <- summary(germ_model)
 # str(germ_summary)
-var_names <- c("Intercept","Distance","Pct. light","Basal area","Forest age: young","Litter mass","Basal area:Forest age")
+var_names <- c("Intercept","Distance", "Forest age: young","Litter mass")
 # germ_fixed <- as.data.frame(germ_summary$coefficients)
 # germ_fixed$var_names <- var_names
 # germ_confint <- as.data.frame(confint(germ_model))
@@ -2179,7 +2192,7 @@ germ_scaled_coef <- read_csv("model_output_data/germ_fixed_coef.csv")
 ## Seedling survival model
 Logistic regression to estimate species-level survival probabilities.
 
-```{r find survival model}
+```{r find survival model, eval=F}
 # find random component ----
 survival_2006 <- survival_2006 %>% 
   mutate(
@@ -2222,8 +2235,8 @@ summary(surv_mod4)
 # find fixed component ----
 survival_2006 <- filter(survival_2006, !is.na(alive))
 surv_mod <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_distance*age + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + scaled_distance*scaled_pct_moisture + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial", na.action = "na.fail")
-m4_dredge <- MuMIn::dredge(surv_mod)
-filter(m4_dredge, delta <3)
+# m4_dredge <- MuMIn::dredge(surv_mod)
+# filter(m4_dredge, delta <3)
 ## This model dredging indicated that the random-effects only model was actually the best, but the weighting across the models is rather small. The top 7 models have a change in AICc of less than 2
 
 # surv_mod4_ML <- refitML(surv_mod4)
@@ -2257,11 +2270,29 @@ anova(surv_mod4a, surv_mod4d)
 summary(surv_mod4d)
 # That doesn't really tell us much, except that the variables don't explain survival probability very well
 
+# I revised the germination model to deal with collinearity, so will do the same here
+surv_model1 <- glmer(cbind(alive,dead) ~ distance + avg_pct_light + avg_basal_area * age + litter_kg_m2 + (1 | site_code) + (1 | common_name), family = "binomial", data = survival_2006)
+summary(surv_model1)
+# remove basal area and interaction with age
+surv_model2 <- glmer(cbind(alive,dead) ~ distance + avg_pct_light + age + litter_kg_m2 + (1 | site_code) + (1 | common_name), family = "binomial", data = survival_2006)
+summary(surv_model2)
+# it doesn't look like any of the explanatory variables have an effect, so i'm going to match it with the germination model
+surv_model2 <- glmer(cbind(alive,dead) ~ distance + age + litter_kg_m2 + (1 | site_code) + (1 | common_name), family = "binomial", data = survival_2006)
+summary(surv_model2)
+
 ```
 
 ```{r final survival model}
+survival_2006 <- survival_2006 %>% 
+  mutate(
+    scaled_distance = distance/max(distance),
+    scaled_pct_light = scale(avg_pct_light),
+    scaled_basal_area = scale(avg_basal_area),
+    scaled_litter_kg_m2 = scale(litter_kg_m2),
+    scaled_pct_moisture = scale(pct_moisture)
+  )
 
-surv_model <- glmer(cbind(alive,dead) ~ scaled_distance*scaled_pct_light + scaled_basal_area*age + scaled_distance*scaled_litter_kg_m2 + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
+surv_model <- glmer(cbind(alive,dead) ~ scaled_distance + age + scaled_litter_kg_m2 + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
 
 summary(surv_model)
 plot(surv_model)
@@ -2275,10 +2306,11 @@ ggplot(as.data.frame(cbind(fitted(surv_model),e2)),
 
 plot(survival_2006$scaled_distance, e2)
 lines(lowess(e2~survival_2006$scaled_distance))
-plot(survival_2006$scaled_basal_area, e2)
-lines(lowess(e2~survival_2006$scaled_basal_area))
-plot(survival_2006$scaled_pct_light, e2)
-lines(lowess(e2~survival_2006$scaled_pct_light))
+# plot(survival_2006$age, e2)# error
+# plot(survival_2006$scaled_basal_area, e2)
+# lines(lowess(e2~survival_2006$scaled_basal_area))
+# plot(survival_2006$scaled_pct_light, e2)
+# lines(lowess(e2~survival_2006$scaled_pct_light))
 plot(survival_2006$scaled_litter_kg_m2, e2)
 lines(lowess(e2~survival_2006$scaled_litter_kg_m2))
 
@@ -2330,7 +2362,7 @@ predict(surv_model)
 ```{r surv-fixef-plot-data, cache=T, eval=F}
 surv_summary <- summary(surv_model)
 # str(surv_summary)
-var_names <- c("Intercept","Distance","Pct. light","Basal area","Forest age: young","Litter mass","Pct. light:Distance","Basal area:Forest age","Litter mass:Distance")
+var_names <- c("Intercept","Distance","Forest age: young","Litter mass")
 surv_fixed <- as.data.frame(surv_summary$coefficients)
 surv_fixed$var_names <- var_names
 surv_confint <- as.data.frame(confint(surv_model))
