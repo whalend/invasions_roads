@@ -1108,11 +1108,14 @@ ggplot(herbiv_habitat_data, aes(f_habitat, avg_herbivory)) +
 
 ```
 
+We've settled on doing a model to try and explain herbivory. First, I'm looking at whether there was any clear pattern in herbivory from year to year.
+
 ```{r herbiv-by-year}
+
 ggplot(herbiv, aes(distance, herbivory)) +
   stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "pointrange", size = .75, show.legend = T, position = "jitter") +
   # geom_point(aes(shape = common_name)) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  geom_smooth(aes(linetype = status), method = "lm", se = T, show.legend = F, color = "grey50", alpha = .2) +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
   facet_grid(age~year) +
@@ -1130,8 +1133,11 @@ In young forests, herbivory increased with distance from edge for both native an
 
 Herbivory was categorized, where 1 = 1-25%, 2 = 26-50%, 3 = 51-75%.
 
-What kind of herbivory might this be? Deer? Defoliators?
+What kind of herbivory might this be: Defoliators.
 
+There's not a particularly clear pattern in changes between years, just generally lower for the invasive species. I can still put year in as a factor to test it statistically. It looks like forest age will be important, and probably distance. Some species also appear to be more susceptible than others. I'm thinking a model along the lines of this to start:
+
+herbivory ~ distance + age + year + pct_light + litter
 
 
 # Modeling
@@ -2425,5 +2431,18 @@ Growth was relativley poor for all the metrics at the DG, FR, and GR, and tended
 
 ```{r gridded-site-ranef-fig}
 cowplot::plot_grid(plotlist = list(biomass_site_ranef_plot, diam_site_ranef_plot, rgr_site_ranef_plot, surv_site_ranef_plot, germ_site_ranef_plot))
+```
+
+## Herbivory model
+General model formulation: herbivory ~ distance + age + year + pct_light + litter
+
+I'm not actually sure how to fit a model to these data. It's ordinal in that the categories indicate the range of herbivory in terms of leaf area affected. 
+
+```{r find-herbivory-model, eval=F}
+summary(herbiv)
+herbiv_noNA_data <- filter(herbiv, !is.na(herbivory))
+summary(herbiv_noNA_data)
+hist(herbiv_noNA_data$herbivory)
+
 ```
 
