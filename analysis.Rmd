@@ -196,6 +196,7 @@ seedling_data <- seedling_data %>%
 
 ```{r site grouped data}
 
+## Group by all factors of interest: site, forest age, distance, species, status
 ## This site-grouped data should be used for fitting mixed-effects models
 ## using site_code as a random effect.
 site_grouped_data <- seedling_data %>%
@@ -220,12 +221,14 @@ site_grouped_data <- seedling_data %>%
             avg_pct_light = mean(avg_pct_light),
             litter_kg_m2 = mean(litter_kg_m2),
             pct_moisture = mean(pct_moisture)) %>% 
-  ungroup(.)
+  ungroup(.) %>% 
+  mutate(f_age = as.factor(ifelse(age=="Mature forest",0,1)))
 
 ```
 
 ```{r distance grouped data}
 
+## groups by distance, ignores site
 distance_grouped_data <- seedling_data %>%
   # rename(age = forest_age) %>%
   group_by(age, distance, habitat_type, f_habitat, common_name, status) %>% 
@@ -296,6 +299,23 @@ germination_data <- germination_data %>%
 ```
 
 ***
+
+```{r species-grouped-data}
+species_grouped_data <- seedling_data %>%
+  group_by(common_name) %>% 
+  summarise(avg_biomass = mean(tot_biomass, na.rm = T),
+            # n_obs = length(tot_biomass),
+            se_biomass = sd(tot_biomass, na.rm = T)/sqrt(length(tot_biomass)),
+            avg_diameter = mean(diameter06, na.rm = T),
+            se_diameter = sd(diameter06, na.rm = T)/sqrt(length(diameter06)),
+            avg_rgr_ht = mean(rgr_ht_days, na.rm = T),
+            se_rgr_ht = sd(rgr_ht_days, na.rm = T)/sqrt(length(rgr_ht_days))
+  )
+species_grouped_data %>%
+  select(common_name:avg_biomass) %>%
+  spread(key = age, value = avg_biomass)
+```
+
 
 ```{r make species table}
 germination_data$common_name[germination_data$species=="D"] <- "Dogwood"
@@ -1048,7 +1068,7 @@ ggplot(filter(herbiv, year == 2006), aes(distance, herbivory)) +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
-  ylab("Herbivory score") +
+  ylab("Herbivory score in 2006") +
   xlab("Distance from road (m)") 
 
 herbiv_distance_data <- herbiv %>%
@@ -1071,10 +1091,11 @@ ggplot(herbiv_distance_data, aes(distance, avg_herbivory)) +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
-  ylab("Herbivory score") +
+  ylab("Herbivory score (2006)") +
   xlab("Distance from road (m)")
 
 ggplot(herbiv_habitat_data, aes(f_habitat, avg_herbivory)) +
+  geom_errorbar(aes(ymin = avg_herbivory - se_herbivory, ymax = avg_herbivory + se_herbivory), width = 0) +
   geom_line(aes(linetype = common_name, group = common_name), show.legend = F) +
   geom_point(aes(shape = common_name), size = 2.5) +
   facet_wrap(~age) +
@@ -1082,10 +1103,28 @@ ggplot(herbiv_habitat_data, aes(f_habitat, avg_herbivory)) +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
-  ylab("Herbivory score") +
+  ylab("Herbivory score (2006)") +
   xlab("Distance")
 
 ```
+
+```{r herbiv-by-year}
+ggplot(herbiv, aes(distance, herbivory)) +
+  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "pointrange", size = .75, show.legend = T, position = "jitter") +
+  # geom_point(aes(shape = common_name)) +
+  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
+  scale_linetype_manual(values = c(2,1)) +
+  scale_color_brewer(palette = "RdBu") +
+  facet_grid(age~year) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        panel.grid = element_blank(),
+        legend.title = element_blank()) +
+  ylab("Herbivory score") +
+  xlab("Distance from road (m)") 
+
+```
+
 
 In young forests, herbivory increased with distance from edge for both native and non-native species, but decreased with distance from edge for native species in mature forests. There was no relationship between distance from edge and herbivory for non-native species in mature forests. Herbivory was greater on native than non-native species in both forest types.
 
@@ -1131,6 +1170,8 @@ We used mixed-effects logistic regressions to model germination and survival pro
 
 In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the "lme4" (@Bates2015) and "lmerTest" (@Kuznetsova2017) packages in the R statistical computing environment. The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.
 
+The factor f_age represents forest age, and a value of 1 indicates young forests while a value of 0 indicates mature forests.
+ 
 ## Biomass model
 ```{r biomass-model, eval=F}
 
@@ -1262,12 +1303,30 @@ m4.full <- lmer(Form, data = site_grouped_data, REML = F)
 summary(m4.full)
 m4.b <- update(m4.full, .~. -avg_basal_area)
 anova(m4.full, m4.b)
+
+
+bmod <- lmer(log(avg_biomass) ~ distance + avg_pct_light + age + (1|site_code) + (1|common_name), data = site_grouped_data)
+
+anova(bmod, m4.b)
+
+bmod_list <- list(
+  m1 <- lmer(pct_moisture ~ distance + (1|site_code), data = site_grouped_data),
+  m2 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age + pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+)
+
+piecewiseSEM::sem.basis.set(bmod_list)
+piecewiseSEM::sem.fit(bmod_list, data = site_grouped_data)
+piecewiseSEM::rsquared(bmod_list)
+# piecewiseSEM::sem.coefs(bmod_list, data = site_grouped_data) # error
+summary(m1)
+summary(m2)# indicates that % moisture has no effect after accounting for other variables
+
 ```
 
 ### Diagnostic plots 
 ```{r final-biomass-model}
 
-Form <- formula(log(avg_biomass) ~ distance + avg_pct_light + age + distance*pct_moisture + (1|site_code) + (1|common_name))
+Form <- formula(log(avg_biomass) ~ distance + avg_pct_light + f_age + (1|site_code) + (1|common_name))
 # m4.full <- lmer(Form, data = site_grouped_data, REML = F)
 # summary(m4.full)
 # This model now has only variables the a significant effect in the fixed component. Now the model needs to be refit with REML
@@ -1303,7 +1362,7 @@ E2 <- resid(biomass_model, type = "pearson")
 boxplot(E2 ~ distance, data = biomass_model@frame)
 plot(biomass_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-plot(biomass_model@frame$pct_moisture, E2)
+# plot(biomass_model@frame$pct_moisture, E2)
 
 model_summary <- summary(biomass_model)
 # correlation between observations from the same site
@@ -1319,8 +1378,9 @@ site_grouped_data <- site_grouped_data %>%
          scaled_pct_light = (avg_pct_light-mean(avg_pct_light, na.rm = T))/(2*sd(avg_pct_light)))
 
 
-biomass_model_scaled <- lmer(log(avg_biomass) ~ scaled_distance + scaled_pct_light + age + scaled_distance*scaled_pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+biomass_model_scaled <- lmer(log(avg_biomass) ~ scaled_distance + scaled_pct_light + f_age + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(biomass_model_scaled)
+
 
 ## Checking for non-linearity using an additive mixed model
 # ggplot(filter(site_grouped_data, is.na(avg_biomass)=="FALSE"), 
@@ -1348,12 +1408,16 @@ summary(biomass_model_scaled)
 
 ### Model coefficients
 ```{r biomass-ranef-plot}
+biomass_summary <- summary(biomass_model)
 
 # lattice::dotplot(fixef(biomass_model))
 biomass_ranef <- ranef(biomass_model, condVar = T)
 # lattice::dotplot(biomass_ranef)
 biomass_ranef_df <- as.data.frame(biomass_ranef)
 write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
+
+intercept <- biomass_summary$coefficients[1,1]
+biomass_coefs <- as.data.frame(unlist(coef(biomass_model)))
 
 (biomass_species_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="common_name"), 
        aes(y = grp, x = condval)) +
@@ -1397,6 +1461,7 @@ biomass_confint <- as.data.frame(confint(biomass_model))
 biomass_confint <- biomass_confint[-c(1:3),]
 biomass_fixed <- cbind(biomass_fixed, biomass_confint)
 # str(biomass_fixed)
+
 (biomass_coef_plot <- ggplot(filter(biomass_fixed, var_names!="Intercept"), 
        aes(y = var_names, x = Estimate)) +
   # coord_flip() +
@@ -1446,14 +1511,14 @@ write_csv(biomass_scaled_coef, "model_output_data/biomass_fixed_coef.csv")
 # str(as.data.frame(model_summary$coefficients))
 
 # library(sjPlot)
-# plot_model(biomass_model, mdrt.values = "all")
+# sjPlot::plot_model(biomass_model_scaled, mdrt.values = "all")
 
 # lattice::dotplot(ranef(biomass_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 
 ```
 
-Conditional and marginal R^2^ of the biomass model `r MuMIn::r.squaredGLMM(biomass_model)`
+Conditional and marginal R^2^ of the biomass model `r MuMIn::r.squaredGLMM(bmod)`
 
 All species generated more aboveground biomass in young forests and at locations with greater light availability. Biomass production decreased with distance from the road/forest edge and (interestingly) with greater soil moisture, however, there was a significant interaction between distance and soil moisture indicating greater soil moisture at distances farther from the edge.
 
@@ -1461,6 +1526,24 @@ The random intercepts for each species show that native species generated less b
 
 Site-level biomass production was greater at CH, PR, LD, and SR, while lower at DG, FR, and GR. The intercepts for the other five sites all had confidence error estimates crossing zero, with absolute values of the intercepts <0.12.
 
+
+I'm exploring making plots of the marginal effects for each group in the random effects, particulalry for species, with special interest in the relationship with distance (edge effects). 
+```{r sjPlot-biomass}
+
+sjPlot::sjp.lmer(biomass_model, type = "re.qq")
+sjPlot::plot_model(biomass_model, type = "diag")
+
+biomass_sjplot <- sjPlot::sjp.lmer(biomass_model, type = "ri.slope", legend.title = "")
+# sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type = "eff")
+# sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type)
+
+# sjPlot::sjp.lmer(biomass_model, type = "fe.slope")
+biomass_distance <- biomass_sjplot$plot[[6]]
+biomass_distance +
+  # labs(y = "Biomass", x = "Distance") + 
+  theme_classic()
+
+```
 
 
 ~~What about fitting a separate models for each species? I don't think this is necessary unless we want to be able to say something specific about the relationship between the response and specific predictors for each species. I think it is reasonable to assume that the plants generally respond similarly to things like soil moisture and light availability.~~
@@ -1995,30 +2078,30 @@ write.csv(germ_ranef_df, "model_output_data/germ_ranef.csv")
   ggtitle("Site germination intercepts"))
 ```
 
-```{r germ-fixef-plot, cache=T}
-germ_summary <- summary(germ_model)
+```{r germ-fixef-plot-data, cache=T, eval=F}
+# germ_summary <- summary(germ_model)
 # str(germ_summary)
 var_names <- c("Intercept","Distance","Pct. light","Basal area","Forest age: young","Litter mass","Basal area:Forest age")
-germ_fixed <- as.data.frame(germ_summary$coefficients)
-germ_fixed$var_names <- var_names
-germ_confint <- as.data.frame(confint(germ_model))
-germ_confint <- germ_confint[-c(1:2),]
-germ_fixed <- cbind(germ_fixed, germ_confint)
-# str(germ_fixed)
-
-(germ_coef_plot <- ggplot(filter(germ_fixed, var_names!="Intercept"), 
-       aes(y = var_names, x = Estimate)) +
-  # coord_flip() +
-  geom_vline(xintercept = 0, color = "gray70") +
-  geom_point(size = 2) +
-  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
-  theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
-        ) +
-  labs(x="", y="") +
-  ggtitle("Means ± 95% confidence intervals - germ"))
+# germ_fixed <- as.data.frame(germ_summary$coefficients)
+# germ_fixed$var_names <- var_names
+# germ_confint <- as.data.frame(confint(germ_model))
+# germ_confint <- germ_confint[-c(1:2),]
+# germ_fixed <- cbind(germ_fixed, germ_confint)
+# # str(germ_fixed)
+# 
+# (germ_coef_plot <- ggplot(filter(germ_fixed, var_names!="Intercept"), 
+#        aes(y = var_names, x = Estimate)) +
+#   # coord_flip() +
+#   geom_vline(xintercept = 0, color = "gray70") +
+#   geom_point(size = 2) +
+#   geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+#   theme_classic() +
+#   theme(axis.text.y = element_text(size = 12),
+#         axis.text.x = element_text(size = 12),
+#         plot.title = element_text(hjust = .5, size = 18)
+#         ) +
+#   labs(x="", y="") +
+#   ggtitle("Means ± 95% confidence intervals - germ"))
 
 
 germ_scaled_summary <- summary(germ_model_scaled)
@@ -2028,6 +2111,11 @@ germ_scaled_coef$var_names <- var_names
 germ_confint <- as.data.frame(confint(germ_model_scaled))
 germ_confint <- germ_confint[-c(1:2),]
 germ_scaled_coef <- cbind(germ_scaled_coef, germ_confint)
+write_csv(germ_scaled_coef, "model_output_data/germ_fixed_coef.csv")
+```
+
+```{r germ-fixef-plot}
+germ_scaled_coef <- read_csv("model_output_data/germ_fixed_coef.csv")
 
 (germ_scaled_coef_plot <- ggplot(filter(germ_scaled_coef, var_names!="Intercept"), 
        aes(y = var_names, x = Estimate)) +
@@ -2043,8 +2131,6 @@ germ_scaled_coef <- cbind(germ_scaled_coef, germ_confint)
   labs(x="", y="") +
   ggtitle("(Scaled) means ± 95% confidence intervals - germ")
   )
-
-write.csv(germ_scaled_coef, "model_output_data/germ_fixed_coef.csv")
 
 ```
 
@@ -2180,6 +2266,9 @@ write.csv(surv_ranef_df, "model_output_data/survival_ranef.csv")
   labs(x="", y="") +
   ggtitle("Species survival probability intercepts"))
 
+predict(surv_model)
+
+
 (surv_site_ranef_plot <- ggplot(filter(surv_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
   geom_point() +
@@ -2193,9 +2282,10 @@ write.csv(surv_ranef_df, "model_output_data/survival_ranef.csv")
   labs(x="", y="") +
   ggtitle("Site survival probability intercepts"))
 
+
 ```
 
-```{r surv-fixef-plot, cache=T}
+```{r surv-fixef-plot-data, cache=T, eval=F}
 surv_summary <- summary(surv_model)
 # str(surv_summary)
 var_names <- c("Intercept","Distance","Pct. light","Basal area","Forest age: young","Litter mass","Pct. light:Distance","Basal area:Forest age","Litter mass:Distance")
@@ -2205,6 +2295,12 @@ surv_confint <- as.data.frame(confint(surv_model))
 surv_confint <- surv_confint[-c(1:2),]
 surv_fixed <- cbind(surv_fixed, surv_confint)
 # str(surv_fixed)
+write_csv(surv_fixed, "model_output_data/survival_fixed_coef.csv")
+
+```
+
+```{r surv-fixef-plot}
+surv_fixed <- read_csv("model_output_data/survival_fixed_coef.csv")
 
 (surv_coef_plot <- ggplot(filter(surv_fixed, var_names!="Intercept"),
        aes(y = var_names, x = Estimate)) +
@@ -2218,10 +2314,7 @@ surv_fixed <- cbind(surv_fixed, surv_confint)
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
-  ggtitle("Scaled means ± 95% confidence intervals - surv"))
-
-write.csv(surv_fixed, "model_output_data/survival_fixed_coef.csv")
-
+  ggtitle("Survival scaled means ± 95% CI"))
 
 # surv_scaled_summary <- summary(surv_model_scaled)
 # # str(surv_scaled_summary)
@@ -2248,8 +2341,6 @@ write.csv(surv_fixed, "model_output_data/survival_fixed_coef.csv")
 
 ```
 
-<!-- `r MuMIn::r.squaredGLMM(surv_model_scaled)` -->
-
 ## Germination and survival results
 The probability of germination increased with distance from edge, light availability, litter mass, and basal area, but the effect of basal area was moderated by forest successional age, with lower germination in young forests. Effects of measured site conditions on survival were relatively weak and predominantly due to interaction variables. Light availability had a significant positive effect on survival probability, but this decreased with distance from the edge (indicated by the negative interaction term). The positive interaction of distance and litter increased survival probability, although the main effects of distance and litter were statistically insignificant. The interaction of basal area and forest age was similar, but with a negative effect where seedlings at locations with lower basal area in younger forests had lower probability of survival. Variation in survival depended predominantly on species specific characteristics and unmeasured site characteristics as indicated by the variance accounted for by these random effects variables.
 
@@ -2261,3 +2352,4 @@ Growth was relativley poor for all the metrics at the DG, FR, and GR, and tended
 ```{r gridded-site-ranef-fig}
 cowplot::plot_grid(plotlist = list(biomass_site_ranef_plot, diam_site_ranef_plot, rgr_site_ranef_plot, surv_site_ranef_plot, germ_site_ranef_plot))
 ```
+
