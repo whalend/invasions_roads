@@ -1171,6 +1171,11 @@ We used mixed-effects logistic regressions to model germination and survival pro
 In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the "lme4" (@Bates2015) and "lmerTest" (@Kuznetsova2017) packages in the R statistical computing environment. The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.
 
 The factor f_age represents forest age, and a value of 1 indicates young forests while a value of 0 indicates mature forests.
+
+```{r raw-predictors-pairs-plot, eval=F}
+GGally::ggpairs(select(site_grouped_data, distance, tree_richness, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture, age), aes(color = age, alpha = .2))
+```
+
  
 ## Biomass model
 ```{r biomass-model, eval=F}
@@ -1222,7 +1227,7 @@ anova(m1_lmer, m2_lmer)
 
 
 # 1. Start with as many explanatory variables in the fixed component as possible and then add in various structures to the random component
-biomass_mod1 <- nlme::gls(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture, data = filter(site_grouped_data, is.na(avg_biomass)=="FALSE"), method = "REML")
+biomass_mod1 <- nlme::gls(log(avg_biomass) ~ distance + avg_pct_light + litter_kg_m2 + pct_moisture + distance:avg_pct_light + avg_basal_area*age + distance:litter_kg_m2 + distance:pct_moisture, data = filter(site_grouped_data, is.na(avg_biomass)=="FALSE"), method = "REML")
 
 biomass_mod2 <- lmer(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (1|site_code), data = site_grouped_data)
 
@@ -1304,8 +1309,8 @@ summary(m4.full)
 m4.b <- update(m4.full, .~. -avg_basal_area)
 anova(m4.full, m4.b)
 
-
-bmod <- lmer(log(avg_biomass) ~ distance + avg_pct_light + age + (1|site_code) + (1|common_name), data = site_grouped_data)
+# there's strong correlation between distance and % moisture in the mixed model
+bmod <- lmer(log(avg_biomass) ~ distance + avg_pct_light + age + pct_moisture + distance:pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
 
 anova(bmod, m4.b)
 
@@ -1319,7 +1324,9 @@ piecewiseSEM::sem.fit(bmod_list, data = site_grouped_data)
 piecewiseSEM::rsquared(bmod_list)
 # piecewiseSEM::sem.coefs(bmod_list, data = site_grouped_data) # error
 summary(m1)
-summary(m2)# indicates that % moisture has no effect after accounting for other variables
+summary(m2)# indicates that % moisture has no effect after accounting for other variables, so excluding % moisture and the interaction with distance from the model
+
+
 
 ```
 
@@ -1518,7 +1525,7 @@ write_csv(biomass_scaled_coef, "model_output_data/biomass_fixed_coef.csv")
 
 ```
 
-Conditional and marginal R^2^ of the biomass model `r MuMIn::r.squaredGLMM(bmod)`
+Conditional and marginal R^2^ of the biomass model `r MuMIn::r.squaredGLMM(biomass_model)`
 
 All species generated more aboveground biomass in young forests and at locations with greater light availability. Biomass production decreased with distance from the road/forest edge and (interestingly) with greater soil moisture, however, there was a significant interaction between distance and soil moisture indicating greater soil moisture at distances farther from the edge.
 
@@ -1612,11 +1619,29 @@ summary(diam_mod4d)
 Form <- formula(log(avg_diameter) ~ distance + avg_pct_light + age + distance*pct_moisture + (1|site_code) + (1|common_name))
 diam_mod4e <- lmer(Form, data = site_grouped_data, REML = F)
 summary(diam_mod4e)
+
+# there's strong correlation between distance and % moisture in the mixed model
+dmod <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + (1|site_code) + (1|common_name), data = site_grouped_data)
+
+anova(dmod, diam_mod4e)
+
+dmod_list <- list(
+  m1 <- lmer(pct_moisture ~ distance + (1|site_code), data = site_grouped_data),
+  m2 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + f_age + pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+)
+
+piecewiseSEM::sem.basis.set(dmod_list)
+piecewiseSEM::sem.fit(dmod_list, data = site_grouped_data)
+piecewiseSEM::rsquared(dmod_list)
+# piecewiseSEM::sem.coefs(bmod_list, data = site_grouped_data) # error
+summary(m1)
+summary(m2)# indicates that % moisture has no effect after accounting for other variables, so excluding % moisture and the interaction with distance from the model
+
 ```
 
 ```{r final diameter model}
 
-diam_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + distance*pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+diam_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(diam_model)
 
 # model diagnostics - residual plots ----
@@ -1790,11 +1815,28 @@ rgr_mod4d <- lmer(form, data = site_grouped_data, REML = F)
 anova(rgr_mod4_ML, rgr_mod4d)
 summary(rgr_mod4d)
 
-form <- formula(avg_rgr_ht ~ avg_pct_light + age + distance * pct_moisture + (1 | site_code) + (1 | common_name))
+form <- formula(avg_rgr_ht ~ distance + avg_pct_light + age + distance * pct_moisture + (1 | site_code) + (1 | common_name))
 rgr_mod4e <- lmer(form, data = site_grouped_data, REML = F)
 anova(rgr_mod4_ML, rgr_mod4e)
 summary(rgr_mod4e)
 # percent moisture is not terribly convincing at p = .044, but the interaction with distance is pretty strong statistically
+
+# there's strong correlation between distance and % moisture in the mixed model
+rmod <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + (1|site_code) + (1|common_name), data = site_grouped_data)
+
+anova(rmod, diam_mod4e)
+
+dmod_list <- list(
+  m1 <- lmer(pct_moisture ~ distance + (1|site_code), data = site_grouped_data),
+  m2 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + f_age + pct_moisture + (1|site_code) + (1|common_name), data = site_grouped_data)
+)
+
+piecewiseSEM::sem.basis.set(rmod_list)
+piecewiseSEM::sem.fit(rmod_list, data = site_grouped_data)
+piecewiseSEM::rsquared(rmod_list)
+# piecewiseSEM::sem.coefs(bmod_list, data = site_grouped_data) # error
+summary(m1)
+summary(m2)# indicates that % moisture has no effect after accounting for other variables, so excluding % moisture and the interaction with distance from the model
 
 ```
 
