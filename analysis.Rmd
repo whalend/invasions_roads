@@ -699,7 +699,7 @@ germination_habitat_data <- germination_data %>%
 
 ggplot(germination_data, aes(distance, pct_germinated)) +
   stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
-  geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey40", size = .8) +
+  geom_smooth(aes(linetype = status), method = "loess", se = T, show.legend = F, color = "grey40", size = .8) +
   # scale_shape_manual(values = c(rep(16, 3), rep(17, 3))) +
   # scale_color_manual(values = c(brewer.pal(3, "RdBu"), brewer.pal(3, "RdBu"))) +
   scale_linetype_manual(values = c(2,1)) +
@@ -1058,6 +1058,9 @@ herbiv$year[herbiv$year=="herbivory04"] <- 2004
 herbiv$year[herbiv$year=="herbivory05"] <- 2005
 herbiv$year[herbiv$year=="herbivory06"] <- 2006
 
+left_join(herbiv, 
+          select(surv, site_code, age, distance, common_name, year, survival))
+
 ggplot(filter(herbiv, year == 2006), aes(distance, herbivory)) +
   stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
   geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
@@ -1112,10 +1115,10 @@ We've settled on doing a model to try and explain herbivory. First, I'm looking 
 
 ```{r herbiv-by-year}
 
-ggplot(herbiv, aes(distance, herbivory)) +
+ggplot(herbiv, aes(f_habitat, herbivory)) +
   stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "pointrange", size = .75, show.legend = T, position = "jitter") +
   # geom_point(aes(shape = common_name)) +
-  geom_smooth(aes(linetype = status), method = "lm", se = T, show.legend = F, color = "grey50", alpha = .2) +
+  geom_smooth(aes(linetype = status), method = "loess", se = T, show.legend = F, color = "grey50", alpha = .2) +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "RdBu") +
   facet_grid(age~year) +
@@ -1131,7 +1134,7 @@ ggplot(herbiv, aes(distance, herbivory)) +
 
 In young forests, herbivory increased with distance from edge for both native and non-native species, but decreased with distance from edge for native species in mature forests. There was no relationship between distance from edge and herbivory for non-native species in mature forests. Herbivory was greater on native than non-native species in both forest types.
 
-Herbivory was categorized, where 1 = 1-25%, 2 = 26-50%, 3 = 51-75%.
+Herbivory was categorized as leaf-loss, where 0 = no herbivory, 1 = ≤25%, 2 = 26-50%, 3 = 51-75%, 4 = 76-99%, and 5 = 100% leaf removal by herbivores.
 
 What kind of herbivory might this be: Defoliators.
 
@@ -2436,13 +2439,46 @@ cowplot::plot_grid(plotlist = list(biomass_site_ranef_plot, diam_site_ranef_plot
 ## Herbivory model
 General model formulation: herbivory ~ distance + age + year + pct_light + litter
 
-I'm not actually sure how to fit a model to these data. It's ordinal in that the categories indicate the range of herbivory in terms of leaf area affected. 
+I'm not actually sure how to fit a model to these data. It's ordinal in that the categories indicate the range of herbivory in terms of leaf area affected. Herbivory was categorized as leaf-loss, where 
+
+- 0 = no herbivory
+- 1 = ≤25% 
+- 2 = 26-50%
+- 3 = 51-75%
+- 4 = 76-99%
+- 5 = 100% leaf removal by herbivores
+
+The internet has some suggestions on how to do this for mixed-effects models: 
+[](https://stats.stackexchange.com/questions/238581/how-to-use-ordinal-logistic-regression-with-random-effects?noredirect=1&lq=1)
+
+The `ordinal` package has the `clmm` and `clmm2`, with will probably suffice for my purposes. I just need to get a decent inference off the data. Two other packages implement Bayesian MCMC frameworsks:  [MCMCglmm](https://cran.r-project.org/package=MCMCglmm) and [brms](https://cran.r-project.org/package=brms).
+
+Other studies have looked at incidence, i.e., presence/absence of herbivory at each observation.
 
 ```{r find-herbivory-model, eval=F}
+
 summary(herbiv)
+herbiv <- herbiv %>% 
+  mutate(herbivory_incidence = ifelse(herbivory == 0,0,1))
+
 herbiv_noNA_data <- filter(herbiv, !is.na(herbivory))
 summary(herbiv_noNA_data)
 hist(herbiv_noNA_data$herbivory)
+herbiv_noNA_data <- herbiv_noNA_data %>% 
+  mutate(herbivory_incidence = as.factor(ifelse(herbivory == 0,0,1)))
+
+ggplot(filter(herbiv_noNA_data), aes(distance, herbivory_incidence)) +
+  # geom_boxplot(aes(group = distance)) +
+  geom_point(aes(color = status), position = "jitter") +
+  geom_smooth(aes(color = status), method = "loess") +
+  facet_grid(age~year) +
+  # scale_color_brewer(palette = 7) +
+  theme_bw()
+
+
+# install.packages("ordinal")
+library(ordinal)
+
 
 ```
 
