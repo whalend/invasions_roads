@@ -201,26 +201,39 @@ seedling_data <- seedling_data %>%
 ## using site_code as a random effect.
 site_grouped_data <- seedling_data %>%
   group_by(site_code, age, distance, habitat_type, f_habitat, common_name, status) %>% 
-  summarise(avg_biomass = mean(tot_biomass, na.rm = T),
-            # n_obs = length(tot_biomass),
-            se_biomass = sd(tot_biomass, na.rm = T)/sqrt(length(tot_biomass)),
-            avg_diameter = mean(diameter06, na.rm = T),
-            se_diameter = sd(diameter06, na.rm = T)/sqrt(length(diameter06)),
-            avg_rgr_ht = mean(rgr_ht_days, na.rm = T),
-            se_rgr_ht = sd(rgr_ht_days, na.rm = T)/sqrt(length(rgr_ht_days)),
-            avg_height = mean(final_ht06, na.rm = T),
-            se_height = sd(final_ht06, na.rm = T)/sqrt(length(final_ht06)),
-            avg_num_leaves = mean(num_leaves, na.rm = T),
-            se_num_leaves = sd(num_leaves)/sqrt(length(num_leaves)),
-            tree_richness = mean(tree_richness),
-            avg_dbh = mean(avg_dbh),
-            se_dbh = mean(se_dbh),
-            total_dbh = mean(total_dbh),
-            avg_basal_area = mean(avg_basal_area),
-            avg_ppfd = mean(avg_ppfd),
-            avg_pct_light = mean(avg_pct_light),
-            litter_kg_m2 = mean(litter_kg_m2),
-            pct_moisture = mean(pct_moisture)) %>% 
+  mutate(
+    herbiv_incidence_04 = ifelse(herbivory04>0,1,0),
+    herbiv_incidence_05 = ifelse(herbivory05>0,1,0),
+    herbiv_incidence_06 = ifelse(herbivory06>0,1,0)
+    ) %>% 
+  summarise(
+    avg_biomass = mean(tot_biomass, na.rm = T),
+    # n_obs = length(tot_biomass),
+    se_biomass = sd(tot_biomass, na.rm = T)/sqrt(length(tot_biomass)),
+    avg_diameter = mean(diameter06, na.rm = T),
+    se_diameter = sd(diameter06, na.rm = T)/sqrt(length(diameter06)),
+    avg_rgr_ht = mean(rgr_ht_days, na.rm = T),
+    se_rgr_ht = sd(rgr_ht_days, na.rm = T)/sqrt(length(rgr_ht_days)),
+    avg_height = mean(final_ht06, na.rm = T),
+    se_height = sd(final_ht06, na.rm = T)/sqrt(length(final_ht06)),
+    avg_num_leaves = mean(num_leaves, na.rm = T),
+    se_num_leaves = sd(num_leaves)/sqrt(length(num_leaves)),
+    tree_richness = mean(tree_richness),
+    avg_dbh = mean(avg_dbh),
+    se_dbh = mean(se_dbh),
+    total_dbh = mean(total_dbh),
+    avg_basal_area = mean(avg_basal_area),
+    avg_ppfd = mean(avg_ppfd),
+    avg_pct_light = mean(avg_pct_light),
+    litter_kg_m2 = mean(litter_kg_m2),
+    pct_moisture = mean(pct_moisture),
+    avg_herbivory_04 = mean(herbivory04, na.rm = T),
+    avg_herbivory_05 = mean(herbivory05, na.rm = T),
+    avg_herbivory_06 = mean(herbivory06, na.rm = T),
+    avg_h_incidence_04 = mean(herbiv_incidence_04, na.rm = T),
+    avg_h_incidence_05 = mean(herbiv_incidence_05, na.rm = T),
+    avg_h_incidence_06 = mean(herbiv_incidence_06, na.rm = T)
+    ) %>% 
   ungroup(.) %>% 
   mutate(f_age = as.factor(ifelse(age=="Mature forest",0,1)))
 
@@ -1335,8 +1348,6 @@ piecewiseSEM::rsquared(bmod_list)
 summary(m1)
 summary(m2)# indicates that % moisture has no effect after accounting for other variables, so excluding % moisture and the interaction with distance from the model
 
-
-
 ```
 
 ### Diagnostic plots 
@@ -1419,6 +1430,20 @@ summary(biomass_model_scaled)
 # summary(scaled_biomass_model)
 
 # confint(biomass_model)
+
+# Explore herbivory predictors in model ####
+
+bmod_herbiv <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_herbivory_04 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(bmod_herbiv)
+
+bmod_herbiv2 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence_05 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(bmod_herbiv2)
+
+bmod_herbiv3 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(bmod_herbiv3)
+
+# I tried an herbivory predictor from each year using either averaged ordinal scores or average incidence (presence/absence), resulting in data pooled across species at each distance at each site. For the ordinal model, only the average herbivory from the 2004 observation was statistically significant. Using incidence, observations from 2005 and 2006 are statistically significant. 
+
 ```
 
 
@@ -1433,7 +1458,7 @@ biomass_ranef_df <- as.data.frame(biomass_ranef)
 write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
 
 intercept <- biomass_summary$coefficients[1,1]
-biomass_coefs <- as.data.frame(unlist(coef(biomass_model)))
+biomass_coefs <- coef(biomass_model)
 
 (biomass_species_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="common_name"), 
        aes(y = grp, x = condval)) +
@@ -1549,15 +1574,20 @@ I'm exploring making plots of the marginal effects for each group in the random 
 sjPlot::sjp.lmer(biomass_model, type = "re.qq")
 sjPlot::plot_model(biomass_model, type = "diag")
 
-biomass_sjplot <- sjPlot::sjp.lmer(biomass_model, type = "ri.slope", legend.title = "")
+biomass_sjplot <- sjPlot::sjp.lmer(biomass_model, type = "ri.slope", vars = "distance")
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type = "eff")
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type)
 
 # sjPlot::sjp.lmer(biomass_model, type = "fe.slope")
-biomass_distance <- biomass_sjplot$plot[[6]]
-biomass_distance +
-  # labs(y = "Biomass", x = "Distance") + 
-  theme_classic()
+biomass_distance <- biomass_sjplot$plot[[2]]
+# biomass_distance <- biomass_distance$data
+biomass_lines <- biomass_distance +
+  # geom_line() +
+  # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
+  scale_color_brewer(palette = 7) +
+  labs(y = "Biomass", x = "Distance", title = "") +
+  theme_classic() +
+  theme(legend.title = element_blank())
 
 ```
 
@@ -1736,7 +1766,6 @@ diam_fixed <- cbind(diam_fixed, diam_confint)
 
 diam_scaled_summary <- summary(diam_model_scaled)
 # str(diam_scaled_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Pct. moisture","Distance:Pct. moisture")
 diam_scaled_coef <- as.data.frame(diam_scaled_summary$coefficients)
 diam_scaled_coef$var_names <- var_names
 diam_confint <- as.data.frame(confint(diam_model_scaled))
@@ -1764,7 +1793,22 @@ write_csv(diam_scaled_coef, "model_output_data/diam_fixed_coef.csv")
 
 Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squaredGLMM(diam_model_scaled)`
 
-Seedling diameter increased with light availability and was greater in younger forests, but decreased with distance
+Seedling diameter increased with light availability and was greater in younger forests, but decreased with distance.
+
+```{r sjplot-diameter}
+
+diam_sjplot <- sjPlot::sjp.lmer(diam_model, type = "ri.slope", vars = "distance")
+diam_sjplot <- diam_sjplot$plot[[2]]
+diam_lines <- diam_sjplot +
+  # geom_line() +
+  # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
+  scale_color_brewer(palette = 7) +
+  labs(y = "Diameter", x = "Distance", title = "") +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
+```
+
 
 ## Relative growth rate model
 The units of relative growth rate are percent change per day (I think).
@@ -1991,9 +2035,32 @@ Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squar
 
 The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.
 
+```{r sjplot-rgr}
 
-```{r gridded-results-figure, fig.height=10, fig.width=7}
+rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", vars = "distance")
+rgr_sjplot <- rgr_sjplot$plot[[2]]
+rgr_lines <- rgr_sjplot +
+  # geom_line() +
+  # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
+  scale_color_brewer(palette = 7) +
+  labs(y = "Relative growth rate", x = "Distance", title = "") +
+  theme_classic() +
+  theme(legend.title = element_blank())
+
+```
+
+
+```{r gridded-dotplots, fig.height=10, fig.width=7}
+
 cowplot::plot_grid(plotlist = list(biomass_scaled_coef_plot, biomass_species_ranef_plot, diam_scaled_coef_plot, diam_species_ranef_plot, rgr_scaled_coef_plot, rgr_species_ranef_plot), nrow = 3,ncol = 2, axis = "lb")
+
+```
+
+```{r gridded-lineplots}
+
+cowplot::plot_grid(plotlist = list(biomass_lines, diam_lines, rgr_lines),
+                   ncol = 1)
+
 ```
 
 
@@ -2197,6 +2264,20 @@ germ_scaled_coef <- read_csv("model_output_data/germ_fixed_coef.csv")
   )
 
 ```
+
+```{r sjplot-germination}
+
+germ_sjplot <- sjPlot::sjp.glmer(germ_model_scaled, type = "ri.slope", vars = "scaled_distance", facet.grid = F)
+germ_sjplot <- germ_sjplot$plot[[2]]
+germ_lines <- germ_sjplot +
+  labs(y = "Germination probability", x = "Scaled distance") +
+  ggtitle("") +
+  theme_classic() +
+  theme(legend.title = element_blank()) +
+  scale_color_brewer(palette = 7)
+
+```
+
 
 ## Seedling survival model
 Logistic regression to estimate species-level survival probabilities.
@@ -2453,9 +2534,9 @@ The internet has some suggestions on how to do this for mixed-effects models:
 
 The `ordinal` package has the `clmm` and `clmm2`, with will probably suffice for my purposes. I just need to get a decent inference off the data. Two other packages implement Bayesian MCMC frameworsks:  [MCMCglmm](https://cran.r-project.org/package=MCMCglmm) and [brms](https://cran.r-project.org/package=brms).
 
-Other studies have looked at incidence, i.e., presence/absence of herbivory at each observation.
+Other studies have looked at incidence, i.e., presence/absence of herbivory at each observation, so we could take that approach.
 
-```{r find-herbivory-model, eval=F}
+```{r ordinal-vs-incidence, eval=T}
 
 summary(herbiv)
 herbiv <- herbiv %>% 
@@ -2465,20 +2546,43 @@ herbiv_noNA_data <- filter(herbiv, !is.na(herbivory))
 summary(herbiv_noNA_data)
 hist(herbiv_noNA_data$herbivory)
 herbiv_noNA_data <- herbiv_noNA_data %>% 
-  mutate(herbivory_incidence = as.factor(ifelse(herbivory == 0,0,1)))
+  mutate(herbivory_incidence = ifelse(herbivory == 0,0,1))
 
-ggplot(filter(herbiv_noNA_data), aes(distance, herbivory_incidence)) +
+herb_ordinal <- ggplot(herbiv_noNA_data, aes(distance, herbivory)) +
   # geom_boxplot(aes(group = distance)) +
   geom_point(aes(color = status), position = "jitter") +
-  geom_smooth(aes(color = status), method = "loess") +
+  geom_smooth(aes(color = status), method = "loess", show.legend = F) +
   facet_grid(age~year) +
   # scale_color_brewer(palette = 7) +
-  theme_bw()
+  xlab("") +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        legend.position = "top",
+        legend.title = element_blank()) +
+  scale_color_manual(values = c())
 
+herb_incidence <- ggplot(herbiv_noNA_data, aes(distance, herbivory_incidence)) +
+  # geom_boxplot(aes(group = distance)) +
+  geom_point(aes(color = status), position = "jitter") +
+  geom_smooth(aes(color = status), method = "loess", show.legend = F) +
+  facet_grid(age~year) +
+  # scale_color_brewer(palette = 7) +
+  theme_bw() +
+  theme(strip.background = element_blank(),
+        legend.position = "none")
 
-# install.packages("ordinal")
-library(ordinal)
-
+cowplot::plot_grid(plotlist = list(herb_ordinal, herb_incidence), nrow = 2)
 
 ```
+
+```{r incident-herbivory-model}
+
+```
+
+
+```{r ordinal-herbivory-model}
+# install.packages("ordinal")
+library(ordinal)
+```
+
 
