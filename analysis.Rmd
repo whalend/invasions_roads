@@ -2058,10 +2058,12 @@ Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squar
 The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.
 
 ```{r sjplot-rgr}
+sjPlot::sjp.lmer(rgr_model)
 
 rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", vars = "distance")
 rgr_distance <- rgr_sjplot$plot[[2]]
 rgr_distance_lines <- rgr_distance +
+  geom_abline(intercept = rgr_summary$coefficients[1,1], slope = )
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = 7) +
@@ -2072,16 +2074,13 @@ rgr_distance_lines <- rgr_distance +
 ```
 
 
-```{r gridded-dotplots, fig.height=10, fig.width=7}
+```{r gridded-dot-line-plots, fig.height=10, fig.width=7}
 
-cowplot::plot_grid(plotlist = list(biomass_scaled_coef_plot, biomass_species_ranef_plot, biomass_distance_lines, diam_scaled_coef_plot, diam_species_ranef_plot, diam_distance_lines, rgr_scaled_coef_plot, rgr_species_ranef_plot, rgr_distance_lines), nrow = 3,ncol = 3)
-
-```
-
-```{r gridded-lineplots}
-
-cowplot::plot_grid(plotlist = list(biomass_lines, diam_lines, rgr_lines),
-                   ncol = 1)
+cowplot::plot_grid(plotlist = list(
+  biomass_scaled_coef_plot, biomass_species_ranef_plot, biomass_distance_lines, 
+  diam_scaled_coef_plot, diam_species_ranef_plot, diam_distance_lines,
+  rgr_scaled_coef_plot, rgr_species_ranef_plot, rgr_distance_lines), 
+  nrow = 3, ncol = 3)
 
 ```
 
