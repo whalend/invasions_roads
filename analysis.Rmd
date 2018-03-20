@@ -2199,7 +2199,7 @@ summary(germ_model_scaled)
 
 ```{r germ-ranef-plot}
 
-germ_ranef <- ranef(germ_model, condVar = T)
+germ_ranef <- ranef(germ_model_scaled, condVar = T)
 germ_ranef_df <- as.data.frame(germ_ranef)
 write.csv(germ_ranef_df, "model_output_data/germ_ranef.csv")
 
@@ -2287,15 +2287,29 @@ germ_scaled_coef <- read_csv("model_output_data/germ_fixed_coef.csv")
 ```
 
 ```{r sjplot-germination}
+sjPlot::sjp.glmer(germ_model_scaled, type = "fe")
 
-germ_sjplot <- sjPlot::sjp.glmer(germ_model_scaled, type = "ri.slope", vars = "scaled_distance", facet.grid = F)
-germ_sjplot <- germ_sjplot$plot[[2]]
-germ_lines <- germ_sjplot +
-  labs(y = "Germination probability", x = "Scaled distance") +
+germ_sjplot <- sjPlot::sjp.glmer(germ_model, type = "ri.slope", facet.grid = F)
+
+germ_distance <- germ_sjplot$plot[[4]]
+(germ_distance_lines <- germ_distance +
+  labs(y = "Predicted germination probability", x = "Distance (m)") +
   ggtitle("") +
   theme_classic() +
   theme(legend.title = element_blank()) +
+  # viridis::scale_color_viridis(discrete = T, begin = .01, end = .999, option = "inferno")
   scale_color_brewer(palette = 7)
+)
+
+germ_litter <- germ_sjplot$plot[[6]]
+(germ_litter_lines <- germ_litter +
+  labs(y = "Predicted germination probability", x = "Litter (kg/m2)") +
+  ggtitle("") +
+  theme_classic() +
+  theme(legend.title = element_blank()) +
+  # viridis::scale_color_viridis(discrete = T, begin = .01, end = .99, option = "A")
+  scale_color_brewer(palette = 7)
+)
 
 ```
 
@@ -2403,15 +2417,20 @@ survival_2006 <- survival_2006 %>%
     scaled_pct_moisture = scale(pct_moisture)
   )
 
-surv_model <- glmer(cbind(alive,dead) ~ scaled_distance + age + scaled_litter_kg_m2 + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
+survival_2006$obs_id <- seq_along(survival_2006$age)
 
+surv_model <- glmer(cbind(alive,dead) ~ distance + age + litter_kg_m2 + (1|site_code) + (1|common_name) + (1|obs_id), data = survival_2006, family = "binomial")
 summary(surv_model)
-plot(surv_model)
 
-e2 <- resid(surv_model, type = "deviance")
+surv_model_scaled <- glmer(cbind(alive,dead) ~ scaled_distance + age + scaled_litter_kg_m2 + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
 
-ggplot(as.data.frame(cbind(fitted(surv_model),e2)),
-       aes(fitted(surv_model), e2)) +
+summary(surv_model_scaled)
+plot(surv_model_scaled)
+
+e2 <- resid(surv_model_scaled, type = "deviance")
+
+ggplot(as.data.frame(cbind(fitted(surv_model_scaled),e2)),
+       aes(fitted(surv_model_scaled), e2)) +
   geom_point() +
   geom_smooth()
 
@@ -2451,7 +2470,7 @@ write.csv(surv_ranef_df, "model_output_data/survival_ranef.csv")
   labs(x="", y="") +
   ggtitle("Species survival probability intercepts"))
 
-predict(surv_model)
+# predict(surv_model)
 
 
 (surv_site_ranef_plot <- ggplot(filter(surv_ranef_df, grpvar=="site_code"), 
@@ -2471,7 +2490,7 @@ predict(surv_model)
 ```
 
 ```{r surv-fixef-plot-data, cache=T, eval=F}
-surv_summary <- summary(surv_model)
+surv_summary <- summary(surv_model_scaled)
 # str(surv_summary)
 var_names <- c("Intercept","Distance","Forest age: young","Litter mass")
 surv_fixed <- as.data.frame(surv_summary$coefficients)
@@ -2525,6 +2544,27 @@ surv_fixed <- read_csv("model_output_data/survival_fixed_coef.csv")
 #   )
 
 ```
+
+The estimated marginal and condiational R^2^ values reinforce that the fixed effects don't explain the variance in seedling survival: 
+
+`r MuMIn::r.squaredGLMM(surv_model)`
+
+```{r survival-sjplot}
+surv_model <- glmer(cbind(alive, dead) ~ distance + age + litter_kg_m2 + (1 | site_code) + (1 | common_name), data = survival_2006, family = "binomial")
+
+surv_sjplot <- sjPlot::sjp.glmer(surv_model, type = "ri.slope", facet.grid = F)
+surv_distance <- surv_sjplot$plot[[4]]
+(surv_distance_lines <- surv_distance +
+  labs(y = "Predicted survival probability", x = "Distance (m)") +
+  ggtitle("") +
+  theme_classic() +
+  theme(legend.title = element_blank()) +
+  # viridis::scale_color_viridis(discrete = T, begin = .01, end = .999, option = "inferno")
+  scale_color_brewer(palette = 7)
+)
+
+```
+
 
 ## Germination and survival results
 The probability of germination increased with distance from edge, light availability, litter mass, and basal area, but the effect of basal area was moderated by forest successional age, with lower germination in young forests. Effects of measured site conditions on survival were relatively weak and predominantly due to interaction variables. Light availability had a significant positive effect on survival probability, but this decreased with distance from the edge (indicated by the negative interaction term). The positive interaction of distance and litter increased survival probability, although the main effects of distance and litter were statistically insignificant. The interaction of basal area and forest age was similar, but with a negative effect where seedlings at locations with lower basal area in younger forests had lower probability of survival. Variation in survival depended predominantly on species specific characteristics and unmeasured site characteristics as indicated by the variance accounted for by these random effects variables.
@@ -2598,12 +2638,25 @@ cowplot::plot_grid(plotlist = list(herb_ordinal, herb_incidence), nrow = 2)
 
 ```{r incident-herbivory-model}
 
+herbiv_noNA_data$f_herbiv_incidence <- as.factor(herbiv_noNA_data$herbivory_incidence)
+
+herbiv_incidence_mod <- glmer(f_herbiv_incidence ~ distance + age*year + status + (1|site_code) + (1|common_name), family = "binomial", data = herbiv_noNA_data)
+summary(herbiv_incidence_mod)
+AIC(herbiv_incidence_mod)
+
 ```
 
 
 ```{r ordinal-herbivory-model}
 # install.packages("ordinal")
 library(ordinal)
+herbiv_noNA_data$f_herbiv <- as.factor(herbiv_noNA_data$herbivory)
+herbiv_ordinal_mod <- clmm(f_herbiv ~ distance + age*year + status + (1|site_code) + (1|common_name), data = herbiv_noNA_data)
+summary(herbiv_ordinal_mod)
+herbiv_ord_mod_ranef <- ranef(herbiv_ordinal_mod, condVar = T)
+
+# profile.clmm2(herbiv_ordinal_mod)
+
 ```
 
 
