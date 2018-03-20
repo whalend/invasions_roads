@@ -1264,7 +1264,6 @@ biomass_mod6 <- lmer(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*
 biomass_mod6a <- lmer(log(avg_biomass) ~ distance*avg_pct_light + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture + (distance|site_code/common_name) + (1|common_name), data = site_grouped_data)
 
 
-
 # 2. compare AIC (or BIC) values from the different models
 AIC(biomass_mod1)
 AIC(biomass_mod2)
@@ -1376,20 +1375,34 @@ m4.full <- lmer(Form, data = site_grouped_data, REML = T)
 # summary(m5)
 # anova(m5,m4.full)
 
+# Explore herbivory predictors in model ####
+
+bmod_herbiv <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_herbivory_04 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(bmod_herbiv)
+
+bmod_herbiv2 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence_05 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(bmod_herbiv2)
+
+bmod_herbiv3 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(bmod_herbiv3)
+
+# I tried an herbivory predictor from each year using either averaged ordinal scores or average incidence (presence/absence), resulting in data pooled across species at each distance at each site. For the ordinal model, only the average herbivory from the 2004 observation was statistically significant. Using incidence, observations from 2005 and 2006 are statistically significant. Since biomass was measured in 2006 it makes the most sense to use herbivory measured in 2006.
+
+MuMIn::AICc(bmod_herbiv3); MuMIn::r.squaredGLMM(bmod_herbiv3)
+MuMIn::AICc(m4.full); MuMIn::r.squaredGLMM(m4.full)
 
 # Check fitted biomass model ------- 
-biomass_model <- m4.full
+biomass_model <- bmod_herbiv3
 summary(biomass_model)
 
 plot(biomass_model)
 # Residual vs. fitted values show some heterogeneity of variance; spread seems to increase some with fitted values
 # Plot residuals against each explanatory variables, looking for patterns in spread.
 E2 <- resid(biomass_model, type = "pearson")
-# plot(biomass_mod4a@frame$distance, E2)
 boxplot(E2 ~ distance, data = biomass_model@frame)
 plot(biomass_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-# plot(biomass_model@frame$pct_moisture, E2)
+plot(biomass_model@frame$avg_h_incidence_06, E2)
 
 model_summary <- summary(biomass_model)
 # correlation between observations from the same site
@@ -1402,10 +1415,11 @@ model_summary <- summary(biomass_model)
 site_grouped_data <- site_grouped_data %>% 
   mutate(scaled_distance = distance/max(distance),
          scaled_pct_moisture = (pct_moisture-mean(pct_moisture, na.rm = T))/(2*sd(pct_moisture)),
-         scaled_pct_light = (avg_pct_light-mean(avg_pct_light, na.rm = T))/(2*sd(avg_pct_light)))
+         scaled_pct_light = (avg_pct_light-mean(avg_pct_light, na.rm = T))/(2*sd(avg_pct_light)),
+         scaled_herbiv_incidence = (avg_h_incidence_06-mean(avg_h_incidence_06, na.rm = T))/(2*sd(avg_h_incidence_06, na.rm = T)))
 
 
-biomass_model_scaled <- lmer(log(avg_biomass) ~ scaled_distance + scaled_pct_light + f_age + (1|site_code) + (1|common_name), data = site_grouped_data)
+biomass_model_scaled <- lmer(log(avg_biomass) ~ scaled_distance + scaled_pct_light + f_age + scaled_herbiv_incidence + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(biomass_model_scaled)
 
 
@@ -1431,25 +1445,13 @@ summary(biomass_model_scaled)
 
 # confint(biomass_model)
 
-# Explore herbivory predictors in model ####
 
-bmod_herbiv <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_herbivory_04 + (1|site_code) + (1|common_name), data = site_grouped_data)
-summary(bmod_herbiv)
-
-bmod_herbiv2 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence_05 + (1|site_code) + (1|common_name), data = site_grouped_data)
-summary(bmod_herbiv2)
-
-bmod_herbiv3 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
-summary(bmod_herbiv3)
-
-# I tried an herbivory predictor from each year using either averaged ordinal scores or average incidence (presence/absence), resulting in data pooled across species at each distance at each site. For the ordinal model, only the average herbivory from the 2004 observation was statistically significant. Using incidence, observations from 2005 and 2006 are statistically significant. 
 
 ```
 
 
 ### Model coefficients
 ```{r biomass-ranef-plot}
-biomass_summary <- summary(biomass_model)
 
 # lattice::dotplot(fixef(biomass_model))
 biomass_ranef <- ranef(biomass_model, condVar = T)
@@ -1495,7 +1497,7 @@ biomass_coefs <- coef(biomass_model)
 # str(biomass_fixef)
 biomass_summary <- summary(biomass_model)
 # str(biomass_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young")
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Herbivory")
 biomass_fixed <- as.data.frame(biomass_summary$coefficients)
 biomass_fixed$var_names <- var_names
 biomass_confint <- as.data.frame(confint(biomass_model))
@@ -1520,7 +1522,6 @@ biomass_fixed <- cbind(biomass_fixed, biomass_confint)
 
 biomass_scaled_summary <- summary(biomass_model_scaled)
 # str(biomass_scaled_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young")
 biomass_scaled_coef <- as.data.frame(biomass_scaled_summary$coefficients)
 biomass_scaled_coef$var_names <- var_names
 biomass_confint <- as.data.frame(confint(biomass_model_scaled))
@@ -1580,14 +1581,16 @@ biomass_sjplot <- sjPlot::sjp.lmer(biomass_model, type = "ri.slope", vars = "dis
 
 # sjPlot::sjp.lmer(biomass_model, type = "fe.slope")
 biomass_distance <- biomass_sjplot$plot[[2]]
+biomass_distance$data$y <- exp(biomass_distance$data$y)
 # biomass_distance <- biomass_distance$data
-biomass_lines <- biomass_distance +
+(biomass_distance_lines <- biomass_distance +
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = 7) +
-  labs(y = "Biomass", x = "Distance", title = "") +
+  labs(y = "Biomass (g)", x = "Distance (m)", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
+)
 
 ```
 
@@ -1676,11 +1679,20 @@ piecewiseSEM::rsquared(dmod_list)
 summary(m1)
 summary(m2)# indicates that % moisture has no effect after accounting for other variables, so excluding % moisture and the interaction with distance from the model
 
+diam_model_h1 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_herbivory_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(diam_model_h1)
+
+diam_model_h2 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(diam_model_h2)
+
+MuMIn::AICc(dmod); MuMIn::r.squaredGLMM(dmod)
+MuMIn::AICc(diam_model_h2); MuMIn::r.squaredGLMM(diam_model_h2)
+
 ```
 
 ```{r final diameter model}
 
-diam_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + (1|site_code) + (1|common_name), data = site_grouped_data)
+diam_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(diam_model)
 
 # model diagnostics - residual plots ----
@@ -1692,11 +1704,11 @@ boxplot(E2 ~ distance, data = diam_model@frame)
 boxplot(E2 ~ age, data = diam_model@frame)
 plot(diam_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-# plot(diam_model@frame$pct_moisture, E2)
+plot(diam_model@frame$avg_h_incidence_06, E2)
 
 
 # model with scaled predictors ----
-diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + age +  (1|site_code) + (1|common_name), data = site_grouped_data)
+diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(diam_model_scaled)
 
 ```
@@ -1741,7 +1753,7 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
 ```{r diameter-fixef-plot, cache=T}
 diam_summary <- summary(diam_model)
 # str(diam_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young")
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Herbivory")
 diam_fixed <- as.data.frame(diam_summary$coefficients)
 diam_fixed$var_names <- var_names
 diam_confint <- as.data.frame(confint(diam_model))
@@ -1798,14 +1810,17 @@ Seedling diameter increased with light availability and was greater in younger f
 ```{r sjplot-diameter}
 
 diam_sjplot <- sjPlot::sjp.lmer(diam_model, type = "ri.slope", vars = "distance")
-diam_sjplot <- diam_sjplot$plot[[2]]
-diam_lines <- diam_sjplot +
+diam_distance <- diam_sjplot$plot[[2]]
+diam_distance$data$y <- exp(diam_distance$data$y)
+
+(diam_distance_lines <- diam_distance +
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = 7) +
-  labs(y = "Diameter", x = "Distance", title = "") +
+  labs(y = "Diameter (mm)", x = "Distance", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
+  )
 
 ```
 
@@ -1891,14 +1906,22 @@ piecewiseSEM::rsquared(rmod_list)
 summary(m1)
 summary(m2)# indicates that % moisture has no effect after accounting for other variables, so excluding % moisture and the interaction with distance from the model
 
+rmod_herbiv1 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_herbivory_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(rmod_herbiv1)
+
+rmod_herbiv2 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(rmod_herbiv2)
+
+MuMIn::AICc(rmod_herbiv1); MuMIn::r.squaredGLMM(rmod_herbiv1)
+MuMIn::AICc(rmod_herbiv2); MuMIn::r.squaredGLMM(rmod_herbiv2)
+
 ```
 
 Do we actually want to test/know what the slope/intercept interaction is between distance and species as a rondom component??
 
 ```{r final rgr model}
 
-form <- formula(avg_rgr_ht ~ distance + avg_pct_light + age + (1 | site_code) + (1 | common_name))
-rgr_model <- lmer(form, data = site_grouped_data, REML = T)
+rgr_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data, REML = T)
 summary(rgr_model)
 
 # model diagnostics ----
@@ -1910,11 +1933,10 @@ boxplot(E2 ~ distance, data = rgr_model@frame)
 boxplot(E2 ~ age, data = rgr_model@frame)
 plot(rgr_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-# plot(rgr_model@frame$pct_moisture, E2)
+plot(rgr_model@frame$avg_h_incidence_06, E2)
 
-rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age + (1 | site_code) + (1 | common_name),
-                         data = site_grouped_data)
-summary(rgr_model_scaled)
+rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1 | site_code) + (1 | common_name), data = site_grouped_data)
+# summary(rgr_model_scaled)
 
 ```
 
@@ -1961,7 +1983,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 ```{r rgr-fixef-plot, cache=T}
 rgr_summary <- summary(rgr_model)
 # str(rgr_summary)
-var_names <- c("Intercept","Distance","Pct. light","Forest age: young")
+var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Herbivory")
 rgr_fixed <- as.data.frame(rgr_summary$coefficients)
 rgr_fixed$var_names <- var_names
 rgr_confint <- as.data.frame(confint(rgr_model))
@@ -2031,19 +2053,19 @@ rgr_species_coefs <- (coef(rgr_model)[[2]])
 
 ```
 
-Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squaredGLMM(rgr_model_scaled)`
+Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squaredGLMM(rgr_model)`
 
 The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.
 
 ```{r sjplot-rgr}
 
 rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", vars = "distance")
-rgr_sjplot <- rgr_sjplot$plot[[2]]
-rgr_lines <- rgr_sjplot +
+rgr_distance <- rgr_sjplot$plot[[2]]
+rgr_distance_lines <- rgr_distance +
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = 7) +
-  labs(y = "Relative growth rate", x = "Distance", title = "") +
+  labs(y = "Relative growth rate (% / day)", x = "Distance", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
 
@@ -2052,7 +2074,7 @@ rgr_lines <- rgr_sjplot +
 
 ```{r gridded-dotplots, fig.height=10, fig.width=7}
 
-cowplot::plot_grid(plotlist = list(biomass_scaled_coef_plot, biomass_species_ranef_plot, diam_scaled_coef_plot, diam_species_ranef_plot, rgr_scaled_coef_plot, rgr_species_ranef_plot), nrow = 3,ncol = 2, axis = "lb")
+cowplot::plot_grid(plotlist = list(biomass_scaled_coef_plot, biomass_species_ranef_plot, biomass_distance_lines, diam_scaled_coef_plot, diam_species_ranef_plot, diam_distance_lines, rgr_scaled_coef_plot, rgr_species_ranef_plot, rgr_distance_lines), nrow = 3,ncol = 3)
 
 ```
 
