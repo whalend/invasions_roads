@@ -315,7 +315,7 @@ germination_data <- germination_data %>%
 
 ```{r species-grouped-data}
 species_grouped_data <- seedling_data %>%
-  group_by(common_name) %>% 
+  group_by(common_name, age) %>% 
   summarise(avg_biomass = mean(tot_biomass, na.rm = T),
             # n_obs = length(tot_biomass),
             se_biomass = sd(tot_biomass, na.rm = T)/sqrt(length(tot_biomass)),
@@ -1451,6 +1451,7 @@ summary(biomass_model_scaled)
 
 
 ### Model coefficients
+
 ```{r biomass-ranef-plot}
 
 # lattice::dotplot(fixef(biomass_model))
@@ -1459,7 +1460,7 @@ biomass_ranef <- ranef(biomass_model, condVar = T)
 biomass_ranef_df <- as.data.frame(biomass_ranef)
 write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
 
-intercept <- biomass_summary$coefficients[1,1]
+# intercept <- biomass_summary$coefficients[1,1]
 biomass_coefs <- coef(biomass_model)
 
 (biomass_species_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="common_name"), 
@@ -2063,7 +2064,7 @@ sjPlot::sjp.lmer(rgr_model)
 rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", vars = "distance")
 rgr_distance <- rgr_sjplot$plot[[2]]
 rgr_distance_lines <- rgr_distance +
-  geom_abline(intercept = rgr_summary$coefficients[1,1], slope = )
+  # geom_abline(intercept = rgr_summary$coefficients[1,1], slope = -(1/3))
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = 7) +
@@ -2434,15 +2435,15 @@ ggplot(as.data.frame(cbind(fitted(surv_model_scaled),e2)),
   geom_point() +
   geom_smooth()
 
-plot(survival_2006$scaled_distance, e2)
-lines(lowess(e2~survival_2006$scaled_distance))
+plot(surv_model_scaled@frame$scaled_distance, e2)
+lines(lowess(e2~surv_model_scaled@frame$scaled_distance))
 # plot(survival_2006$age, e2)# error
 # plot(survival_2006$scaled_basal_area, e2)
 # lines(lowess(e2~survival_2006$scaled_basal_area))
 # plot(survival_2006$scaled_pct_light, e2)
 # lines(lowess(e2~survival_2006$scaled_pct_light))
-plot(survival_2006$scaled_litter_kg_m2, e2)
-lines(lowess(e2~survival_2006$scaled_litter_kg_m2))
+plot(surv_model_scaled@frame$scaled_litter_kg_m2, e2)
+lines(lowess(e2~surv_model_scaled@frame$scaled_litter_kg_m2))
 
 # interplot::interplot(surv_model, "scaled_litter_kg_m2","scaled_distance")
 # interplot::interplot(surv_model, "scaled_pct_light","scaled_distance")
@@ -2620,7 +2621,7 @@ herb_ordinal <- ggplot(herbiv_noNA_data, aes(distance, herbivory)) +
   theme(strip.background = element_blank(),
         legend.position = "top",
         legend.title = element_blank()) +
-  scale_color_manual(values = c())
+  scale_color_manual(values = c("orange","blue"))
 
 herb_incidence <- ggplot(herbiv_noNA_data, aes(distance, herbivory_incidence)) +
   # geom_boxplot(aes(group = distance)) +
@@ -2630,7 +2631,8 @@ herb_incidence <- ggplot(herbiv_noNA_data, aes(distance, herbivory_incidence)) +
   # scale_color_brewer(palette = 7) +
   theme_bw() +
   theme(strip.background = element_blank(),
-        legend.position = "none")
+        legend.position = "none") +
+  scale_color_manual(values = c("orange","blue"))
 
 cowplot::plot_grid(plotlist = list(herb_ordinal, herb_incidence), nrow = 2)
 
