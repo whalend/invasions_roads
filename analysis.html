@@ -118,7 +118,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Edge effects on species establishement, growth and survival in an experimental plant invasion</h1>
-<h4 class="date"><em>08 March, 2018</em></h4>
+<h4 class="date"><em>22 March, 2018</em></h4>
 
 </div>
 
@@ -151,13 +151,27 @@ $(document).ready(function () {
 </ul></li>
 <li><a href="#diameter-model">Diameter model</a></li>
 <li><a href="#relative-growth-rate-model">Relative growth rate model</a></li>
+<li><a href="#growth-performance-results">Growth performance results</a></li>
 <li><a href="#percent-germination-model">Percent germination model</a></li>
 <li><a href="#seedling-survival-model">Seedling survival model</a></li>
+<li><a href="#germination-and-survival-results">Germination and survival results</a></li>
+<li><a href="#site-level-effects">Site-level effects</a></li>
+<li><a href="#herbivory-model">Herbivory model</a></li>
 </ul></li>
 </ul>
 </div>
 
 <hr />
+<pre><code>## # A tibble: 6 x 3
+## # Groups: common_name [6]
+##   common_name  `Mature forest` `Young forest`
+## * &lt;fctr&gt;                 &lt;dbl&gt;          &lt;dbl&gt;
+## 1 Autumn olive           1.36            2.34
+## 2 Honeysuckle            0.770           2.03
+## 3 Privet                 0.855           1.90
+## 4 Dogwood                0.664           1.27
+## 5 Redbud                 0.753           1.88
+## 6 Spicebush              0.508           1.22</code></pre>
 <table>
 <thead>
 <tr class="header">
@@ -263,6 +277,7 @@ $(document).ready(function () {
 <th style="text-align: left;">Status</th>
 <th style="text-align: right;">Mature forest</th>
 <th style="text-align: right;">Young forest</th>
+<th style="text-align: right;">Average</th>
 </tr>
 </thead>
 <tbody>
@@ -271,36 +286,42 @@ $(document).ready(function () {
 <td style="text-align: left;">Non-native</td>
 <td style="text-align: right;">67.19</td>
 <td style="text-align: right;">44.07</td>
+<td style="text-align: right;">55.63</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Honeysuckle</td>
 <td style="text-align: left;">Non-native</td>
 <td style="text-align: right;">29.99</td>
 <td style="text-align: right;">25.34</td>
+<td style="text-align: right;">27.66</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Privet</td>
 <td style="text-align: left;">Non-native</td>
 <td style="text-align: right;">8.21</td>
 <td style="text-align: right;">0.97</td>
+<td style="text-align: right;">4.59</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Dogwood</td>
 <td style="text-align: left;">Native</td>
 <td style="text-align: right;">23.85</td>
 <td style="text-align: right;">12.34</td>
+<td style="text-align: right;">18.09</td>
 </tr>
 <tr class="odd">
 <td style="text-align: left;">Redbud</td>
 <td style="text-align: left;">Native</td>
 <td style="text-align: right;">4.77</td>
 <td style="text-align: right;">0.96</td>
+<td style="text-align: right;">2.86</td>
 </tr>
 <tr class="even">
 <td style="text-align: left;">Spicebush</td>
 <td style="text-align: left;">Native</td>
 <td style="text-align: right;">2.18</td>
 <td style="text-align: right;">10.00</td>
+<td style="text-align: right;">6.09</td>
 </tr>
 </tbody>
 </table>
@@ -314,6 +335,62 @@ $(document).ready(function () {
 ##  [9] &quot;common_name&quot;    &quot;avg_basal_area&quot; &quot;avg_pct_light&quot;  &quot;litter_kg_m2&quot;  
 ## [13] &quot;pct_moisture&quot;   &quot;year&quot;           &quot;survival&quot;</code></pre>
 <p><img src="analysis_files/figure-html/survival-1.png" width="4200" /><img src="analysis_files/figure-html/survival-2.png" width="4200" /><img src="analysis_files/figure-html/survival-3.png" width="4200" /></p>
+<table>
+<caption>Proportion of seedlings of each species surviving to 2006</caption>
+<thead>
+<tr class="header">
+<th style="text-align: left;">Species</th>
+<th style="text-align: left;">Status</th>
+<th style="text-align: right;">Mature forest</th>
+<th style="text-align: right;">Young forest</th>
+<th style="text-align: right;">Average</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Autumn olive</td>
+<td style="text-align: left;">Non-native</td>
+<td style="text-align: right;">48.53</td>
+<td style="text-align: right;">50.69</td>
+<td style="text-align: right;">49.61</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Honeysuckle</td>
+<td style="text-align: left;">Non-native</td>
+<td style="text-align: right;">95.56</td>
+<td style="text-align: right;">95.14</td>
+<td style="text-align: right;">95.35</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Privet</td>
+<td style="text-align: left;">Non-native</td>
+<td style="text-align: right;">85.29</td>
+<td style="text-align: right;">93.06</td>
+<td style="text-align: right;">89.17</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dogwood</td>
+<td style="text-align: left;">Native</td>
+<td style="text-align: right;">61.03</td>
+<td style="text-align: right;">41.67</td>
+<td style="text-align: right;">51.35</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Redbud</td>
+<td style="text-align: left;">Native</td>
+<td style="text-align: right;">91.91</td>
+<td style="text-align: right;">80.56</td>
+<td style="text-align: right;">86.23</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Spicebush</td>
+<td style="text-align: left;">Native</td>
+<td style="text-align: right;">86.76</td>
+<td style="text-align: right;">88.19</td>
+<td style="text-align: right;">87.48</td>
+</tr>
+</tbody>
+</table>
 <p>Seedling survival over the duration of the experiment was high across sites and species (NA). Autumn olive and dogwood had relatively low survival compared to the other species (AO: 49% mature, 50.7% young; DW: 60.4% mature, 41.7% young). Seedling survival for all other species averaged greater than 80%. In mature forests, autumn olive and dogwood both had lower survival with increasing distance from the edge, but in young forest autumn olive tended to have greater survival farther from the edge.</p>
 <p>While these general linear trends with distance are present, the precise relationship with distance from edge is non-linear across all species. In mature forests, most species showed greatest survival at 5 and 10 m from the edge, with the exception of honeysuckle, which had greatest survival at distances of 20 m and greater. Honeysuckle also had the greatest proportion of overall surviving seedlings (94.8%). In contrast, seedling survival in young forests was overall lower for native than non-native species, and also lower at interior versus edge locations for native species, except for spicebush.</p>
 </section>
@@ -335,10 +412,28 @@ $(document).ready(function () {
 </section>
 <section id="seedling-herbivory" class="level3">
 <h3>Seedling herbivory</h3>
+<pre><code>## # A tibble: 20,160 x 12
+##    site… site… age   dist… spec… stat… habi… f_ha… comm… year  herb… surv…
+##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt;
+##  1 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      1     1
+##  2 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      1     1
+##  3 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      1     1
+##  4 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      1     1
+##  5 Cica… CH    Youn…     0 D     Nati…     0 0-5 m Dogw… 2004      0     1
+##  6 Cica… CH    Youn…     0 D     Nati…     0 0-5 m Dogw… 2004      0     1
+##  7 Cica… CH    Youn…     0 D     Nati…     0 0-5 m Dogw… 2004      0     1
+##  8 Cica… CH    Youn…     0 D     Nati…     0 0-5 m Dogw… 2004      0     1
+##  9 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      2     1
+## 10 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      2     1
+## # ... with 20,150 more rows</code></pre>
 <p><img src="analysis_files/figure-html/herbivory-1.png" width="4200" /><img src="analysis_files/figure-html/herbivory-2.png" width="4200" /><img src="analysis_files/figure-html/herbivory-3.png" width="4200" /></p>
+<p>We’ve settled on doing a model to try and explain herbivory. First, I’m looking at whether there was any clear pattern in herbivory from year to year.</p>
+<p><img src="analysis_files/figure-html/herbiv-by-year-1.png" width="4200" /></p>
 <p>In young forests, herbivory increased with distance from edge for both native and non-native species, but decreased with distance from edge for native species in mature forests. There was no relationship between distance from edge and herbivory for non-native species in mature forests. Herbivory was greater on native than non-native species in both forest types.</p>
-<p>Herbivory was categorized, where 1 = 1-25%, 2 = 26-50%, 3 = 51-75%.</p>
-<p>What kind of herbivory might this be? Deer? Defoliators?</p>
+<p>Herbivory was categorized as leaf-loss, where 0 = no herbivory, 1 = ≤25%, 2 = 26-50%, 3 = 51-75%, 4 = 76-99%, and 5 = 100% leaf removal by herbivores.</p>
+<p>What kind of herbivory might this be: Defoliators.</p>
+<p>There’s not a particularly clear pattern in changes between years, just generally lower for the invasive species. I can still put year in as a factor to test it statistically. It looks like forest age will be important, and probably distance. Some species also appear to be more susceptible than others. I’m thinking a model along the lines of this to start:</p>
+<p>herbivory ~ distance + age + year + pct_light + litter</p>
 </section>
 </section>
 </section>
@@ -347,10 +442,13 @@ $(document).ready(function () {
 <section id="speciesdistancesite-level-grouping" class="level2">
 <h2>Species/distance/site level grouping</h2>
 <p>This grouping of data would theoretically gives an average data point of the performance of each species at each distance at each site (n = 432). What we actually have is 420 observations, so we have 12 that were missing, I believe lost due to mowing at the edge. Upon investigating where observations were missing, we lost all seedlings at the 0 meter distance at the FR and HQ sites (n = 12), which means we have 10 instead of 12 observations for plants at 0 meters, but effectively equal observations of each species.</p>
-<p>We calculated the average biomass accumulated, height, and relative growth rate for height acros the four replicates of each species at each distance at each site. These average values were used as the response variables in regression models.</p>
+<p>We calculated the average of biomass accumulated, diameter, and relative growth rate for height across the four replicates of each species at each distance at each site. These average values were used as the response variables in regression models.</p>
 <p>response variable for each species as the average value at for that species at each distance and site, e.g.,</p>
 <p>We calculated the average of each response variable</p>
-<p>We fit mixed-effects models to each performance response variable - biomass, final height, and relative growth rate of height. Following methods described in Zuur et al. (2009), we first parameterized a “beyond optimal” model with all possible explanatory variables and potential interactions and used this to find the optimal structure of the random effects component. After finding the optimal random structure we found the optimal fixed structure by removing statistically insignificant interactions and then main effects. The single weakest explanatory variable was removed and the model refit to identify the next weakest explantory variable. This process was repeated until only statistically significant variables remained and accepted this as the final optimal model. We checked the residual plots of the final models to assure there was no major violation of homogeneity in the residual variance. Biomass and diameter responses were natural logarithm-transformed to improve homogeneity of residual variance and normality of the data. In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the “lme4” (<span class="citation" data-cites="Bates2015">@Bates2015</span>) and “lmerTest” (<span class="citation" data-cites="Kuznetsova2017">@Kuznetsova2017</span>) packages in the R statistical computing environment. The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.</p>
+<p>We fit linear mixed-effects regressions to model each performance response variable - biomass, final height, and relative growth rate of height. Following methods described in Zuur et al. (2009), we first parameterized a “beyond optimal” model with all possible explanatory variables and potential interactions and used this to find the optimal structure of the random effects component. After finding the optimal random structure we found the optimal fixed structure by removing statistically insignificant interactions and then main effects. The single weakest explanatory variable was removed and the model refit to identify the next weakest explantory variable. This process was repeated until only statistically significant variables remained and accepted this as the final optimal model. We checked the residual plots of the final models to assure there was no major violation of homogeneity in the residual variance. Biomass and diameter responses were natural logarithm-transformed to improve homogeneity of residual variance and normality of the data.</p>
+<p>We used mixed-effects logistic regressions to model germination and survival probabilities for each species.</p>
+<p>In all models we allowed the intercept to vary for species and site, and interpret the random intercepts of the performance metrics for each species. Models were fit and evaluated using the “lme4” (<span class="citation" data-cites="Bates2015">@Bates2015</span>) and “lmerTest” (<span class="citation" data-cites="Kuznetsova2017">@Kuznetsova2017</span>) packages in the R statistical computing environment. The coefficient estimates from rescaled continuous variables are reported in the figures. Percent light and percent moisture were centered to a mean of zero and divided by two standard deviations, and distance was rescaled to be between zero and one by dividing by the maximum distance value.</p>
+<p>The factor f_age represents forest age, and a value of 1 indicates young forests while a value of 0 indicates mature forests.</p>
 </section>
 <section id="biomass-model" class="level2">
 <h2>Biomass model</h2>
@@ -358,103 +456,217 @@ $(document).ready(function () {
 <h3>Diagnostic plots</h3>
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
-## Formula: log(avg_biomass) ~ distance + avg_pct_light + age + distance *  
-##     pct_moisture + (1 | site_code) + (1 | common_name)
+## Formula: 
+## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_herbivory_04 +  
+##     (1 | site_code) + (1 | common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 826.6
+## REML criterion at convergence: 828.7
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -3.0453 -0.5886 -0.0350  0.6298  3.2126 
+## -3.1361 -0.5542 -0.0557  0.5871  3.2175 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.16335  0.4042  
-##  common_name (Intercept) 0.04722  0.2173  
-##  Residual                0.37723  0.6142  
+##  site_code   (Intercept) 0.13764  0.3710  
+##  common_name (Intercept) 0.04428  0.2104  
+##  Residual                0.39638  0.6296  
 ## Number of obs: 399, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                         Estimate Std. Error         df t value Pr(&gt;|t|)
-## (Intercept)            5.670e-02  3.073e-01  7.610e+01   0.185  0.85411
-## distance              -4.403e-02  8.528e-03  3.860e+02  -5.163 3.90e-07
-## avg_pct_light          1.408e-02  2.276e-03  3.875e+02   6.185 1.58e-09
-## ageYoung forest        5.500e-01  2.417e-01  9.900e+00   2.275  0.04629
-## pct_moisture          -4.525e-02  1.604e-02  3.880e+02  -2.822  0.00502
-## distance:pct_moisture  2.439e-03  5.289e-04  3.863e+02   4.612 5.43e-06
-##                          
-## (Intercept)              
-## distance              ***
-## avg_pct_light         ***
-## ageYoung forest       *  
-## pct_moisture          ** 
-## distance:pct_moisture ***
+##                    Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)       -0.551535   0.194547  18.200000  -2.835 0.010893 *  
+## distance          -0.005048   0.001516 379.600000  -3.330 0.000954 ***
+## avg_pct_light      0.013127   0.002319 389.100000   5.660 2.94e-08 ***
+## f_age1             0.610356   0.223894   9.900000   2.726 0.021549 *  
+## avg_herbivory_04  -0.074450   0.041274 372.600000  -1.804 0.072067 .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) distnc avg_p_ agYngf pct_ms
-## distance    -0.547                            
-## avg_pct_lgh -0.082 -0.057                     
-## ageYongfrst -0.388  0.028 -0.016              
-## pct_moistur -0.755  0.667 -0.089 -0.008       
-## dstnc:pct_m  0.562 -0.983  0.080 -0.026 -0.717</code></pre>
+##             (Intr) distnc avg_p_ f_age1
+## distance    -0.210                     
+## avg_pct_lgh -0.249  0.110              
+## f_age1      -0.560  0.007 -0.019       
+## avg_hrbv_04 -0.222  0.004  0.025 -0.062</code></pre>
+<pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [lmerMod]
+## Formula: 
+## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_h_incidence_05 +  
+##     (1 | site_code) + (1 | common_name)
+##    Data: site_grouped_data
+## 
+## REML criterion at convergence: 780.4
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.3922 -0.5452 -0.0282  0.5774  3.3355 
+## 
+## Random effects:
+##  Groups      Name        Variance Std.Dev.
+##  site_code   (Intercept) 0.14914  0.3862  
+##  common_name (Intercept) 0.05772  0.2402  
+##  Residual                0.38458  0.6201  
+## Number of obs: 380, groups:  site_code, 12; common_name, 6
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         -0.855374   0.217865  22.900000  -3.926  0.00068 ***
+## distance            -0.004875   0.001535 360.700000  -3.176  0.00162 ** 
+## avg_pct_light        0.013120   0.002329 369.800000   5.634  3.5e-08 ***
+## f_age1               0.615474   0.232250   9.900000   2.650  0.02459 *  
+## avg_h_incidence_05   0.300944   0.115000 365.300000   2.617  0.00924 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) distnc avg_p_ f_age1
+## distance    -0.201                     
+## avg_pct_lgh -0.211  0.117              
+## f_age1      -0.544  0.004 -0.021       
+## avg_h_nc_05 -0.392  0.028 -0.023  0.040</code></pre>
+<pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [lmerMod]
+## Formula: 
+## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_h_incidence_06 +  
+##     (1 | site_code) + (1 | common_name)
+##    Data: site_grouped_data
+## 
+## REML criterion at convergence: 764.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.3164 -0.5285 -0.0163  0.5972  3.1811 
+## 
+## Random effects:
+##  Groups      Name        Variance Std.Dev.
+##  site_code   (Intercept) 0.14792  0.3846  
+##  common_name (Intercept) 0.06809  0.2609  
+##  Residual                0.37975  0.6162  
+## Number of obs: 374, groups:  site_code, 12; common_name, 6
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         -0.817683   0.220857  22.300000  -3.702 0.001219 ** 
+## distance            -0.005625   0.001553 354.900000  -3.623 0.000334 ***
+## avg_pct_light        0.012715   0.002348 363.800000   5.415 1.11e-07 ***
+## f_age1               0.593144   0.231220   9.800000   2.565 0.028549 *  
+## avg_h_incidence_06   0.274227   0.115548 356.800000   2.373 0.018160 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) distnc avg_p_ f_age1
+## distance    -0.178                     
+## avg_pct_lgh -0.198  0.131              
+## f_age1      -0.524  0.007 -0.016       
+## avg_h_nc_06 -0.379 -0.032 -0.057  0.008</code></pre>
+<pre><code>## [1] 781.3155</code></pre>
+<pre><code>##       R2m       R2c 
+## 0.2132277 0.4984883</code></pre>
+<pre><code>## [1] 841.6625</code></pre>
+<pre><code>##       R2m       R2c 
+## 0.2012321 0.4677353</code></pre>
+<pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
+##   to degrees of freedom [lmerMod]
+## Formula: 
+## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_h_incidence_06 +  
+##     (1 | site_code) + (1 | common_name)
+##    Data: site_grouped_data
+## 
+## REML criterion at convergence: 764.9
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -3.3164 -0.5285 -0.0163  0.5972  3.1811 
+## 
+## Random effects:
+##  Groups      Name        Variance Std.Dev.
+##  site_code   (Intercept) 0.14792  0.3846  
+##  common_name (Intercept) 0.06809  0.2609  
+##  Residual                0.37975  0.6162  
+## Number of obs: 374, groups:  site_code, 12; common_name, 6
+## 
+## Fixed effects:
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         -0.817683   0.220857  22.300000  -3.702 0.001219 ** 
+## distance            -0.005625   0.001553 354.900000  -3.623 0.000334 ***
+## avg_pct_light        0.012715   0.002348 363.800000   5.415 1.11e-07 ***
+## f_age1               0.593144   0.231220   9.800000   2.565 0.028549 *  
+## avg_h_incidence_06   0.274227   0.115548 356.800000   2.373 0.018160 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) distnc avg_p_ f_age1
+## distance    -0.178                     
+## avg_pct_lgh -0.198  0.131              
+## f_age1      -0.524  0.007 -0.016       
+## avg_h_nc_06 -0.379 -0.032 -0.057  0.008</code></pre>
 <p><img src="analysis_files/figure-html/final-biomass-model-1.png" width="4200" /><img src="analysis_files/figure-html/final-biomass-model-2.png" width="4200" /><img src="analysis_files/figure-html/final-biomass-model-3.png" width="4200" /><img src="analysis_files/figure-html/final-biomass-model-4.png" width="4200" /></p>
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
-## Formula: log(avg_biomass) ~ scaled_distance + scaled_pct_light + age +  
-##     scaled_distance * scaled_pct_moisture + (1 | site_code) +  
-##     (1 | common_name)
+## Formula: log(avg_biomass) ~ scaled_distance + scaled_pct_light + f_age +  
+##     scaled_herbiv_incidence + (1 | site_code) + (1 | common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 795.7
+## REML criterion at convergence: 750.7
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -3.0453 -0.5886 -0.0350  0.6298  3.2126 
+## -3.3164 -0.5285 -0.0163  0.5972  3.1811 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.16335  0.4042  
-##  common_name (Intercept) 0.04722  0.2173  
-##  Residual                0.37723  0.6142  
-## Number of obs: 399, groups:  site_code, 12; common_name, 6
+##  site_code   (Intercept) 0.14792  0.3846  
+##  common_name (Intercept) 0.06809  0.2609  
+##  Residual                0.37975  0.6162  
+## Number of obs: 374, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                                      Estimate Std. Error        df t value
-## (Intercept)                          -0.36922    0.19647  14.70000  -1.879
-## scaled_distance                      -0.37862    0.09398 380.00000  -4.029
-## scaled_pct_light                      0.43038    0.06959 387.50000   6.185
-## ageYoung forest                       0.55001    0.24172   9.90000   2.275
-## scaled_pct_moisture                  -0.30712    0.10882 388.00000  -2.822
-## scaled_distance:scaled_pct_moisture   0.99323    0.21536 386.30000   4.612
-##                                     Pr(&gt;|t|)    
-## (Intercept)                          0.08019 .  
-## scaled_distance                     6.77e-05 ***
-## scaled_pct_light                    1.58e-09 ***
-## ageYoung forest                      0.04629 *  
-## scaled_pct_moisture                  0.00502 ** 
-## scaled_distance:scaled_pct_moisture 5.43e-06 ***
+##                          Estimate Std. Error        df t value Pr(&gt;|t|)
+## (Intercept)              -0.36735    0.19849  14.90000  -1.851 0.084170
+## scaled_distance          -0.33753    0.09317 354.90000  -3.623 0.000334
+## scaled_pct_light          0.38868    0.07178 363.80000   5.415 1.11e-07
+## f_age1                    0.59314    0.23122   9.80000   2.565 0.028549
+## scaled_herbiv_incidence   0.18216    0.07675 356.80000   2.373 0.018160
+##                            
+## (Intercept)             .  
+## scaled_distance         ***
+## scaled_pct_light        ***
+## f_age1                  *  
+## scaled_herbiv_incidence *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) scld_d scld_pct_l agYngf scld_pct_m
-## scald_dstnc -0.190                                    
-## scld_pct_lg -0.015  0.107                             
-## ageYongfrst -0.620  0.021 -0.016                      
-## scld_pct_ms  0.061 -0.115 -0.089     -0.008           
-## scld_dst:__ -0.008 -0.132  0.080     -0.026 -0.717</code></pre>
+##             (Intr) scld_d scld_p_ f_age1
+## scald_dstnc -0.182                      
+## scld_pct_lg -0.015  0.131               
+## f_age1      -0.584  0.007 -0.016        
+## scld_hrbv_n -0.004 -0.032 -0.057   0.008</code></pre>
 </section>
 <section id="model-coefficients" class="level3">
 <h3>Model coefficients</h3>
 <p><img src="analysis_files/figure-html/biomass-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/biomass-ranef-plot-2.png" width="4200" /></p>
 <p><img src="analysis_files/figure-html/biomass-fixef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/biomass-fixef-plot-2.png" width="4200" /></p>
-<p>Conditional and marginal R<sup>2</sup> of the biomass model 0.2355113, 0.5093745</p>
+<p>Conditional and marginal R<sup>2</sup> of the biomass model 0.2132277, 0.4984883</p>
 <p>All species generated more aboveground biomass in young forests and at locations with greater light availability. Biomass production decreased with distance from the road/forest edge and (interestingly) with greater soil moisture, however, there was a significant interaction between distance and soil moisture indicating greater soil moisture at distances farther from the edge.</p>
 <p>The random intercepts for each species show that native species generated less biomass than non-native species, with spicebush and dogwood performing particularly poorly. For the non-native species, privet and autumn olive were especially good at amassing biomass, with honeysuckle performing slightly less well.</p>
 <p>Site-level biomass production was greater at CH, PR, LD, and SR, while lower at DG, FR, and GR. The intercepts for the other five sites all had confidence error estimates crossing zero, with absolute values of the intercepts &lt;0.12.</p>
+<p>I’m exploring making plots of the marginal effects for each group in the random effects, particulalry for species, with special interest in the relationship with distance (edge effects). <img src="analysis_files/figure-html/sjPlot-biomass-1.png" width="4200" /></p>
+<pre><code>## [[1]]</code></pre>
+<p><img src="analysis_files/figure-html/sjPlot-biomass-2.png" width="4200" /></p>
+<pre><code>## 
+## [[2]]</code></pre>
+<p><img src="analysis_files/figure-html/sjPlot-biomass-3.png" width="4200" /></p>
+<pre><code>## 
+## [[3]]</code></pre>
+<p><img src="analysis_files/figure-html/sjPlot-biomass-4.png" width="4200" /></p>
+<pre><code>## 
+## [[4]]</code></pre>
+<p><img src="analysis_files/figure-html/sjPlot-biomass-5.png" width="4200" /> <img src="analysis_files/figure-html/sjPlot-biomass-6.png" width="4200" /><img src="analysis_files/figure-html/sjPlot-biomass-7.png" width="4200" /><img src="analysis_files/figure-html/sjPlot-biomass-8.png" width="4200" /></p>
 <p><del>What about fitting a separate models for each species? I don’t think this is necessary unless we want to be able to say something specific about the relationship between the response and specific predictors for each species. I think it is reasonable to assume that the plants generally respond similarly to things like soil moisture and light availability.</del></p>
 </section>
 </section>
@@ -462,97 +674,87 @@ $(document).ready(function () {
 <h2>Diameter model</h2>
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
-## Formula: log(avg_diameter) ~ distance + avg_pct_light + age + distance *  
-##     pct_moisture + (1 | site_code) + (1 | common_name)
+## Formula: 
+## log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 +  
+##     (1 | site_code) + (1 | common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 88.4
+## REML criterion at convergence: 73.1
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -2.9440 -0.6144 -0.0289  0.6238  3.4594 
+## -2.8816 -0.5938 -0.0050  0.5799  3.5611 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.013496 0.11617 
-##  common_name (Intercept) 0.004104 0.06406 
-##  Residual                0.058882 0.24266 
-## Number of obs: 399, groups:  site_code, 12; common_name, 6
+##  site_code   (Intercept) 0.013953 0.11812 
+##  common_name (Intercept) 0.006426 0.08016 
+##  Residual                0.059316 0.24355 
+## Number of obs: 374, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                         Estimate Std. Error         df t value Pr(&gt;|t|)
-## (Intercept)            1.123e+00  1.097e-01  1.245e+02  10.238  &lt; 2e-16
-## distance              -1.461e-02  3.351e-03  3.881e+02  -4.361 1.66e-05
-## avg_pct_light          4.570e-03  8.925e-04  3.868e+02   5.121 4.81e-07
-## ageYoung forest        1.885e-01  7.155e-02  1.000e+01   2.634  0.02494
-## pct_moisture          -1.637e-02  6.276e-03  3.837e+02  -2.609  0.00944
-## distance:pct_moisture  8.411e-04  2.077e-04  3.881e+02   4.049 6.21e-05
-##                          
-## (Intercept)           ***
-## distance              ***
-## avg_pct_light         ***
-## ageYoung forest       *  
-## pct_moisture          ** 
-## distance:pct_moisture ***
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         8.099e-01  7.321e-02  2.680e+01  11.063 1.70e-11 ***
+## distance           -1.411e-03  6.134e-04  3.556e+02  -2.300   0.0220 *  
+## avg_pct_light       4.114e-03  9.219e-04  3.632e+02   4.462 1.08e-05 ***
+## ageYoung forest     2.006e-01  7.280e-02  9.900e+00   2.756   0.0204 *  
+## avg_h_incidence_06  9.376e-02  4.520e-02  3.395e+02   2.074   0.0388 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) distnc avg_p_ agYngf pct_ms
-## distance    -0.602                            
-## avg_pct_lgh -0.093 -0.051                     
-## ageYongfrst -0.318  0.037 -0.021              
-## pct_moistur -0.828  0.668 -0.086 -0.011       
-## dstnc:pct_m  0.618 -0.983  0.074 -0.034 -0.718</code></pre>
+##             (Intr) distnc avg_p_ agYngf
+## distance    -0.212                     
+## avg_pct_lgh -0.234  0.130              
+## ageYongfrst -0.499  0.008 -0.020       
+## avg_h_nc_06 -0.447 -0.032 -0.060  0.010</code></pre>
 <p><img src="analysis_files/figure-html/final%20diameter%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20diameter%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20diameter%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20diameter%20model-4.png" width="4200" /><img src="analysis_files/figure-html/final%20diameter%20model-5.png" width="4200" /></p>
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
 ## Formula: log(avg_diameter) ~ scaled_distance + scaled_pct_light + age +  
-##     scaled_distance * scaled_pct_moisture + (1 | site_code) +  
-##     (1 | common_name)
+##     scaled_herbiv_incidence + (1 | site_code) + (1 | common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 57.5
+## REML criterion at convergence: 58.8
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -2.9440 -0.6144 -0.0289  0.6238  3.4594 
+## -2.8816 -0.5938 -0.0050  0.5799  3.5611 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.013496 0.11617 
-##  common_name (Intercept) 0.004104 0.06406 
-##  Residual                0.058882 0.24266 
-## Number of obs: 399, groups:  site_code, 12; common_name, 6
+##  site_code   (Intercept) 0.013953 0.11812 
+##  common_name (Intercept) 0.006426 0.08016 
+##  Residual                0.059316 0.24355 
+## Number of obs: 374, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                                      Estimate Std. Error        df t value
-## (Intercept)                           0.95907    0.05899  15.30000  16.259
-## scaled_distance                      -0.09626    0.03709 381.40000  -2.595
-## scaled_pct_light                      0.13969    0.02728 386.80000   5.121
-## ageYoung forest                       0.18849    0.07155  10.00000   2.634
-## scaled_pct_moisture                  -0.11111    0.04259 383.70000  -2.609
-## scaled_distance:scaled_pct_moisture   0.34249    0.08458 388.10000   4.049
-##                                     Pr(&gt;|t|)    
-## (Intercept)                         4.54e-11 ***
-## scaled_distance                      0.00982 ** 
-## scaled_pct_light                    4.81e-07 ***
-## ageYoung forest                      0.02494 *  
-## scaled_pct_moisture                  0.00944 ** 
-## scaled_distance:scaled_pct_moisture 6.21e-05 ***
+##                          Estimate Std. Error        df t value Pr(&gt;|t|)
+## (Intercept)               0.95930    0.06266  15.10000  15.309 1.30e-10
+## scaled_distance          -0.08464    0.03681 355.60000  -2.300   0.0220
+## scaled_pct_light          0.12575    0.02818 363.20000   4.462 1.08e-05
+## ageYoung forest           0.20064    0.07280   9.90000   2.756   0.0204
+## scaled_herbiv_incidence   0.06228    0.03003 339.50000   2.074   0.0388
+##                            
+## (Intercept)             ***
+## scaled_distance         *  
+## scaled_pct_light        ***
+## ageYoung forest         *  
+## scaled_herbiv_incidence *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) scld_d scld_pct_l agYngf scld_pct_m
-## scald_dstnc -0.249                                    
-## scld_pct_lg -0.020  0.108                             
-## ageYongfrst -0.616  0.027 -0.021                      
-## scld_pct_ms  0.079 -0.113 -0.086     -0.011           
-## scld_dst:__ -0.011 -0.133  0.074     -0.034 -0.718</code></pre>
+##             (Intr) scld_d scld_p_ agYngf
+## scald_dstnc -0.228                      
+## scld_pct_lg -0.019  0.130               
+## ageYongfrst -0.583  0.008 -0.020        
+## scld_hrbv_n -0.005 -0.032 -0.060   0.010</code></pre>
 <p><img src="analysis_files/figure-html/diameter-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/diameter-ranef-plot-2.png" width="4200" /></p>
 <p><img src="analysis_files/figure-html/diameter-fixef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/diameter-fixef-plot-2.png" width="4200" /></p>
-<p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.2043497, 0.3874433</p>
+<p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1772482, 0.3876369</p>
+<p>Seedling diameter increased with light availability and was greater in younger forests, but decreased with distance.</p>
+<p><img src="analysis_files/figure-html/sjplot-diameter-1.png" width="4200" /><img src="analysis_files/figure-html/sjplot-diameter-2.png" width="4200" /><img src="analysis_files/figure-html/sjplot-diameter-3.png" width="4200" /></p>
 </section>
 <section id="relative-growth-rate-model" class="level2">
 <h2>Relative growth rate model</h2>
@@ -561,98 +763,64 @@ $(document).ready(function () {
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
 ## Formula: 
-## avg_rgr_ht ~ distance + avg_pct_light + age + distance * pct_moisture +  
+## log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 +  
 ##     (1 | site_code) + (1 | common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 277.3
+## REML criterion at convergence: 73.1
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -3.4386 -0.6097 -0.0025  0.6354  3.0069 
+## -2.8816 -0.5938 -0.0050  0.5799  3.5611 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.030607 0.17495 
-##  common_name (Intercept) 0.008603 0.09275 
-##  Residual                0.094203 0.30692 
-## Number of obs: 399, groups:  site_code, 12; common_name, 6
+##  site_code   (Intercept) 0.013953 0.11812 
+##  common_name (Intercept) 0.006426 0.08016 
+##  Residual                0.059316 0.24355 
+## Number of obs: 374, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                         Estimate Std. Error         df t value Pr(&gt;|t|)
-## (Intercept)            3.228e+00  1.458e-01  9.620e+01  22.141  &lt; 2e-16
-## distance              -1.824e-02  4.252e-03  3.873e+02  -4.290 2.26e-05
-## avg_pct_light          4.554e-03  1.134e-03  3.881e+02   4.015 7.13e-05
-## ageYoung forest        2.576e-01  1.058e-01  9.900e+00   2.434 0.035411
-## pct_moisture          -1.603e-02  7.984e-03  3.875e+02  -2.008 0.045351
-## distance:pct_moisture  9.957e-04  2.637e-04  3.875e+02   3.776 0.000184
-##                          
-## (Intercept)           ***
-## distance              ***
-## avg_pct_light         ***
-## ageYoung forest       *  
-## pct_moisture          *  
-## distance:pct_moisture ***
+##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)         8.099e-01  7.321e-02  2.680e+01  11.063 1.70e-11 ***
+## distance           -1.411e-03  6.134e-04  3.556e+02  -2.300   0.0220 *  
+## avg_pct_light       4.114e-03  9.219e-04  3.632e+02   4.462 1.08e-05 ***
+## ageYoung forest     2.006e-01  7.280e-02  9.900e+00   2.756   0.0204 *  
+## avg_h_incidence_06  9.376e-02  4.520e-02  3.395e+02   2.074   0.0388 *  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) distnc avg_p_ agYngf pct_ms
-## distance    -0.575                            
-## avg_pct_lgh -0.087 -0.054                     
-## ageYongfrst -0.357  0.032 -0.018              
-## pct_moistur -0.793  0.667 -0.088 -0.009       
-## dstnc:pct_m  0.590 -0.983  0.077 -0.029 -0.718</code></pre>
+##             (Intr) distnc avg_p_ agYngf
+## distance    -0.212                     
+## avg_pct_lgh -0.234  0.130              
+## ageYongfrst -0.499  0.008 -0.020       
+## avg_h_nc_06 -0.447 -0.032 -0.060  0.010</code></pre>
 <p><img src="analysis_files/figure-html/final%20rgr%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20rgr%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20rgr%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20rgr%20model-4.png" width="4200" /><img src="analysis_files/figure-html/final%20rgr%20model-5.png" width="4200" /></p>
-<pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
-##   to degrees of freedom [lmerMod]
-## Formula: 
-## avg_rgr_ht ~ scaled_distance + scaled_pct_light + age + scaled_distance *  
-##     scaled_pct_moisture + (1 | site_code) + (1 | common_name)
-##    Data: site_grouped_data
-## 
-## REML criterion at convergence: 246.4
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -3.4386 -0.6097 -0.0025  0.6354  3.0069 
-## 
-## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.030607 0.17495 
-##  common_name (Intercept) 0.008603 0.09275 
-##  Residual                0.094203 0.30692 
-## Number of obs: 399, groups:  site_code, 12; common_name, 6
-## 
-## Fixed effects:
-##                                      Estimate Std. Error        df t value
-## (Intercept)                           3.06876    0.08608  14.70000  35.650
-## scaled_distance                      -0.17083    0.04694 380.40000  -3.639
-## scaled_pct_light                      0.13921    0.03467 388.10000   4.015
-## ageYoung forest                       0.25756    0.10581   9.90000   2.434
-## scaled_pct_moisture                  -0.10879    0.05418 387.50000  -2.008
-## scaled_distance:scaled_pct_moisture   0.40543    0.10737 387.50000   3.776
-##                                     Pr(&gt;|t|)    
-## (Intercept)                         8.88e-16 ***
-## scaled_distance                     0.000312 ***
-## scaled_pct_light                    7.13e-05 ***
-## ageYoung forest                     0.035411 *  
-## scaled_pct_moisture                 0.045351 *  
-## scaled_distance:scaled_pct_moisture 0.000184 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) scld_d scld_pct_l agYngf scld_pct_m
-## scald_dstnc -0.216                                    
-## scld_pct_lg -0.018  0.107                             
-## ageYongfrst -0.621  0.024 -0.018                      
-## scld_pct_ms  0.069 -0.114 -0.088     -0.009           
-## scld_dst:__ -0.010 -0.132  0.077     -0.029 -0.718</code></pre>
+<pre><code>##              (Intercept)     distance avg_pct_light ageYoung forest
+## Autumn olive   0.8341711 -0.001410739   0.004113719       0.2006376
+## Honeysuckle    0.8577471 -0.001410739   0.004113719       0.2006376
+## Privet         0.9002381 -0.001410739   0.004113719       0.2006376
+## Dogwood        0.7319488 -0.001410739   0.004113719       0.2006376
+## Redbud         0.8264401 -0.001410739   0.004113719       0.2006376
+## Spicebush      0.7086994 -0.001410739   0.004113719       0.2006376
+##              avg_h_incidence_06
+## Autumn olive         0.09376174
+## Honeysuckle          0.09376174
+## Privet               0.09376174
+## Dogwood              0.09376174
+## Redbud               0.09376174
+## Spicebush            0.09376174</code></pre>
 <p><img src="analysis_files/figure-html/rgr-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/rgr-ranef-plot-2.png" width="4200" /></p>
 <p><img src="analysis_files/figure-html/rgr-fixef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/rgr-fixef-plot-2.png" width="4200" /></p>
-<p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1941434, 0.430983</p>
+<p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1772482, 0.3876369</p>
 <p>The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.</p>
+<p><img src="analysis_files/figure-html/sjplot-rgr-1.png" width="4200" /><img src="analysis_files/figure-html/sjplot-rgr-2.png" width="4200" /><img src="analysis_files/figure-html/sjplot-rgr-3.png" width="4200" /><img src="analysis_files/figure-html/sjplot-rgr-4.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/gridded-dot-line-plots-1.png" width="4200" /></p>
+</section>
+<section id="growth-performance-results" class="level2">
+<h2>Growth performance results</h2>
+<p>Seedling growth metrics of biomass, diameter, and relative growth rate of height all responded similarly to edge effects, moisture and light availability, and forest successional age. Growth increased with light availability and was greater in young forests and decreased with distance from edge and moisture availability. The nonnative species generally performed better than the native species, however, there was species specific variability among growth metrics. The nonnative species privet, autumn olive, and honeysuckle had the best performance in terms of above-ground biomass relative to the overall average, while the native dogwood and spicebush generated relatively small amounts of biomass. The average biomass produced by the native redbud was close to the overall average across all the species. Privet also showed the greatest increase in diameter relative to the other species, while dogwood and especially spicebush had relatively small increases in diameter. Autumn olive and privet had the two highest relative growth rates in height and spicebush had the lowest. Relative growth rates of redbud, dogwood, and honeysuckle were similar, and near the overall average across all species.</p>
 </section>
 <section id="percent-germination-model" class="level2">
 <h2>Percent germination model</h2>
@@ -661,588 +829,306 @@ $(document).ready(function () {
 ##   Approximation) [glmerMod]
 ##  Family: binomial  ( logit )
 ## Formula: 
-## cbind(seeds_germinated, seeds_present) ~ distance + avg_pct_light +  
-##     avg_basal_area * age + litter_kg_m2 + (1 | site_code) + (1 |  
-##     common_name)
+## cbind(seeds_germinated, seeds_present) ~ distance + age + litter_kg_m2 +  
+##     (1 | site_code) + (1 | common_name)
 ##    Data: germination_data
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##    813.6    850.2   -397.8    795.6      422 
+##    820.0    844.3   -404.0    808.0      425 
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -1.8674 -0.6140 -0.2603  0.1917  5.1710 
+## -1.7113 -0.6165 -0.2536  0.2654  4.9852 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.08502  0.2916  
-##  common_name (Intercept) 1.29184  1.1366  
+##  site_code   (Intercept) 0.08699  0.2949  
+##  common_name (Intercept) 1.26869  1.1264  
 ## Number of obs: 431, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                                 Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)                    -3.752274   0.679352  -5.523 3.33e-08 ***
-## distance                        0.006238   0.002459   2.537  0.01119 *  
-## avg_pct_light                   0.009251   0.003787   2.443  0.01458 *  
-## avg_basal_area                  0.024181   0.008876   2.724  0.00645 ** 
-## ageYoung forest                 0.821594   0.466951   1.759  0.07850 .  
-## litter_kg_m2                    0.553471   0.219737   2.519  0.01178 *  
-## avg_basal_area:ageYoung forest -0.055812   0.022646  -2.464  0.01372 *  
+##                  Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)     -2.540634   0.552877  -4.595 4.32e-06 ***
+## distance         0.004564   0.002311   1.974   0.0483 *  
+## ageYoung forest -0.393468   0.215068  -1.830   0.0673 .  
+## litter_kg_m2     0.350322   0.200727   1.745   0.0809 .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) distnc avg_p_ avg_b_ agYngf ltt__2
-## distance    -0.246                                   
-## avg_pct_lgh -0.376  0.278                            
-## avg_basal_r -0.507  0.099  0.369                     
-## ageYongfrst -0.505  0.136  0.233  0.600              
-## littr_kg_m2 -0.515  0.182  0.197  0.149  0.400       
-## avg_bsl_:Yf  0.331 -0.128 -0.143 -0.412 -0.843 -0.326</code></pre>
-<p><img src="analysis_files/figure-html/final%20germination%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-4.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-5.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-6.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-7.png" width="4200" /></p>
+##             (Intr) distnc agYngf
+## distance    -0.145              
+## ageYongfrst -0.277  0.004       
+## littr_kg_m2 -0.467  0.082  0.253</code></pre>
+<p><img src="analysis_files/figure-html/final%20germination%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-4.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-5.png" width="4200" /></p>
 <pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
 ##   Approximation) [glmerMod]
 ##  Family: binomial  ( logit )
-## Formula: 
-## cbind(seeds_germinated, seeds_present) ~ scaled_distance + scaled_pct_light +  
-##     scaled_basal_area * age + scaled_litter_kg_m2 + (1 | site_code) +  
-##     (1 | common_name)
+## Formula: cbind(seeds_germinated, seeds_present) ~ scaled_distance + age +  
+##     scaled_litter_kg_m2 + (1 | site_code) + (1 | common_name)
 ##    Data: germination_data
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##    813.6    850.2   -397.8    795.6      422 
+##    820.0    844.3   -404.0    808.0      425 
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -1.8674 -0.6140 -0.2603  0.1917  5.1710 
+## -1.7113 -0.6165 -0.2536  0.2654  4.9852 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.08502  0.2916  
-##  common_name (Intercept) 1.29184  1.1366  
+##  site_code   (Intercept) 0.08699  0.2949  
+##  common_name (Intercept) 1.26870  1.1264  
 ## Number of obs: 431, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                                   Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)                        -2.4439     0.5045  -4.844 1.27e-06 ***
-## scaled_distance                     0.3743     0.1475   2.537  0.01119 *  
-## scaled_pct_light                    0.2990     0.1224   2.443  0.01458 *  
-## scaled_basal_area                   0.4914     0.1804   2.724  0.00645 ** 
-## ageYoung forest                    -0.4080     0.2721  -1.499  0.13379    
-## scaled_litter_kg_m2                 0.3580     0.1421   2.519  0.01177 *  
-## scaled_basal_area:ageYoung forest  -1.1342     0.4602  -2.464  0.01372 *  
+##                     Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)          -2.1671     0.4909  -4.415 1.01e-05 ***
+## scaled_distance       0.2738     0.1387   1.974   0.0483 *  
+## ageYoung forest      -0.3935     0.2151  -1.830   0.0673 .  
+## scaled_litter_kg_m2   0.2266     0.1298   1.745   0.0809 .  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) scld_d scld_p_ scld_b_ agYngf sc___2
-## scald_dstnc -0.166                                     
-## scld_pct_lg -0.121  0.278                              
-## scald_bsl_r -0.170  0.099  0.369                       
-## ageYongfrst -0.180 -0.001  0.139   0.274               
-## scld_ltt__2 -0.142  0.182  0.197   0.149   0.087       
-## scld_bs_:Yf  0.114 -0.128 -0.143  -0.412   0.386 -0.326</code></pre>
+##             (Intr) scld_d agYngf
+## scald_dstnc -0.127              
+## ageYongfrst -0.201  0.004       
+## scld_ltt__2 -0.090  0.082  0.253</code></pre>
 <p><img src="analysis_files/figure-html/germ-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/germ-ranef-plot-2.png" width="4200" /></p>
-<pre><code>##    user  system elapsed 
-## 240.810   2.771 254.229</code></pre>
-<p><img src="analysis_files/figure-html/germ-fixef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/germ-fixef-plot-2.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/germ-fixef-plot-1.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/sjplot-germination-1.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-2.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-3.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-4.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-5.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-6.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-7.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-8.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-9.png" width="4200" /></p>
 </section>
 <section id="seedling-survival-model" class="level2">
 <h2>Seedling survival model</h2>
 <p>Logistic regression to estimate species-level survival probabilities.</p>
-<pre><code>## [1] 1370.782</code></pre>
-<pre><code>## [1] 1324.547</code></pre>
-<pre><code>## [1] 1324.157</code></pre>
-<pre><code>## [1] 1003.663</code></pre>
-<pre><code>## [1] 999.9547</code></pre>
-<pre><code>## Data: survival_2006
-## Models:
-## surv_mod4: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_distance * 
-## surv_mod4:     age + scaled_basal_area * age + scaled_distance * scaled_litter_kg_m2 + 
-## surv_mod4:     scaled_distance * scaled_pct_moisture + (1 | site_code) + 
-## surv_mod4:     (1 | common_name)
-## surv_mod5: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_distance * 
-## surv_mod5:     age + scaled_basal_area * age + scaled_distance * scaled_litter_kg_m2 + 
-## surv_mod5:     scaled_distance * scaled_pct_moisture + (scaled_distance | 
-## surv_mod5:     site_code) + (1 | common_name)
-##           Df     AIC    BIC  logLik deviance  Chisq Chi Df Pr(&gt;Chisq)  
-## surv_mod4 14 1003.66 1060.2 -487.83   975.66                           
-## surv_mod5 16  999.95 1064.6 -483.98   967.95 7.7087      2    0.02119 *
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre><code>## Data: survival_2006
-## Models:
-## surv_mod4: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_distance * 
-## surv_mod4:     age + scaled_basal_area * age + scaled_distance * scaled_litter_kg_m2 + 
-## surv_mod4:     scaled_distance * scaled_pct_moisture + (1 | site_code) + 
-## surv_mod4:     (1 | common_name)
-## surv_mod4a: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_distance * 
-## surv_mod4a:     age + scaled_basal_area * age + scaled_distance * scaled_litter_kg_m2 + 
-## surv_mod4a:     scaled_distance * scaled_pct_moisture + (1 | site_code/common_name)
-##            Df     AIC    BIC  logLik deviance  Chisq Chi Df Pr(&gt;Chisq)    
-## surv_mod4  14 1003.66 1060.2 -487.83   975.66                             
-## surv_mod4a 14  957.39 1013.9 -464.69   929.39 46.278      0  &lt; 2.2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
 ##   Approximation) [glmerMod]
 ##  Family: binomial  ( logit )
 ## Formula: 
-## cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_distance *  
-##     age + scaled_basal_area * age + scaled_distance * scaled_litter_kg_m2 +  
-##     scaled_distance * scaled_pct_moisture + (1 | site_code) +  
-##     (1 | common_name)
+## cbind(alive, dead) ~ distance + age + litter_kg_m2 + (1 | site_code) +  
+##     (1 | common_name) + (1 | obs_id)
 ##    Data: survival_2006
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##   1003.7   1060.2   -487.8    975.7      405 
+##    922.1    950.3   -454.0    908.1      412 
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -6.1428 -0.7105  0.3876  0.6805  3.1541 
+## -1.7498 -0.2994  0.2914  0.4587  1.1419 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.6266   0.7916  
-##  common_name (Intercept) 1.5276   1.2359  
-## Number of obs: 419, groups:  site_code, 12; common_name, 6
+##  obs_id      (Intercept) 2.088    1.445   
+##  site_code   (Intercept) 1.018    1.009   
+##  common_name (Intercept) 2.400    1.549   
+## Number of obs: 419, groups:  obs_id, 419; site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                                      Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)                          1.683928   0.634184   2.655  0.00792
-## scaled_distance                     -0.343732   0.305473  -1.125  0.26049
-## scaled_pct_light                     0.257366   0.127361   2.021  0.04330
-## ageYoung forest                     -0.382761   0.549125  -0.697  0.48578
-## scaled_basal_area                    0.199334   0.174809   1.140  0.25416
-## scaled_litter_kg_m2                 -0.053450   0.127663  -0.419  0.67545
-## scaled_pct_moisture                 -0.009291   0.137975  -0.067  0.94631
-## scaled_distance:scaled_pct_light    -0.598771   0.289866  -2.066  0.03886
-## scaled_distance:ageYoung forest      0.235055   0.442452   0.531  0.59524
-## ageYoung forest:scaled_basal_area   -0.594014   0.269351  -2.205  0.02743
-## scaled_distance:scaled_litter_kg_m2  0.471660   0.230959   2.042  0.04113
-## scaled_distance:scaled_pct_moisture  0.086446   0.256182   0.337  0.73578
-##                                       
-## (Intercept)                         **
-## scaled_distance                       
-## scaled_pct_light                    * 
-## ageYoung forest                       
-## scaled_basal_area                     
-## scaled_litter_kg_m2                   
-## scaled_pct_moisture                   
-## scaled_distance:scaled_pct_light    * 
-## scaled_distance:ageYoung forest       
-## ageYoung forest:scaled_basal_area   * 
-## scaled_distance:scaled_litter_kg_m2 * 
-## scaled_distance:scaled_pct_moisture   
+##                  Estimate Std. Error z value Pr(&gt;|z|)  
+## (Intercept)      2.106874   0.937527   2.247   0.0246 *
+## distance        -0.004210   0.005035  -0.836   0.4031  
+## ageYoung forest -0.225238   0.632839  -0.356   0.7219  
+## litter_kg_m2     0.223423   0.422281   0.529   0.5967  
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##                       (Intr) scld_d scld_pct_l agYngf scld_b_ sc___2
-## scald_dstnc           -0.181                                        
-## scld_pct_lg           -0.040 -0.030                                 
-## ageYongfrst           -0.429  0.227  0.026                          
-## scald_bsl_r           -0.164 -0.175  0.210      0.206               
-## scld_ltt__2           -0.134  0.268  0.076      0.259  0.116        
-## scld_pct_ms           -0.003 -0.169 -0.005      0.068  0.253   0.139
-## scld_dstnc:scld_pct_l  0.029  0.021 -0.727      0.049 -0.133   0.058
-## scld_dst:Yf            0.149 -0.753  0.012     -0.320  0.107  -0.356
-## agYfrst:s__            0.122  0.087 -0.196      0.043 -0.647  -0.133
-## scld_d:___2            0.079 -0.250  0.083     -0.176 -0.050  -0.648
-## scld_dstnc:scld_pct_m -0.004  0.134  0.052     -0.050 -0.187  -0.113
-##                       scld_pct_m scld_dstnc:scld_pct_l sc_:Yf aYf:__
-## scald_dstnc                                                         
-## scld_pct_lg                                                         
-## ageYongfrst                                                         
-## scald_bsl_r                                                         
-## scld_ltt__2                                                         
-## scld_pct_ms                                                         
-## scld_dstnc:scld_pct_l  0.087                                        
-## scld_dst:Yf            0.118      0.018                             
-## agYfrst:s__           -0.103      0.299                -0.057       
-## scld_d:___2            0.058     -0.125                 0.345 -0.035
-## scld_dstnc:scld_pct_m -0.735     -0.147                -0.248  0.011
-##                       s_:___
-## scald_dstnc                 
-## scld_pct_lg                 
-## ageYongfrst                 
-## scald_bsl_r                 
-## scld_ltt__2                 
-## scld_pct_ms                 
-## scld_dstnc:scld_pct_l       
-## scld_dst:Yf                 
-## agYfrst:s__                 
-## scld_d:___2                 
-## scld_dstnc:scld_pct_m -0.003</code></pre>
-<pre><code>##    (Intercept)  age scaled_basal_area scaled_distance scaled_litter_kg_m2
-## 1     1.629132 &lt;NA&gt;                NA              NA                  NA
-## 2     1.710386 &lt;NA&gt;                NA      -0.2070961                  NA
-## 3     1.710418 &lt;NA&gt;                NA      -0.1967132         -0.06019211
-## 4     1.630413 &lt;NA&gt;                NA              NA                  NA
-## 5     1.629233 &lt;NA&gt;                NA              NA          0.06333076
-## 6     1.629535 &lt;NA&gt;                NA              NA                  NA
-## 7     1.728952    +                NA              NA                  NA
-## 8     1.629588 &lt;NA&gt;      -0.017901353              NA                  NA
-## 9     1.710384 &lt;NA&gt;                NA      -0.2069399          0.06338667
-## 10    1.707994 &lt;NA&gt;                NA      -0.1978256                  NA
-## 11    1.631080 &lt;NA&gt;                NA              NA          0.08566973
-## 12    1.706937 &lt;NA&gt;                NA      -0.1836511         -0.03994554
-## 13    1.701687 &lt;NA&gt;                NA      -0.1928209         -0.05317439
-## 14    1.813061    +                NA      -0.2078640                  NA
-## 15    1.705208 &lt;NA&gt;                NA      -0.1932985                  NA
-## 16    1.710309 &lt;NA&gt;      -0.001101742      -0.2068488                  NA
-##    scaled_pct_light scaled_pct_moisture age:scaled_basal_area
-## 1                NA                  NA                  &lt;NA&gt;
-## 2                NA                  NA                  &lt;NA&gt;
-## 3                NA                  NA                  &lt;NA&gt;
-## 4        0.06474544                  NA                  &lt;NA&gt;
-## 5                NA                  NA                  &lt;NA&gt;
-## 6                NA         -0.04734028                  &lt;NA&gt;
-## 7                NA                  NA                  &lt;NA&gt;
-## 8                NA                  NA                  &lt;NA&gt;
-## 9                NA                  NA                  &lt;NA&gt;
-## 10       0.05928607                  NA                  &lt;NA&gt;
-## 11       0.08471580                  NA                  &lt;NA&gt;
-## 12       0.07713569                  NA                  &lt;NA&gt;
-## 13       0.20397479                  NA                  &lt;NA&gt;
-## 14               NA                  NA                  &lt;NA&gt;
-## 15               NA         -0.02520348                  &lt;NA&gt;
-## 16               NA                  NA                  &lt;NA&gt;
-##    age:scaled_distance scaled_distance:scaled_litter_kg_m2
-## 1                 &lt;NA&gt;                                  NA
-## 2                 &lt;NA&gt;                                  NA
-## 3                 &lt;NA&gt;                           0.3663862
-## 4                 &lt;NA&gt;                                  NA
-## 5                 &lt;NA&gt;                                  NA
-## 6                 &lt;NA&gt;                                  NA
-## 7                 &lt;NA&gt;                                  NA
-## 8                 &lt;NA&gt;                                  NA
-## 9                 &lt;NA&gt;                                  NA
-## 10                &lt;NA&gt;                                  NA
-## 11                &lt;NA&gt;                                  NA
-## 12                &lt;NA&gt;                           0.3657045
-## 13                &lt;NA&gt;                           0.4026720
-## 14                &lt;NA&gt;                                  NA
-## 15                &lt;NA&gt;                                  NA
-## 16                &lt;NA&gt;                                  NA
-##    scaled_distance:scaled_pct_light scaled_distance:scaled_pct_moisture df
-## 1                                NA                                  NA  3
-## 2                                NA                                  NA  4
-## 3                                NA                                  NA  6
-## 4                                NA                                  NA  4
-## 5                                NA                                  NA  4
-## 6                                NA                                  NA  4
-## 7                                NA                                  NA  4
-## 8                                NA                                  NA  4
-## 9                                NA                                  NA  5
-## 10                               NA                                  NA  5
-## 11                               NA                                  NA  5
-## 12                               NA                                  NA  7
-## 13                       -0.3855483                                  NA  8
-## 14                               NA                                  NA  5
-## 15                               NA                                  NA  5
-## 16                               NA                                  NA  5
-##       logLik     AICc     delta     weight
-## 1  -494.3234 994.7047 0.0000000 0.06058277
-## 2  -493.7398 995.5762 0.8714749 0.03918418
-## 3  -491.9437 996.0913 1.3865645 0.03028729
-## 4  -493.9998 996.0962 1.3915492 0.03021190
-## 5  -494.0510 996.1986 1.4939081 0.02870457
-## 6  -494.1775 996.4517 1.7469863 0.02529274
-## 7  -494.2429 996.5824 1.8777591 0.02369184
-## 8  -494.3114 996.7194 2.0146637 0.02212435
-## 9  -493.4683 997.0818 2.3771528 0.01845682
-## 10 -493.4701 997.0855 2.3808430 0.01842280
-## 11 -493.5358 997.2169 2.5121971 0.01725172
-## 12 -491.5168 997.3060 2.6013322 0.01649974
-## 13 -490.5324 997.4160 2.7112772 0.01561718
-## 14 -493.6549 997.4551 2.7504431 0.01531433
-## 15 -493.7008 997.5470 2.8422717 0.01462708
-## 16 -493.7397 997.6247 2.9200468 0.01406919</code></pre>
-<pre><code>## 
-## Call:
-## glm(formula = cbind(alive, dead) ~ 1, family = &quot;binomial&quot;, data = survival_2006)
-## 
-## Deviance Residuals: 
-##    Min      1Q  Median      3Q     Max  
-## -3.400  -1.145   1.466   1.466   1.466  
-## 
-## Coefficients:
-##             Estimate Std. Error z value Pr(&gt;|z|)    
-## (Intercept)  1.17651    0.05755   20.44   &lt;2e-16 ***
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## (Dispersion parameter for binomial family taken to be 1)
-## 
-##     Null deviance: 1124.4  on 418  degrees of freedom
-## Residual deviance: 1124.4  on 418  degrees of freedom
-## AIC: 1389.4
-## 
-## Number of Fisher Scoring iterations: 4</code></pre>
-<pre><code>## Data: survival_2006
-## Models:
-## surv_mod4a: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_basal_area * 
-## surv_mod4a:     age + scaled_distance * scaled_litter_kg_m2 + (1 | site_code) + 
-## surv_mod4a:     (1 | common_name)
-## surv_mod4: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_distance * 
-## surv_mod4:     age + scaled_basal_area * age + scaled_distance * scaled_litter_kg_m2 + 
-## surv_mod4:     scaled_distance * scaled_pct_moisture + (1 | site_code) + 
-## surv_mod4:     (1 | common_name)
-##            Df     AIC    BIC  logLik deviance  Chisq Chi Df Pr(&gt;Chisq)
-## surv_mod4a 11  998.28 1042.7 -488.14   976.28                         
-## surv_mod4  14 1003.66 1060.2 -487.83   975.66 0.6204      3     0.8918</code></pre>
-<pre><code>## Data: survival_2006
-## Models:
-## surv_mod_ranef: cbind(alive, dead) ~ (1 | site_code) + (1 | common_name)
-## surv_mod4a: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_basal_area * 
-## surv_mod4a:     age + scaled_distance * scaled_litter_kg_m2 + (1 | site_code) + 
-## surv_mod4a:     (1 | common_name)
-##                Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(&gt;Chisq)
-## surv_mod_ranef  3 994.65 1006.8 -494.32   988.65                         
-## surv_mod4a     11 998.28 1042.7 -488.14   976.28 12.363      8     0.1357</code></pre>
+##             (Intr) distnc agYngf
+## distance    -0.136              
+## ageYongfrst -0.437  0.011       
+## littr_kg_m2 -0.549  0.008  0.196</code></pre>
 <pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
 ##   Approximation) [glmerMod]
 ##  Family: binomial  ( logit )
 ## Formula: 
-## cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_basal_area *  
-##     age + scaled_distance * scaled_litter_kg_m2 + (1 | site_code) +  
-##     (1 | common_name)
+## cbind(alive, dead) ~ scaled_distance + age + scaled_litter_kg_m2 +  
+##     (1 | site_code) + (1 | common_name)
 ##    Data: survival_2006
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##    998.3   1042.7   -488.1    976.3      408 
+##    998.8   1023.1   -493.4    986.8      413 
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -5.9749 -0.6556  0.3850  0.6874  2.9365 
+## -7.0152 -0.7619  0.3999  0.7006  3.0638 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.6407   0.8005  
-##  common_name (Intercept) 1.5276   1.2360  
+##  site_code   (Intercept) 0.6959   0.8342  
+##  common_name (Intercept) 1.5121   1.2297  
 ## Number of obs: 419, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                                     Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)                          1.62255    0.62846   2.582  0.00983
-## scaled_distance                     -0.19462    0.19289  -1.009  0.31300
-## scaled_pct_light                     0.25085    0.12698   1.976  0.04821
-## scaled_basal_area                    0.19285    0.16843   1.145  0.25220
-## ageYoung forest                     -0.25609    0.51964  -0.493  0.62215
-## scaled_litter_kg_m2                 -0.01851    0.11605  -0.160  0.87331
-## scaled_distance:scaled_pct_light    -0.57778    0.28692  -2.014  0.04404
-## scaled_basal_area:ageYoung forest   -0.57201    0.26605  -2.150  0.03155
-## scaled_distance:scaled_litter_kg_m2  0.41175    0.21303   1.933  0.05326
-##                                       
-## (Intercept)                         **
-## scaled_distance                       
-## scaled_pct_light                    * 
-## scaled_basal_area                     
-## ageYoung forest                       
-## scaled_litter_kg_m2                   
-## scaled_distance:scaled_pct_light    * 
-## scaled_basal_area:ageYoung forest   * 
-## scaled_distance:scaled_litter_kg_m2 . 
+##                     Estimate Std. Error z value Pr(&gt;|z|)   
+## (Intercept)          1.78596    0.62285   2.867  0.00414 **
+## scaled_distance     -0.20750    0.19026  -1.091  0.27543   
+## ageYoung forest     -0.15033    0.50744  -0.296  0.76704   
+## scaled_litter_kg_m2  0.05921    0.08691   0.681  0.49567   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) scld_d scld_p_ scld_b_ agYngf sc___2 sc_:__ s__:Yf
-## scald_dstnc -0.103                                                   
-## scld_pct_lg -0.045 -0.012                                            
-## scald_bsl_r -0.184 -0.116  0.220                                     
-## ageYongfrst -0.408 -0.035  0.040   0.237                             
-## scld_ltt__2 -0.081 -0.010  0.098   0.125   0.135                     
-## scld_dst:__  0.032  0.032 -0.727  -0.161   0.038  0.040              
-## scld_bs_:Yf  0.135  0.026 -0.192  -0.645   0.028 -0.162  0.303       
-## scld_d:___2  0.025  0.062  0.075  -0.100  -0.062 -0.608 -0.126 -0.001</code></pre>
-<pre><code>## Data: survival_2006
-## Models:
-## surv_mod4b: cbind(alive, dead) ~ scale(distance) * scale(avg_pct_light) + 
-## surv_mod4b:     scale(avg_basal_area) * age + scale(litter_kg_m2) + (1 | 
-## surv_mod4b:     site_code) + (1 | common_name)
-## surv_mod4a: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_basal_area * 
-## surv_mod4a:     age + scaled_distance * scaled_litter_kg_m2 + (1 | site_code) + 
-## surv_mod4a:     (1 | common_name)
-##            Df    AIC    BIC  logLik deviance  Chisq Chi Df Pr(&gt;Chisq)  
-## surv_mod4b 10 999.99 1040.4 -489.99   979.99                           
-## surv_mod4a 11 998.28 1042.7 -488.14   976.28 3.7039      1    0.05428 .
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre><code>## Data: survival_2006
-## Models:
-## surv_mod4c: cbind(alive, dead) ~ scale(distance) + scale(avg_pct_light) + 
-## surv_mod4c:     scale(avg_basal_area) * age + scale(litter_kg_m2) + (1 | 
-## surv_mod4c:     site_code) + (1 | common_name)
-## surv_mod4b: cbind(alive, dead) ~ scale(distance) * scale(avg_pct_light) + 
-## surv_mod4b:     scale(avg_basal_area) * age + scale(litter_kg_m2) + (1 | 
-## surv_mod4b:     site_code) + (1 | common_name)
-##            Df     AIC    BIC  logLik deviance  Chisq Chi Df Pr(&gt;Chisq)  
-## surv_mod4c  9 1001.18 1037.5 -491.59   983.18                           
-## surv_mod4b 10  999.99 1040.4 -489.99   979.99 3.1897      1     0.0741 .
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
-##   Approximation) [glmerMod]
-##  Family: binomial  ( logit )
-## Formula: cbind(alive, dead) ~ scale(distance) + scale(avg_pct_light) +  
-##     scale(avg_basal_area) * age + scale(litter_kg_m2) + (1 |  
-##     site_code) + (1 | common_name)
-##    Data: survival_2006
-## 
-##      AIC      BIC   logLik deviance df.resid 
-##   1001.2   1037.5   -491.6    983.2      410 
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -6.3931 -0.6958  0.3949  0.7034  2.9721 
-## 
-## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.6584   0.8114  
-##  common_name (Intercept) 1.5158   1.2312  
-## Number of obs: 419, groups:  site_code, 12; common_name, 6
-## 
-## Fixed effects:
-##                                       Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)                            1.56491    0.62505   2.504   0.0123
-## scale(distance)                       -0.06976    0.06765  -1.031   0.3024
-## scale(avg_pct_light)                   0.07178    0.08546   0.840   0.4009
-## scale(avg_basal_area)                  0.17036    0.16607   1.026   0.3050
-## ageYoung forest                       -0.16706    0.52329  -0.319   0.7495
-## scale(litter_kg_m2)                    0.11129    0.09182   1.212   0.2255
-## scale(avg_basal_area):ageYoung forest -0.42543    0.25358  -1.678   0.0934
-##                                        
-## (Intercept)                           *
-## scale(distance)                        
-## scale(avg_pct_light)                   
-## scale(avg_basal_area)                  
-## ageYoung forest                        
-## scale(litter_kg_m2)                    
-## scale(avg_basal_area):ageYoung forest .
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) scl(d) scl(vg_p_) scl(vg_b_) agYngf s(__2)
-## scal(dstnc)  0.011                                           
-## scl(vg_pc_) -0.028  0.046                                    
-## scl(vg_bs_) -0.192 -0.109  0.145                             
-## ageYongfrst -0.419 -0.031  0.089      0.238                  
-## scl(ltt__2) -0.073  0.026  0.209      0.066      0.115       
-## scl(v__):Yf  0.134  0.015  0.036     -0.639      0.017 -0.201</code></pre>
-<pre><code>## Data: survival_2006
-## Models:
-## surv_mod4d: cbind(alive, dead) ~ distance + avg_pct_light + avg_basal_area * 
-## surv_mod4d:     age + litter_kg_m2 + (1 | site_code) + (1 | common_name)
-## surv_mod4a: cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_basal_area * 
-## surv_mod4a:     age + scaled_distance * scaled_litter_kg_m2 + (1 | site_code) + 
-## surv_mod4a:     (1 | common_name)
-##            Df     AIC    BIC  logLik deviance  Chisq Chi Df Pr(&gt;Chisq)  
-## surv_mod4d  9 1001.18 1037.5 -491.59   983.18                           
-## surv_mod4a 11  998.28 1042.7 -488.14   976.28 6.8937      2    0.03185 *
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
-##   Approximation) [glmerMod]
-##  Family: binomial  ( logit )
-## Formula: cbind(alive, dead) ~ distance + avg_pct_light + avg_basal_area *  
-##     age + litter_kg_m2 + (1 | site_code) + (1 | common_name)
-##    Data: survival_2006
-## 
-##      AIC      BIC   logLik deviance df.resid 
-##   1001.2   1037.5   -491.6    983.2      410 
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -6.3931 -0.6958  0.3949  0.7034  2.9721 
-## 
-## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.6584   0.8114  
-##  common_name (Intercept) 1.5158   1.2312  
-## Number of obs: 419, groups:  site_code, 12; common_name, 6
-## 
-## Fixed effects:
-##                                 Estimate Std. Error z value Pr(&gt;|z|)  
-## (Intercept)                     0.820518   0.880999   0.931   0.3517  
-## distance                       -0.003308   0.003208  -1.031   0.3024  
-## avg_pct_light                   0.004691   0.005585   0.840   0.4009  
-## avg_basal_area                  0.016557   0.016141   1.026   0.3050  
-## ageYoung forest                 0.746330   0.748611   0.997   0.3188  
-## litter_kg_m2                    0.339782   0.280360   1.212   0.2255  
-## avg_basal_area:ageYoung forest -0.041348   0.024647  -1.678   0.0934 .
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) distnc avg_p_ avg_b_ agYngf ltt__2
-## distance    -0.046                                   
-## avg_pct_lgh -0.277  0.046                            
-## avg_basal_r -0.572 -0.109  0.145                     
-## ageYongfrst -0.611 -0.033  0.036  0.631              
-## littr_kg_m2 -0.447  0.026  0.209  0.066  0.227       
-## avg_bsl_:Yf  0.416  0.015  0.036 -0.639 -0.715 -0.201</code></pre>
-<pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
-##   Approximation) [glmerMod]
-##  Family: binomial  ( logit )
-## Formula: 
-## cbind(alive, dead) ~ scaled_distance * scaled_pct_light + scaled_basal_area *  
-##     age + scaled_distance * scaled_litter_kg_m2 + (1 | site_code) +  
-##     (1 | common_name)
-##    Data: survival_2006
-## 
-##      AIC      BIC   logLik deviance df.resid 
-##    998.3   1042.7   -488.1    976.3      408 
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -5.9749 -0.6556  0.3850  0.6874  2.9365 
-## 
-## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.6407   0.8005  
-##  common_name (Intercept) 1.5276   1.2360  
-## Number of obs: 419, groups:  site_code, 12; common_name, 6
-## 
-## Fixed effects:
-##                                     Estimate Std. Error z value Pr(&gt;|z|)
-## (Intercept)                          1.62255    0.62846   2.582  0.00983
-## scaled_distance                     -0.19462    0.19289  -1.009  0.31300
-## scaled_pct_light                     0.25085    0.12698   1.976  0.04821
-## scaled_basal_area                    0.19285    0.16843   1.145  0.25220
-## ageYoung forest                     -0.25609    0.51964  -0.493  0.62215
-## scaled_litter_kg_m2                 -0.01851    0.11605  -0.160  0.87331
-## scaled_distance:scaled_pct_light    -0.57778    0.28692  -2.014  0.04404
-## scaled_basal_area:ageYoung forest   -0.57201    0.26605  -2.150  0.03155
-## scaled_distance:scaled_litter_kg_m2  0.41175    0.21303   1.933  0.05326
-##                                       
-## (Intercept)                         **
-## scaled_distance                       
-## scaled_pct_light                    * 
-## scaled_basal_area                     
-## ageYoung forest                       
-## scaled_litter_kg_m2                   
-## scaled_distance:scaled_pct_light    * 
-## scaled_basal_area:ageYoung forest   * 
-## scaled_distance:scaled_litter_kg_m2 . 
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) scld_d scld_p_ scld_b_ agYngf sc___2 sc_:__ s__:Yf
-## scald_dstnc -0.103                                                   
-## scld_pct_lg -0.045 -0.012                                            
-## scald_bsl_r -0.184 -0.116  0.220                                     
-## ageYongfrst -0.408 -0.035  0.040   0.237                             
-## scld_ltt__2 -0.081 -0.010  0.098   0.125   0.135                     
-## scld_dst:__  0.032  0.032 -0.727  -0.161   0.038  0.040              
-## scld_bs_:Yf  0.135  0.026 -0.192  -0.645   0.028 -0.162  0.303       
-## scld_d:___2  0.025  0.062  0.075  -0.100  -0.062 -0.608 -0.126 -0.001</code></pre>
-<p><img src="analysis_files/figure-html/final%20survival%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-4.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-5.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-6.png" width="4200" /></p>
+##             (Intr) scld_d agYngf
+## scald_dstnc -0.126              
+## ageYongfrst -0.411  0.010       
+## scld_ltt__2 -0.062  0.001  0.156</code></pre>
+<p><img src="analysis_files/figure-html/final%20survival%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-4.png" width="4200" /></p>
 <p><img src="analysis_files/figure-html/surv-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/surv-ranef-plot-2.png" width="4200" /></p>
 <p><img src="analysis_files/figure-html/surv-fixef-plot-1.png" width="4200" /></p>
+<p>The estimated marginal and condiational R<sup>2</sup> values reinforce that the fixed effects don’t explain the variance in seedling survival:</p>
+<p>0.0037321, 0.3908736</p>
+<p><img src="analysis_files/figure-html/survival-sjplot-1.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-2.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-3.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-4.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-5.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-6.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-7.png" width="4200" /></p>
+</section>
+<section id="germination-and-survival-results" class="level2">
+<h2>Germination and survival results</h2>
+<p>The probability of germination increased with distance from edge, light availability, litter mass, and basal area, but the effect of basal area was moderated by forest successional age, with lower germination in young forests. Effects of measured site conditions on survival were relatively weak and predominantly due to interaction variables. Light availability had a significant positive effect on survival probability, but this decreased with distance from the edge (indicated by the negative interaction term). The positive interaction of distance and litter increased survival probability, although the main effects of distance and litter were statistically insignificant. The interaction of basal area and forest age was similar, but with a negative effect where seedlings at locations with lower basal area in younger forests had lower probability of survival. Variation in survival depended predominantly on species specific characteristics and unmeasured site characteristics as indicated by the variance accounted for by these random effects variables.</p>
+<p>Germination probability for the nonnative autumn olive and honeysuckle, and native dogwood was greater than the overall average; privet, redbud, and spicebush had below average germination, with spicebush being the lowest. In contrast, the transplanted autumn olive and dogwood seedlings had the lowest survival probability, while honeysuckle, privet, spicebush, and redbud seedlings all showed above average survival. Honeysuckle seedlings were particularly likely to persist to the end of the experiment.</p>
+</section>
+<section id="site-level-effects" class="level2">
+<h2>Site-level effects</h2>
+<p>Growth was relativley poor for all the metrics at the DG, FR, and GR, and tended to be greatest at the CH and PR sites. In addition to the CH and PR sites, seedlings at the LD and SR sites tended to perform well in terms of biomass; seedling diameters at the TC and SR sites were also greater than average, but lagged well-behind the CH site; relative-growth-rate tended to be greater than average at the BB and LD, but the PR site was the best for this variable. In terms of survival, the CH site was the most favorable, while seedling survival was similar and above average at the TC, DU, and PR sites. Probability of germination was close to the average across most of the site, but exceptionally greater at the DB site, and exceptionally lower at the DU site.</p>
+<p><img src="analysis_files/figure-html/gridded-site-ranef-fig-1.png" width="4200" /></p>
+</section>
+<section id="herbivory-model" class="level2">
+<h2>Herbivory model</h2>
+<p>General model formulation: herbivory ~ distance + age + year + pct_light + litter</p>
+<p>I’m not actually sure how to fit a model to these data. It’s ordinal in that the categories indicate the range of herbivory in terms of leaf area affected. Herbivory was categorized as leaf-loss, where</p>
+<ul>
+<li>0 = no herbivory</li>
+<li>1 = ≤25%</li>
+<li>2 = 26-50%</li>
+<li>3 = 51-75%</li>
+<li>4 = 76-99%</li>
+<li>5 = 100% leaf removal by herbivores</li>
+</ul>
+<p>The internet has some suggestions on how to do this for mixed-effects models: <a href="https://stats.stackexchange.com/questions/238581/how-to-use-ordinal-logistic-regression-with-random-effects?noredirect=1&amp;lq=1"></a></p>
+<p>The <code>ordinal</code> package has the <code>clmm</code> and <code>clmm2</code>, with will probably suffice for my purposes. I just need to get a decent inference off the data. Two other packages implement Bayesian MCMC frameworsks: <a href="https://cran.r-project.org/package=MCMCglmm">MCMCglmm</a> and <a href="https://cran.r-project.org/package=brms">brms</a>.</p>
+<p>Other studies have looked at incidence, i.e., presence/absence of herbivory at each observation, so we could take that approach.</p>
+<pre><code>##   site_name          site_code             age               distance    
+##  Length:5040        Length:5040        Length:5040        Min.   : 0.00  
+##  Class :character   Class :character   Class :character   1st Qu.: 5.00  
+##  Mode  :character   Mode  :character   Mode  :character   Median :20.00  
+##                                                           Mean   :23.14  
+##                                                           3rd Qu.:40.00  
+##                                                           Max.   :60.00  
+##                                                                          
+##    species                 status      habitat_type     f_habitat   
+##  Length:5040        Native    :2520   Min.   :0.000   0-5 m  :1584  
+##  Class :character   Non-native:2520   1st Qu.:0.000   10-20 m:1728  
+##  Mode  :character                     Median :1.000   40-60 m:1728  
+##                                       Mean   :1.029                 
+##                                       3rd Qu.:2.000                 
+##                                       Max.   :2.000                 
+##                                                                     
+##        common_name      year             herbivory    
+##  Autumn olive:840   Length:5040        Min.   :0.000  
+##  Honeysuckle :840   Class :character   1st Qu.:0.000  
+##  Privet      :840   Mode  :character   Median :1.000  
+##  Dogwood     :840                      Mean   :1.088  
+##  Redbud      :840                      3rd Qu.:1.000  
+##  Spicebush   :840                      Max.   :5.000  
+##                                        NA&#39;s   :978</code></pre>
+<pre><code>##   site_name          site_code             age               distance    
+##  Length:4062        Length:4062        Length:4062        Min.   : 0.00  
+##  Class :character   Class :character   Class :character   1st Qu.: 5.00  
+##  Mode  :character   Mode  :character   Mode  :character   Median :20.00  
+##                                                           Mean   :22.71  
+##                                                           3rd Qu.:40.00  
+##                                                           Max.   :60.00  
+##    species                 status      habitat_type     f_habitat   
+##  Length:4062        Native    :1964   Min.   :0.000   0-5 m  :1290  
+##  Class :character   Non-native:2098   1st Qu.:0.000   10-20 m:1417  
+##  Mode  :character                     Median :1.000   40-60 m:1355  
+##                                       Mean   :1.016                 
+##                                       3rd Qu.:2.000                 
+##                                       Max.   :2.000                 
+##        common_name      year             herbivory     herbivory_incidence
+##  Autumn olive:521   Length:4062        Min.   :0.000   Min.   :0.000      
+##  Honeysuckle :806   Class :character   1st Qu.:0.000   1st Qu.:0.000      
+##  Privet      :771   Mode  :character   Median :1.000   Median :1.000      
+##  Dogwood     :494                      Mean   :1.088   Mean   :0.707      
+##  Redbud      :720                      3rd Qu.:1.000   3rd Qu.:1.000      
+##  Spicebush   :750                      Max.   :5.000   Max.   :1.000</code></pre>
+<p><img src="analysis_files/figure-html/ordinal-vs-incidence-1.png" width="4200" /><img src="analysis_files/figure-html/ordinal-vs-incidence-2.png" width="4200" /></p>
+<pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
+##   Approximation) [glmerMod]
+##  Family: binomial  ( logit )
+## Formula: 
+## f_herbiv_incidence ~ distance + age * year + status + (1 | site_code) +  
+##     (1 | common_name)
+##    Data: herbiv_noNA_data
+## 
+##      AIC      BIC   logLik deviance df.resid 
+##   4473.0   4536.1  -2226.5   4453.0     4052 
+## 
+## Scaled residuals: 
+##     Min      1Q  Median      3Q     Max 
+## -5.3723 -0.9920  0.4119  0.6865  1.3240 
+## 
+## Random effects:
+##  Groups      Name        Variance Std.Dev.
+##  site_code   (Intercept) 0.07192  0.2682  
+##  common_name (Intercept) 0.32008  0.5658  
+## Number of obs: 4062, groups:  site_code, 12; common_name, 6
+## 
+## Fixed effects:
+##                            Estimate Std. Error z value Pr(&gt;|z|)    
+## (Intercept)               1.3843435  0.3606555   3.838 0.000124 ***
+## distance                 -0.0008086  0.0017456  -0.463 0.643194    
+## ageYoung forest           0.4028182  0.1946030   2.070 0.038457 *  
+## year2005                  0.5708527  0.1262667   4.521 6.15e-06 ***
+## year2006                  0.5440517  0.1281367   4.246 2.18e-05 ***
+## statusNon-native         -1.2069354  0.4695301  -2.571 0.010155 *  
+## ageYoung forest:year2005 -0.9267511  0.1747619  -5.303 1.14e-07 ***
+## ageYoung forest:year2006 -0.4315990  0.1802183  -2.395 0.016626 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Correlation of Fixed Effects:
+##             (Intr) distnc agYngf yr2005 yr2006 sttsN- aYf:2005
+## distance    -0.111                                            
+## ageYongfrst -0.264  0.011                                     
+## year2005    -0.142  0.001  0.272                              
+## year2006    -0.140 -0.003  0.269  0.418                       
+## statsNn-ntv -0.657 -0.004 -0.004 -0.004 -0.003                
+## agYfrs:2005  0.101 -0.001 -0.407 -0.721 -0.300  0.005         
+## agYfrs:2006  0.101  0.005 -0.393 -0.294 -0.707  0.000  0.440</code></pre>
+<pre><code>## [1] 4472.969</code></pre>
+<pre><code>## Cumulative Link Mixed Model fitted with the Laplace approximation
+## 
+## formula: f_herbiv ~ distance + age * year + status + (1 | site_code) +  
+##     (1 | common_name)
+## data:    herbiv_noNA_data
+## 
+##  link  threshold nobs logLik   AIC     niter      max.grad cond.H 
+##  logit flexible  4062 -4879.14 9786.28 1113(3340) 1.06e-02 3.3e+05
+## 
+## Random effects:
+##  Groups      Name        Variance Std.Dev.
+##  site_code   (Intercept) 0.05269  0.2296  
+##  common_name (Intercept) 0.28432  0.5332  
+## Number of groups:  site_code 12,  common_name 6 
+## 
+## Coefficients:
+##                            Estimate Std. Error z value Pr(&gt;|z|)    
+## distance                 -0.0001806  0.0014249  -0.127 0.899139    
+## ageYoung forest           0.4289984  0.1658279   2.587 0.009681 ** 
+## year2005                  0.3427562  0.1015191   3.376 0.000735 ***
+## year2006                  0.3998139  0.1027399   3.892 9.96e-05 ***
+## statusNon-native         -1.3415312  0.4401605  -3.048 0.002305 ** 
+## ageYoung forest:year2005 -0.6863718  0.1439552  -4.768 1.86e-06 ***
+## ageYoung forest:year2006 -0.3468326  0.1448112  -2.395 0.016617 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Threshold coefficients:
+##     Estimate Std. Error z value
+## 0|1  -1.5302     0.3340  -4.582
+## 1|2   0.8605     0.3332   2.582
+## 2|3   2.1538     0.3355   6.419
+## 3|4   3.4150     0.3438   9.934
+## 4|5   4.0871     0.3544  11.532</code></pre>
 </section>
 </section>
 
