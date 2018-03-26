@@ -9,12 +9,12 @@ output:
 
 ```{r set options, include=F, echo=F}
 
-knitr::opts_chunk$set(fig.width = 7, fig.height = 3.5)
-knitr::opts_chunk$set(dpi = 600)
+# knitr::opts_chunk$set(fig.width = 7, fig.height = 3.5)
+knitr::opts_chunk$set(dpi = 300)
 knitr::opts_chunk$set(echo = F)
 knitr::opts_chunk$set(warning = F)
 knitr::opts_chunk$set(message = F)
-knitr::opts_chunk$set(fig.asp = .5)
+# knitr::opts_chunk$set(fig.asp = .5)
 # knitr::opts_chunk$set(eval = F)
 
 # options(na.action = "na.fail")# global model setting for using multimodel inference 'dredge' function
@@ -232,7 +232,9 @@ site_grouped_data <- seedling_data %>%
     avg_herbivory_06 = mean(herbivory06, na.rm = T),
     avg_h_incidence_04 = mean(herbiv_incidence_04, na.rm = T),
     avg_h_incidence_05 = mean(herbiv_incidence_05, na.rm = T),
-    avg_h_incidence_06 = mean(herbiv_incidence_06, na.rm = T)
+    avg_h_incidence_06 = mean(herbiv_incidence_06, na.rm = T),
+    avg_h_incidence = rowMeans(cbind(avg_h_incidence_04,avg_h_incidence_05,avg_h_incidence_06), na.rm = T),
+    cumulative_h_incidence = rowSums(cbind(avg_h_incidence_04,avg_h_incidence_05,avg_h_incidence_06), na.rm = T)
     ) %>% 
   ungroup(.) %>% 
   mutate(f_age = as.factor(ifelse(age=="Mature forest",0,1)))
@@ -1071,8 +1073,8 @@ herbiv$year[herbiv$year=="herbivory04"] <- 2004
 herbiv$year[herbiv$year=="herbivory05"] <- 2005
 herbiv$year[herbiv$year=="herbivory06"] <- 2006
 
-left_join(herbiv, 
-          select(surv, site_code, age, distance, common_name, year, survival))
+# left_join(herbiv, 
+#           select(surv, site_code, age, distance, common_name, year, survival))
 
 ggplot(filter(herbiv, year == 2006), aes(distance, herbivory)) +
   stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
@@ -1386,6 +1388,23 @@ summary(bmod_herbiv2)
 bmod_herbiv3 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(bmod_herbiv3)
 
+bmod_herbiv4 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(bmod_herbiv4)
+
+bmod_herbiv5 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  cumulative_h_incidence + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(bmod_herbiv5)
+
+MuMIn::AICc(bmod_herbiv4); MuMIn::r.squaredGLMM(bmod_herbiv4)
+MuMIn::AICc(bmod_herbiv5); MuMIn::r.squaredGLMM(bmod_herbiv5)
+
+bmod_herbiv6 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  cumulative_h_incidence + (1|site_code) + (cumulative_h_incidence|common_name), data = site_grouped_data)
+summary(bmod_herbiv6)
+MuMIn::AICc(bmod_herbiv6); MuMIn::r.squaredGLMM(bmod_herbiv6)
+
+bmod_herbiv7 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data)
+summary(bmod_herbiv7)
+
+
 # I tried an herbivory predictor from each year using either averaged ordinal scores or average incidence (presence/absence), resulting in data pooled across species at each distance at each site. For the ordinal model, only the average herbivory from the 2004 observation was statistically significant. Using incidence, observations from 2005 and 2006 are statistically significant. Since biomass was measured in 2006 it makes the most sense to use herbivory measured in 2006.
 
 MuMIn::AICc(bmod_herbiv3); MuMIn::r.squaredGLMM(bmod_herbiv3)
@@ -1593,6 +1612,9 @@ biomass_distance$data$y <- exp(biomass_distance$data$y)
   theme(legend.title = element_blank())
 )
 
+sjPlot::sjp.lmer(bmod_herbiv6, type = "rs.ri", show.legend = T)
+
+
 ```
 
 
@@ -1688,6 +1710,22 @@ summary(diam_model_h2)
 
 MuMIn::AICc(dmod); MuMIn::r.squaredGLMM(dmod)
 MuMIn::AICc(diam_model_h2); MuMIn::r.squaredGLMM(diam_model_h2)
+
+diam_model_h2a <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (avg_h_incidence_06|common_name), data = site_grouped_data)
+summary(diam_model_h2a)
+MuMIn::AICc(diam_model_h2a); MuMIn::r.squaredGLMM(diam_model_h2a)
+
+diam_model_h3 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + cumulative_h_incidence + (1|site_code) + (1|common_name), data = site_grouped_data)
+summary(diam_model_h3)
+MuMIn::AICc(diam_model_h3); MuMIn::r.squaredGLMM(diam_model_h3)
+
+diam_model_h4 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + cumulative_h_incidence + (1|site_code) + (cumulative_h_incidence|common_name), data = site_grouped_data)
+summary(diam_model_h4)
+MuMIn::AICc(diam_model_h4); MuMIn::r.squaredGLMM(diam_model_h4)
+
+diam_model_h5 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data)
+summary(diam_model_h5)
+MuMIn::AICc(diam_model_h5); MuMIn::r.squaredGLMM(diam_model_h5)
 
 ```
 
@@ -1823,6 +1861,10 @@ diam_distance$data$y <- exp(diam_distance$data$y)
   theme(legend.title = element_blank())
   )
 
+# sjPlot::sjp.lmer(diam_model_h4, type = "rs.ri", show.legend = T)
+sjPlot::sjp.lmer(diam_model_h5, type = "rs.ri", show.legend = T)$plot +
+  theme_bw
+
 ```
 
 
@@ -1891,9 +1933,9 @@ summary(rgr_mod4e)
 # percent moisture is not terribly convincing at p = .044, but the interaction with distance is pretty strong statistically
 
 # there's strong correlation between distance and % moisture in the mixed model
-rmod <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + (1|site_code) + (1|common_name), data = site_grouped_data)
+rmod <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + (1|site_code) + (1|common_name), data = site_grouped_data)
 
-anova(rmod, diam_mod4e)
+anova(rmod, rgr_mod4e)
 
 rmod_list <- list(
   m1 <- lmer(pct_moisture ~ distance + (1|site_code), data = site_grouped_data),
@@ -1907,14 +1949,22 @@ piecewiseSEM::rsquared(rmod_list)
 summary(m1)
 summary(m2)# indicates that % moisture has no effect after accounting for other variables, so excluding % moisture and the interaction with distance from the model
 
-rmod_herbiv1 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_herbivory_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+rmod_herbiv1 <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + avg_herbivory_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(rmod_herbiv1)
 
-rmod_herbiv2 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+rmod_herbiv2 <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
 summary(rmod_herbiv2)
 
 MuMIn::AICc(rmod_herbiv1); MuMIn::r.squaredGLMM(rmod_herbiv1)
 MuMIn::AICc(rmod_herbiv2); MuMIn::r.squaredGLMM(rmod_herbiv2)
+
+rmod_herbiv3 <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data)
+summary(rmod_herbiv3)
+MuMIn::AICc(rmod_herbiv3); MuMIn::r.squaredGLMM(rmod_herbiv3)
+
+rmod_herbiv4 <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + cumulative_h_incidence + (1|site_code) + (cumulative_h_incidence|common_name), data = site_grouped_data)
+summary(rmod_herbiv4)
+MuMIn::AICc(rmod_herbiv4); MuMIn::r.squaredGLMM(rmod_herbiv4)
 
 ```
 
@@ -1922,7 +1972,7 @@ Do we actually want to test/know what the slope/intercept interaction is between
 
 ```{r final rgr model}
 
-rgr_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data, REML = T)
+rgr_model <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data, REML = T)
 summary(rgr_model)
 
 # model diagnostics ----
@@ -2059,11 +2109,12 @@ Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squar
 The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.
 
 ```{r sjplot-rgr}
-sjPlot::sjp.lmer(rgr_model)
 
-rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", vars = "distance")
+# sjPlot::sjp.lmer(rgr_model, type = "ri.slope")
+
+rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", vars = "distance", show.intercept = T, show.loess.ci = T)
 rgr_distance <- rgr_sjplot$plot[[2]]
-rgr_distance_lines <- rgr_distance +
+(rgr_distance_lines <- rgr_distance +
   # geom_abline(intercept = rgr_summary$coefficients[1,1], slope = -(1/3))
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
@@ -2071,19 +2122,71 @@ rgr_distance_lines <- rgr_distance +
   labs(y = "Relative growth rate (% / day)", x = "Distance", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
+)
+
+
+sjPlot::sjp.lmer(rmod_herbiv3, type = "rs.ri")# avg herbiv. incidence
+# sjPlot::sjp.lmer(rmod_herbiv4, type = "rs.ri")# cumulative herbiv. incidence
 
 ```
 
+## Multipanel figure of growth model results
+```{r species-growth-diff-figure, fig.width=10}
+biomass_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
+biomass_species_ranef_plot <- biomass_species_ranef_plot + 
+  ggtitle("") +
+  geom_point(aes(color = grp), size = 3, show.legend = F) +
+  scale_color_brewer(palette = 7)
+  
+diam_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
+diam_species_ranef_plot <- diam_species_ranef_plot + 
+  ggtitle("") +
+  geom_point(aes(color = grp), size = 3, show.legend = F) +
+  scale_color_brewer(palette = 7)
 
-```{r gridded-dot-line-plots, fig.height=10, fig.width=7}
+rgr_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
+rgr_species_ranef_plot <- rgr_species_ranef_plot + 
+  ggtitle("") +
+  geom_point(aes(color = grp), size = 3, show.legend = F) +
+  scale_color_brewer(palette = 7)
+
+
+biomass_distance_lines <- biomass_distance_lines + 
+  theme(legend.position = c(0.6, 0.95),
+        legend.direction = "horizontal",
+        legend.background = element_blank())
+diam_distance_lines <- diam_distance_lines + theme(legend.position = "none")
+rgr_distance_lines <- rgr_distance_lines + theme(legend.position = "none")
 
 cowplot::plot_grid(plotlist = list(
-  biomass_scaled_coef_plot, biomass_species_ranef_plot, biomass_distance_lines, 
-  diam_scaled_coef_plot, diam_species_ranef_plot, diam_distance_lines,
-  rgr_scaled_coef_plot, rgr_species_ranef_plot, rgr_distance_lines), 
-  nrow = 3, ncol = 3)
+  biomass_distance_lines, biomass_species_ranef_plot, 
+  diam_distance_lines, diam_species_ranef_plot, 
+  rgr_distance_lines, rgr_species_ranef_plot), 
+  nrow = 3, ncol = 2, rel_widths = c(1,1))
+
+ggsave(filename = "figures/distance-intercepts-opt2.png", width = 9, height = 9)
 
 ```
+
+```{r growth-fixed-coefs-figure}
+
+biomass_scaled_coef_plot <- biomass_scaled_coef_plot + 
+  ggtitle("biomass")
+diam_scaled_coef_plot <- diam_scaled_coef_plot + 
+  ggtitle("diameter") +
+  theme(axis.text.y = element_blank())
+rgr_scaled_coef_plot <- rgr_scaled_coef_plot + 
+  ggtitle("rgr") +
+  theme(axis.text.y = element_blank(),
+        panel.background = element_rect(margin(r = 2)))
+
+cowplot::plot_grid(plotlist = list(
+  biomass_scaled_coef_plot, diam_scaled_coef_plot, rgr_scaled_coef_plot
+), nrow = 1, rel_widths = c(1.6,1,1))
+ggsave("figures/growth-scaled-coefs-fig.png", width = 9, height = 4.5)
+
+```
+
 
 
 ## Growth performance results
@@ -2594,7 +2697,7 @@ I'm not actually sure how to fit a model to these data. It's ordinal in that the
 The internet has some suggestions on how to do this for mixed-effects models: 
 [](https://stats.stackexchange.com/questions/238581/how-to-use-ordinal-logistic-regression-with-random-effects?noredirect=1&lq=1)
 
-The `ordinal` package has the `clmm` and `clmm2`, with will probably suffice for my purposes. I just need to get a decent inference off the data. Two other packages implement Bayesian MCMC frameworsks:  [MCMCglmm](https://cran.r-project.org/package=MCMCglmm) and [brms](https://cran.r-project.org/package=brms).
+The `ordinal` package has the `clmm` and `clmm2`, which will probably suffice for my purposes. I just need to get a decent inference off the data. Two other packages implement Bayesian MCMC frameworsks:  [MCMCglmm](https://cran.r-project.org/package=MCMCglmm) and [brms](https://cran.r-project.org/package=brms).
 
 Other studies have looked at incidence, i.e., presence/absence of herbivory at each observation, so we could take that approach.
 
@@ -2610,10 +2713,10 @@ hist(herbiv_noNA_data$herbivory)
 herbiv_noNA_data <- herbiv_noNA_data %>% 
   mutate(herbivory_incidence = ifelse(herbivory == 0,0,1))
 
-herb_ordinal <- ggplot(herbiv_noNA_data, aes(distance, herbivory)) +
+herb_ordinal <- ggplot(herbiv_noNA_data, aes(habitat_type, herbivory)) +
   # geom_boxplot(aes(group = distance)) +
   geom_point(aes(color = status), position = "jitter") +
-  geom_smooth(aes(color = status), method = "loess", show.legend = F) +
+  geom_smooth(aes(color = status), method = "lm", show.legend = F) +
   facet_grid(age~year) +
   # scale_color_brewer(palette = 7) +
   xlab("") +
@@ -2621,18 +2724,18 @@ herb_ordinal <- ggplot(herbiv_noNA_data, aes(distance, herbivory)) +
   theme(strip.background = element_blank(),
         legend.position = "top",
         legend.title = element_blank()) +
-  scale_color_manual(values = c("orange","blue"))
+  scale_color_manual(values = c("green4","tan2"))
 
-herb_incidence <- ggplot(herbiv_noNA_data, aes(distance, herbivory_incidence)) +
+herb_incidence <- ggplot(herbiv_noNA_data, aes(habitat_type, herbivory_incidence)) +
   # geom_boxplot(aes(group = distance)) +
   geom_point(aes(color = status), position = "jitter") +
-  geom_smooth(aes(color = status), method = "loess", show.legend = F) +
+  geom_smooth(aes(color = status), method = "lm", show.legend = F) +
   facet_grid(age~year) +
   # scale_color_brewer(palette = 7) +
   theme_bw() +
   theme(strip.background = element_blank(),
         legend.position = "none") +
-  scale_color_manual(values = c("orange","blue"))
+  scale_color_manual(values = c("green4","tan2"))
 
 cowplot::plot_grid(plotlist = list(herb_ordinal, herb_incidence), nrow = 2)
 
@@ -2653,11 +2756,39 @@ AIC(herbiv_incidence_mod)
 # install.packages("ordinal")
 library(ordinal)
 herbiv_noNA_data$f_herbiv <- as.factor(herbiv_noNA_data$herbivory)
+herbiv_noNA_data$status <- factor(herbiv_noNA_data$status, levels = c("Non-native","Native"))
+
 herbiv_ordinal_mod <- clmm(f_herbiv ~ distance + age*year + status + (1|site_code) + (1|common_name), data = herbiv_noNA_data)
 summary(herbiv_ordinal_mod)
+
+h_ord_mod2 <- clmm(f_herbiv ~ distance + age*year + status + (1|common_name), data = herbiv_noNA_data)
+anova(herbiv_ordinal_mod, h_ord_mod2)
+
+h_ord_mod3 <- clmm(f_herbiv ~ distance + age*year + status + (1|site_code), data = herbiv_noNA_data)
+anova(herbiv_ordinal_mod, h_ord_mod3)
+
+h_ord_mod4 <- clmm(f_herbiv ~ distance + age + year + status + (1|site_code) + (1|common_name), data = herbiv_noNA_data)
+anova(herbiv_ordinal_mod, h_ord_mod4)
+
+h_ord_mod5 <- clmm(f_herbiv ~ distance + age + status + (1|site_code) + (1|common_name), data = herbiv_noNA_data)
+anova(herbiv_ordinal_mod, h_ord_mod5)
+
+
 herbiv_ord_mod_ranef <- ranef(herbiv_ordinal_mod, condVar = T)
+round(exp(herbiv_ordinal_mod$beta), 1)# cumulative odds ratio of herbivory>j for the explanatory variables
+## none of the explanatory variables have an especially strong effect on the odds
+round(exp(confint(herbiv_ordinal_mod, type = "Wald")), 1)# asymmetric 95% confidence intervals of the explanatory variables
 
 # profile.clmm2(herbiv_ordinal_mod)
+
+herbiv06_mod1 <- clmm(f_herbiv ~ distance + age + status + (1|site_code) + (1|common_name), data = filter(herbiv_noNA_data, year == 2006))
+summary(herbiv06_mod1)
+
+herbiv05_mod1 <- clmm(f_herbiv ~ distance + age + status + (1|site_code) + (1|common_name), data = filter(herbiv_noNA_data, year == 2005))
+summary(herbiv05_mod1)
+
+herbiv04_mod1 <- clmm(f_herbiv ~ distance + age + status + (1|site_code) + (1|common_name), data = filter(herbiv_noNA_data, year == 2004))
+summary(herbiv04_mod1)
 
 ```
 
