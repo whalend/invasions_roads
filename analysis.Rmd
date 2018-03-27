@@ -1352,7 +1352,7 @@ summary(m2)# indicates that % moisture has no effect after accounting for other 
 ```
 
 ### Diagnostic plots 
-```{r final-biomass-model}
+```{r add herbivory to model, eval=F}
 
 Form <- formula(log(avg_biomass) ~ distance + avg_pct_light + f_age + (1|site_code) + (1|common_name))
 # m4.full <- lmer(Form, data = site_grouped_data, REML = F)
@@ -1403,15 +1403,20 @@ MuMIn::AICc(bmod_herbiv6); MuMIn::r.squaredGLMM(bmod_herbiv6)
 
 bmod_herbiv7 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data)
 summary(bmod_herbiv7)
-
+MuMIn::AICc(bmod_herbiv7); MuMIn::r.squaredGLMM(bmod_herbiv7)
 
 # I tried an herbivory predictor from each year using either averaged ordinal scores or average incidence (presence/absence), resulting in data pooled across species at each distance at each site. For the ordinal model, only the average herbivory from the 2004 observation was statistically significant. Using incidence, observations from 2005 and 2006 are statistically significant. Since biomass was measured in 2006 it makes the most sense to use herbivory measured in 2006.
 
+## I've now revised this so that the explanatory variable is the averge incidence of herbivory for each species at each distance, i.e, the number of plants with herbivory/the number of total plants for each species at each distance at each site. This gives the mean proportion of plants that experienced herbivory during the entire study period.
+
 MuMIn::AICc(bmod_herbiv3); MuMIn::r.squaredGLMM(bmod_herbiv3)
 MuMIn::AICc(m4.full); MuMIn::r.squaredGLMM(m4.full)
+```
 
+```{r final-biomass-model}
 # Check fitted biomass model ------- 
-biomass_model <- bmod_herbiv3
+biomass_model <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data)
+# equivalent to bmod_herbiv7 in previous chunk
 summary(biomass_model)
 
 plot(biomass_model)
@@ -1421,7 +1426,10 @@ E2 <- resid(biomass_model, type = "pearson")
 boxplot(E2 ~ distance, data = biomass_model@frame)
 plot(biomass_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-plot(biomass_model@frame$avg_h_incidence_06, E2)
+plot(biomass_model@frame$avg_h_incidence, E2)
+# severe spread in the residuals againes herbivory; effing proportions
+# if you cut it around the mean (.70) and only look from there on it's not too bad...
+
 
 model_summary <- summary(biomass_model)
 # correlation between observations from the same site
@@ -1435,12 +1443,12 @@ site_grouped_data <- site_grouped_data %>%
   mutate(scaled_distance = distance/max(distance),
          scaled_pct_moisture = (pct_moisture-mean(pct_moisture, na.rm = T))/(2*sd(pct_moisture)),
          scaled_pct_light = (avg_pct_light-mean(avg_pct_light, na.rm = T))/(2*sd(avg_pct_light)),
-         scaled_herbiv_incidence = (avg_h_incidence_06-mean(avg_h_incidence_06, na.rm = T))/(2*sd(avg_h_incidence_06, na.rm = T)))
+         scaled_herbiv_incidence = (avg_h_incidence-mean(avg_h_incidence, na.rm = T))/(2*sd(avg_h_incidence, na.rm = T)))
 
 
-biomass_model_scaled <- lmer(log(avg_biomass) ~ scaled_distance + scaled_pct_light + f_age + scaled_herbiv_incidence + (1|site_code) + (1|common_name), data = site_grouped_data)
+biomass_model_scaled <- lmer(log(avg_biomass) ~ scaled_distance + scaled_pct_light + f_age + scaled_herbiv_incidence + (1|site_code) + (scaled_herbiv_incidence|common_name), data = site_grouped_data)
 summary(biomass_model_scaled)
-
+# plot(biomass_model_scaled)
 
 ## Checking for non-linearity using an additive mixed model
 # ggplot(filter(site_grouped_data, is.na(avg_biomass)=="FALSE"), 
@@ -1464,14 +1472,12 @@ summary(biomass_model_scaled)
 
 # confint(biomass_model)
 
-
-
 ```
 
 
 ### Model coefficients
 
-```{r biomass-ranef-plot}
+```{r extract biomass model coefficients}
 
 # lattice::dotplot(fixef(biomass_model))
 biomass_ranef <- ranef(biomass_model, condVar = T)
@@ -1482,19 +1488,27 @@ write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
 # intercept <- biomass_summary$coefficients[1,1]
 biomass_coefs <- coef(biomass_model)
 
-(biomass_species_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="common_name"), 
+```
+
+```{r biomass-species-ranef-plot}
+
+(biomass_species_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="common_name", term=="(Intercept)"), 
        aes(y = grp, x = condval)) +
   geom_point() +
+  # facet_wrap(~term) +
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
   geom_vline(xintercept = 0, color = "gray70") +
   theme_classic() +
+  # theme_bw() +
   theme(axis.text.y = element_text(size = 12),
         axis.text.x = element_text(size = 12),
         plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
   ggtitle("Biomass species intercepts"))
+```
 
+```{r biomass-site-ranef-plot}
 (biomass_site_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
   geom_point() +
@@ -1508,36 +1522,36 @@ biomass_coefs <- coef(biomass_model)
   labs(x="", y="") +
   ggtitle("Biomass site intercepts"))  
 
-
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 ```
 
 ```{r biomass-fixef-plot, cache=T}
 # biomass_fixef <- fixef(biomass_model)
 # str(biomass_fixef)
-biomass_summary <- summary(biomass_model)
+# biomass_summary <- summary(biomass_model)
 # str(biomass_summary)
 var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Herbivory")
-biomass_fixed <- as.data.frame(biomass_summary$coefficients)
-biomass_fixed$var_names <- var_names
-biomass_confint <- as.data.frame(confint(biomass_model))
-biomass_confint <- biomass_confint[-c(1:3),]
-biomass_fixed <- cbind(biomass_fixed, biomass_confint)
-# str(biomass_fixed)
-
-(biomass_coef_plot <- ggplot(filter(biomass_fixed, var_names!="Intercept"), 
-       aes(y = var_names, x = Estimate)) +
-  # coord_flip() +
-  geom_vline(xintercept = 0, color = "gray70") +
-  geom_point(size = 2) +
-  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
-  theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
-        ) +
-  labs(x="", y="") +
-  ggtitle("Biomass means ± 95% CI"))  
+# biomass_fixed <- as.data.frame(biomass_summary$coefficients)
+# biomass_fixed$var_names <- var_names
+# biomass_confint <- as.data.frame(confint(biomass_model))
+# biomass_confint <- biomass_confint[-c(1:5),]
+# biomass_fixed <- cbind(biomass_fixed, biomass_confint)
+# # str(biomass_fixed)
+# biomass_fixed$var_names <- factor(biomass_fixed$var_names, levels = c("Herbivory","Pct. light","Forest age: young","Distance","Intercept"))
+# 
+# (biomass_coef_plot <- ggplot(filter(biomass_fixed, var_names!="Intercept"), 
+#        aes(var_names, Estimate)) +
+#   coord_flip() +
+#   geom_hline(yintercept = 0, color = "gray70") +
+#   geom_point(size = 2) +
+#   geom_errorbar(aes(ymin = `2.5 %`, ymax = `97.5 %`), width = 0) +
+#   theme_classic() +
+#   theme(axis.text.y = element_text(size = 12),
+#         axis.text.x = element_text(size = 12),
+#         plot.title = element_text(hjust = .5, size = 18)
+#         ) +
+#   labs(x="", y="") +
+#   ggtitle("Biomass means ± 95% CI"))  
 
 
 biomass_scaled_summary <- summary(biomass_model_scaled)
@@ -1547,6 +1561,7 @@ biomass_scaled_coef$var_names <- var_names
 biomass_confint <- as.data.frame(confint(biomass_model_scaled))
 biomass_confint <- biomass_confint[-c(1:3),]
 biomass_scaled_coef <- cbind(biomass_scaled_coef, biomass_confint)
+biomass_scaled_coef$var_names <- factor(biomass_fixed$var_names, levels = c("Herbivory","Pct. light","Forest age: young","Distance","Intercept"))
 
 (biomass_scaled_coef_plot <- ggplot(filter(biomass_scaled_coef, var_names!="Intercept"), 
        aes(y = var_names, x = Estimate)) +
@@ -1731,7 +1746,7 @@ MuMIn::AICc(diam_model_h5); MuMIn::r.squaredGLMM(diam_model_h5)
 
 ```{r final diameter model}
 
-diam_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data)
+diam_model <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data)
 summary(diam_model)
 
 # model diagnostics - residual plots ----
@@ -1848,7 +1863,7 @@ Seedling diameter increased with light availability and was greater in younger f
 
 ```{r sjplot-diameter}
 
-diam_sjplot <- sjPlot::sjp.lmer(diam_model, type = "ri.slope", vars = "distance")
+diam_sjplot_rislope <- sjPlot::sjp.lmer(diam_model, type = "ri.slope")
 diam_distance <- diam_sjplot$plot[[2]]
 diam_distance$data$y <- exp(diam_distance$data$y)
 
@@ -1862,8 +1877,18 @@ diam_distance$data$y <- exp(diam_distance$data$y)
   )
 
 # sjPlot::sjp.lmer(diam_model_h4, type = "rs.ri", show.legend = T)
-sjPlot::sjp.lmer(diam_model_h5, type = "rs.ri", show.legend = T)$plot +
-  theme_bw
+diam_sjplot_rsri <- sjPlot::sjp.lmer(diam_model, type = "rs.ri", show.legend = T) 
+
+diam_rsri_plot <- diam_sjplot_rsri$plot[[1]]
+diam_rsri_plot$data$y <- exp(diam_rsri_plot$data$y)
+(diam_rsri_plot <- ggplot(diam_rsri_plot$data, aes(x,y,color = grp)) +
+  geom_line() +
+  theme_classic() +
+  xlab("avg herbiv incidence") +
+  ylab("avg diameter") +
+  theme(legend.title = element_blank())
+)
+
 
 ```
 
@@ -2124,11 +2149,17 @@ rgr_distance <- rgr_sjplot$plot[[2]]
   theme(legend.title = element_blank())
 )
 
+```
 
-sjPlot::sjp.lmer(rmod_herbiv3, type = "rs.ri")# avg herbiv. incidence
+```{r rgr-herbiv-by-species}
+rgr_rsri_sjplot <- sjPlot::sjp.lmer(rmod_herbiv3, type = "rs.ri", show.legend = T)# avg herbiv. incidence
 # sjPlot::sjp.lmer(rmod_herbiv4, type = "rs.ri")# cumulative herbiv. incidence
 
+rgr_rsri_plot <- rgr_rsri_sjplot$plot[[1]]
+rgr_rsri_plot + theme_classic()
+
 ```
+
 
 ## Multipanel figure of growth model results
 ```{r species-growth-diff-figure, fig.width=10}
@@ -2136,27 +2167,34 @@ biomass_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$gr
 biomass_species_ranef_plot <- biomass_species_ranef_plot + 
   ggtitle("") +
   geom_point(aes(color = grp), size = 3, show.legend = F) +
-  scale_color_brewer(palette = 7)
+  scale_color_brewer(palette = "BrBG")
   
 diam_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
 diam_species_ranef_plot <- diam_species_ranef_plot + 
   ggtitle("") +
   geom_point(aes(color = grp), size = 3, show.legend = F) +
-  scale_color_brewer(palette = 7)
+  scale_color_brewer(palette = "BrBG")
 
 rgr_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
 rgr_species_ranef_plot <- rgr_species_ranef_plot + 
   ggtitle("") +
   geom_point(aes(color = grp), size = 3, show.legend = F) +
-  scale_color_brewer(palette = 7)
+  scale_color_brewer(palette = "BrBG")
 
 
 biomass_distance_lines <- biomass_distance_lines + 
   theme(legend.position = c(0.6, 0.95),
         legend.direction = "horizontal",
-        legend.background = element_blank())
-diam_distance_lines <- diam_distance_lines + theme(legend.position = "none")
-rgr_distance_lines <- rgr_distance_lines + theme(legend.position = "none")
+        legend.background = element_blank()) +
+  scale_color_brewer(palette = "BrBG") +
+  xlab("")
+diam_distance_lines <- diam_distance_lines + 
+  theme(legend.position = "none") +
+  scale_color_brewer(palette = "BrBG") +
+  xlab("")
+rgr_distance_lines <- rgr_distance_lines + 
+  theme(legend.position = "none") +
+  scale_color_brewer(palette = "BrBG")
 
 cowplot::plot_grid(plotlist = list(
   biomass_distance_lines, biomass_species_ranef_plot, 
@@ -2713,10 +2751,10 @@ hist(herbiv_noNA_data$herbivory)
 herbiv_noNA_data <- herbiv_noNA_data %>% 
   mutate(herbivory_incidence = ifelse(herbivory == 0,0,1))
 
-herb_ordinal <- ggplot(herbiv_noNA_data, aes(habitat_type, herbivory)) +
+herb_ordinal <- ggplot(herbiv_noNA_data, aes(distance, herbivory)) +
   # geom_boxplot(aes(group = distance)) +
   geom_point(aes(color = status), position = "jitter") +
-  geom_smooth(aes(color = status), method = "lm", show.legend = F) +
+  geom_smooth(aes(color = status), method = "loess", show.legend = F) +
   facet_grid(age~year) +
   # scale_color_brewer(palette = 7) +
   xlab("") +
@@ -2726,10 +2764,10 @@ herb_ordinal <- ggplot(herbiv_noNA_data, aes(habitat_type, herbivory)) +
         legend.title = element_blank()) +
   scale_color_manual(values = c("green4","tan2"))
 
-herb_incidence <- ggplot(herbiv_noNA_data, aes(habitat_type, herbivory_incidence)) +
+herb_incidence <- ggplot(herbiv_noNA_data, aes(distance, herbivory_incidence)) +
   # geom_boxplot(aes(group = distance)) +
   geom_point(aes(color = status), position = "jitter") +
-  geom_smooth(aes(color = status), method = "lm", show.legend = F) +
+  geom_smooth(aes(color = status), method = "loess", show.legend = F) +
   facet_grid(age~year) +
   # scale_color_brewer(palette = 7) +
   theme_bw() +
