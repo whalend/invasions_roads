@@ -1437,6 +1437,9 @@ model_summary <- summary(biomass_model)
 ## and of the same species
 # (.217^2)/(.217^2 + .404^2 + .614^2 )
 
+```
+
+```{r scale model data}
 ## For scaled models, dived by 2*sd, except for distance; rescale distance to be between 0 and 1.
 
 site_grouped_data <- site_grouped_data %>% 
@@ -1445,6 +1448,9 @@ site_grouped_data <- site_grouped_data %>%
          scaled_pct_light = (avg_pct_light-mean(avg_pct_light, na.rm = T))/(2*sd(avg_pct_light)),
          scaled_herbiv_incidence = (avg_h_incidence-mean(avg_h_incidence, na.rm = T))/(2*sd(avg_h_incidence, na.rm = T)))
 
+```
+
+```{r scaled biomass model}
 
 biomass_model_scaled <- lmer(log(avg_biomass) ~ scaled_distance + scaled_pct_light + f_age + scaled_herbiv_incidence + (1|site_code) + (scaled_herbiv_incidence|common_name), data = site_grouped_data)
 summary(biomass_model_scaled)
@@ -1610,27 +1616,49 @@ I'm exploring making plots of the marginal effects for each group in the random 
 sjPlot::sjp.lmer(biomass_model, type = "re.qq")
 sjPlot::plot_model(biomass_model, type = "diag")
 
-biomass_sjplot <- sjPlot::sjp.lmer(biomass_model, type = "ri.slope", vars = "distance")
+biomass_sjplot <- sjPlot::sjp.lmer(biomass_model, type = "ri.slope", prnt.plot = F)
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type = "eff")
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type)
+```
 
+```{r marginal-biomass-distance-plot}
 # sjPlot::sjp.lmer(biomass_model, type = "fe.slope")
-biomass_distance <- biomass_sjplot$plot[[2]]
+biomass_distance <- biomass_sjplot$plot[[5]]
 biomass_distance$data$y <- exp(biomass_distance$data$y)
 # biomass_distance <- biomass_distance$data
 (biomass_distance_lines <- biomass_distance +
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
-  scale_color_brewer(palette = 7) +
+  scale_color_brewer(palette = "BrBG") +
   labs(y = "Biomass (g)", x = "Distance (m)", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
 )
 
-sjPlot::sjp.lmer(bmod_herbiv6, type = "rs.ri", show.legend = T)
+```
 
+```{r biomass-herbiv-rsri-plot}
+
+biomass_rsri <- sjPlot::sjp.lmer(biomass_model, type = "rs.ri", show.legend = T, prnt.plot = F)
+
+biomass_herbiv_rsri <- biomass_rsri$plot[[1]]
+biomass_herbiv_rsri$data$y = exp(biomass_herbiv_rsri$data$y)
+
+(biomass_herbiv_rsri_plot <- ggplot(biomass_herbiv_rsri$data,
+                                    aes(x,y,color=grp)) +
+    geom_line() +
+  # geom_path() +
+  # geom_line() +
+    
+  # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
+  scale_color_brewer(palette = "BrBG") +
+  labs(y = "Biomass (g)", x = "Average herbivory incidence", title = "") +
+  theme_classic() +
+  theme(legend.title = element_blank())
+)
 
 ```
+
 
 
 ~~What about fitting a separate models for each species? I don't think this is necessary unless we want to be able to say something specific about the relationship between the response and specific predictors for each species. I think it is reasonable to assume that the plants generally respond similarly to things like soil moisture and light availability.~~
@@ -1758,7 +1786,7 @@ boxplot(E2 ~ distance, data = diam_model@frame)
 boxplot(E2 ~ age, data = diam_model@frame)
 plot(diam_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-plot(diam_model@frame$avg_h_incidence_06, E2)
+plot(diam_model@frame$avg_h_incidence, E2)
 
 
 # model with scaled predictors ----
