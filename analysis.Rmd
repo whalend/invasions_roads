@@ -2215,8 +2215,11 @@ rgr_rsri_plot <- rgr_rsri_sjplot$plot[[1]]
   xlab("Avg. herbivory incidence") +
   ylab("Relative growth rate (% / day)") +
   ggtitle("") +
-  theme(legend.title = element_blank()) +
-  scale_color_brewer(palette = "BrBG")
+  theme(legend.position = c(.7,.9),
+        legend.direction = "horizontal",
+        legend.title = element_blank()) +
+  scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush"))
+  # the 'breaks' reorder the horizontal legend to have the plants grouped in each row
 )
 
 ```
@@ -2290,7 +2293,22 @@ cowplot::plot_grid(plotlist = list(
 
 ```{r growth-herbiv-species-fig3}
 
+biomass_rsri_plot <- 
+  biomass_herbiv_rsri_plot +
+  xlab("") +
+  theme(legend.position = c(.5,1),
+        legend.direction = "horizontal",
+        legend.background = element_blank()) +
+  scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush"))
+  
+diameter_rsri_plot <- diam_rsri_plot +
+  theme(legend.position = "none")
+# rgr_rsri_plot
 
+cowplot::plot_grid(biomass_rsri_plot, diameter_rsri_plot, 
+                   nrow=2)
+
+ggsave("figures/growth-rsri-plot-fig3.eps", width = 5, height = 5)
 
 ```
 
