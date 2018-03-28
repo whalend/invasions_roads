@@ -1531,7 +1531,7 @@ biomass_coefs <- coef(biomass_model)
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 ```
 
-```{r biomass-fixef-plot, cache=T}
+```{r biomass-fixef-data, cache=T}
 # biomass_fixef <- fixef(biomass_model)
 # str(biomass_fixef)
 # biomass_summary <- summary(biomass_model)
@@ -1565,8 +1565,15 @@ biomass_scaled_summary <- summary(biomass_model_scaled)
 biomass_scaled_coef <- as.data.frame(biomass_scaled_summary$coefficients)
 biomass_scaled_coef$var_names <- var_names
 biomass_confint <- as.data.frame(confint(biomass_model_scaled))
-biomass_confint <- biomass_confint[-c(1:3),]
+biomass_confint <- biomass_confint[-c(1:5),]
 biomass_scaled_coef <- cbind(biomass_scaled_coef, biomass_confint)
+write_csv(biomass_scaled_coef, "model_output_data/biomass_fixed_coef.csv")
+
+```
+
+```{r biomass-fixef-plot}
+
+biomass_scaled_coef <- read_csv("model_output_data/biomass_fixed_coef.csv")
 biomass_scaled_coef$var_names <- factor(biomass_fixed$var_names, levels = c("Herbivory","Pct. light","Forest age: young","Distance","Intercept"))
 
 (biomass_scaled_coef_plot <- ggplot(filter(biomass_scaled_coef, var_names!="Intercept"), 
@@ -1584,7 +1591,6 @@ biomass_scaled_coef$var_names <- factor(biomass_fixed$var_names, levels = c("Her
   ggtitle("Biomass means ± 95% CI")
   )
 
-write_csv(biomass_scaled_coef, "model_output_data/biomass_fixed_coef.csv")
 # lattice::dotplot(coef(biomass_model_scaled))
 # species_coefs <- (coef(biomass_model)[[2]])
 
@@ -1790,12 +1796,12 @@ plot(diam_model@frame$avg_h_incidence, E2)
 
 
 # model with scaled predictors ----
-diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1|site_code) + (1|common_name), data = site_grouped_data)
+diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1|site_code) + (scaled_herbiv_incidence|common_name), data = site_grouped_data)
 summary(diam_model_scaled)
 
 ```
 
-```{r diameter-ranef-plot}
+```{r diameter-species-ranef-plot}
 
 diam_ranef <- ranef(diam_model, condVar = T)
 
@@ -1804,7 +1810,7 @@ diam_ranef <- ranef(diam_model, condVar = T)
 diam_ranef_df <- as.data.frame(diam_ranef)
 write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
 
-(diam_species_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="common_name"), 
+(diam_species_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="common_name", term!="(Intercept)"), 
        aes(y = grp, x = condval)) +
   geom_point() +
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
@@ -1816,7 +1822,9 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
         ) +
   labs(x="", y="") +
   ggtitle("Diameter species intercepts"))
+```
 
+```{r diameter-site-ranef-plot}
 (diam_site_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
   geom_point() +
@@ -1832,30 +1840,30 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
 
 ```
 
-```{r diameter-fixef-plot, cache=T}
-diam_summary <- summary(diam_model)
+```{r diameter-fixef-data, cache=T}
+# diam_summary <- summary(diam_model)
 # str(diam_summary)
 var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Herbivory")
-diam_fixed <- as.data.frame(diam_summary$coefficients)
-diam_fixed$var_names <- var_names
-diam_confint <- as.data.frame(confint(diam_model))
-diam_confint <- diam_confint[-c(1:3),]
-diam_fixed <- cbind(diam_fixed, diam_confint)
-# str(diam_fixed)
-
-(diam_coef_plot <- ggplot(filter(diam_fixed, var_names!="Intercept"), 
-       aes(y = var_names, x = Estimate)) +
-  # coord_flip() +
-  geom_vline(xintercept = 0, color = "gray70") +
-  geom_point(size = 2) +
-  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
-  theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
-        ) +
-  labs(x="", y="") +
-  ggtitle("Diameter eans ± 95% CI"))
+# diam_fixed <- as.data.frame(diam_summary$coefficients)
+# diam_fixed$var_names <- var_names
+# diam_confint <- as.data.frame(confint(diam_model))
+# diam_confint <- diam_confint[-c(1:3),]
+# diam_fixed <- cbind(diam_fixed, diam_confint)
+# # str(diam_fixed)
+# 
+# (diam_coef_plot <- ggplot(filter(diam_fixed, var_names!="Intercept"), 
+#        aes(y = var_names, x = Estimate)) +
+#   # coord_flip() +
+#   geom_vline(xintercept = 0, color = "gray70") +
+#   geom_point(size = 2) +
+#   geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+#   theme_classic() +
+#   theme(axis.text.y = element_text(size = 12),
+#         axis.text.x = element_text(size = 12),
+#         plot.title = element_text(hjust = .5, size = 18)
+#         ) +
+#   labs(x="", y="") +
+#   ggtitle("Diameter eans ± 95% CI"))
 
 
 diam_scaled_summary <- summary(diam_model_scaled)
@@ -1863,8 +1871,16 @@ diam_scaled_summary <- summary(diam_model_scaled)
 diam_scaled_coef <- as.data.frame(diam_scaled_summary$coefficients)
 diam_scaled_coef$var_names <- var_names
 diam_confint <- as.data.frame(confint(diam_model_scaled))
-diam_confint <- diam_confint[-c(1:3),]
+diam_confint <- diam_confint[-c(1:5),]
 diam_scaled_coef <- cbind(diam_scaled_coef, diam_confint)
+write_csv(diam_scaled_coef, "model_output_data/diam_fixed_coef.csv")
+
+```
+
+```{r diameter-fixef-plot}
+
+diam_scaled_coef <- read_csv("model_output_data/diam_fixed_coef.csv")
+diam_scaled_coef$var_names <- factor(diam_scaled_coef$var_names, levels = c("Herbivory","Pct. light","Forest age: young","Distance","Intercept"))
 
 (diam_scaled_coef_plot <- ggplot(filter(diam_scaled_coef, var_names!="Intercept"), 
        aes(y = var_names, x = Estimate)) +
@@ -1881,8 +1897,6 @@ diam_scaled_coef <- cbind(diam_scaled_coef, diam_confint)
   ggtitle("Diam means ± 95% CI")
   )
 
-write_csv(diam_scaled_coef, "model_output_data/diam_fixed_coef.csv")
-
 ```
 
 Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squaredGLMM(diam_model_scaled)`
@@ -1891,32 +1905,34 @@ Seedling diameter increased with light availability and was greater in younger f
 
 ```{r sjplot-diameter}
 
-diam_sjplot_rislope <- sjPlot::sjp.lmer(diam_model, type = "ri.slope")
-diam_distance <- diam_sjplot$plot[[2]]
+diam_sjplot_rislope <- sjPlot::sjp.lmer(diam_model, type = "ri.slope", prnt.plot = F, transform="exp")
+diam_distance <- diam_sjplot_rislope$plot[[5]]
 diam_distance$data$y <- exp(diam_distance$data$y)
 
 (diam_distance_lines <- diam_distance +
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
-  scale_color_brewer(palette = 7) +
+  scale_color_brewer(palette = "BrBG") +
   labs(y = "Diameter (mm)", x = "Distance", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
   )
+```
 
+```{r diam-herbiv-rsri-plot}
 # sjPlot::sjp.lmer(diam_model_h4, type = "rs.ri", show.legend = T)
-diam_sjplot_rsri <- sjPlot::sjp.lmer(diam_model, type = "rs.ri", show.legend = T) 
+diam_sjplot_rsri <- sjPlot::sjp.lmer(diam_model, type = "rs.ri", show.legend = T, prnt.plot = F) 
 
 diam_rsri_plot <- diam_sjplot_rsri$plot[[1]]
 diam_rsri_plot$data$y <- exp(diam_rsri_plot$data$y)
 (diam_rsri_plot <- ggplot(diam_rsri_plot$data, aes(x,y,color = grp)) +
   geom_line() +
   theme_classic() +
-  xlab("avg herbiv incidence") +
-  ylab("avg diameter") +
+  scale_color_brewer(palette = "BrBG") +
+  xlab("Average herbivory incidence") +
+  ylab("Diameter (mm)") +
   theme(legend.title = element_blank())
 )
-
 
 ```
 
@@ -2025,7 +2041,7 @@ Do we actually want to test/know what the slope/intercept interaction is between
 
 ```{r final rgr model}
 
-rgr_model <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + avg_h_incidence_06 + (1|site_code) + (1|common_name), data = site_grouped_data, REML = T)
+rgr_model <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data, REML = T)
 summary(rgr_model)
 
 # model diagnostics ----
@@ -2037,26 +2053,26 @@ boxplot(E2 ~ distance, data = rgr_model@frame)
 boxplot(E2 ~ age, data = rgr_model@frame)
 plot(rgr_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
-plot(rgr_model@frame$avg_h_incidence_06, E2)
+plot(rgr_model@frame$avg_h_incidence, E2)
 
-rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1 | site_code) + (1 | common_name), data = site_grouped_data)
+rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1|site_code) + (scaled_herbiv_incidence|common_name), data = site_grouped_data)
 # summary(rgr_model_scaled)
 
 ```
 
 
-```{r rgr-ranef-plot}
+```{r rgr-species-ranef-plot}
 
 rgr_ranef <- ranef(rgr_model, condVar = T)
 
-coef(rgr_model)$common_name
+# coef(rgr_model)$common_name
 
 # lattice::dotplot(ranef(rgr_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
 rgr_ranef_df <- as.data.frame(rgr_ranef)
 write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 
-(rgr_species_ranef_plot <- ggplot(filter(rgr_ranef_df, grpvar=="common_name"), 
+(rgr_species_ranef_plot <- ggplot(filter(rgr_ranef_df, grpvar=="common_name",term!="(Intercept)"), 
        aes(y = grp, x = condval)) +
   geom_point() +
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
@@ -2068,6 +2084,9 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
         ) +
   labs(x="", y="") +
   ggtitle("RGR species intercepts"))
+```
+
+```{r rgr-site-ranef-plot}
 
 (rgr_site_ranef_plot <- ggplot(filter(rgr_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
@@ -2084,30 +2103,30 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 
 ```
 
-```{r rgr-fixef-plot, cache=T}
+```{r rgr-fixef-data, eval=F}
 rgr_summary <- summary(rgr_model)
 # str(rgr_summary)
 var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Herbivory")
-rgr_fixed <- as.data.frame(rgr_summary$coefficients)
-rgr_fixed$var_names <- var_names
-rgr_confint <- as.data.frame(confint(rgr_model))
-rgr_confint <- rgr_confint[-c(1:3),]
-rgr_fixed <- cbind(rgr_fixed, rgr_confint)
-# str(rgr_fixed)
-
-(rgr_coef_plot <- ggplot(filter(rgr_fixed, var_names!="Intercept"), 
-       aes(y = var_names, x = Estimate)) +
-  # coord_flip() +
-  geom_vline(xintercept = 0, color = "gray70") +
-  geom_point(size = 2) +
-  geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
-  theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
-        ) +
-  labs(x="", y="") +
-  ggtitle("RGR means ± 95% CI"))
+# rgr_fixed <- as.data.frame(rgr_summary$coefficients)
+# rgr_fixed$var_names <- var_names
+# rgr_confint <- as.data.frame(confint(rgr_model))
+# rgr_confint <- rgr_confint[-c(1:3),]
+# rgr_fixed <- cbind(rgr_fixed, rgr_confint)
+# # str(rgr_fixed)
+# 
+# (rgr_coef_plot <- ggplot(filter(rgr_fixed, var_names!="Intercept"), 
+#        aes(y = var_names, x = Estimate)) +
+#   # coord_flip() +
+#   geom_vline(xintercept = 0, color = "gray70") +
+#   geom_point(size = 2) +
+#   geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
+#   theme_classic() +
+#   theme(axis.text.y = element_text(size = 12),
+#         axis.text.x = element_text(size = 12),
+#         plot.title = element_text(hjust = .5, size = 18)
+#         ) +
+#   labs(x="", y="") +
+#   ggtitle("RGR means ± 95% CI"))
 
 
 rgr_scaled_summary <- summary(rgr_model_scaled)
@@ -2115,8 +2134,16 @@ rgr_scaled_summary <- summary(rgr_model_scaled)
 rgr_scaled_coef <- as.data.frame(rgr_scaled_summary$coefficients)
 rgr_scaled_coef$var_names <- var_names
 rgr_confint <- as.data.frame(confint(rgr_model_scaled))
-rgr_confint <- rgr_confint[-c(1:3),]
+rgr_confint <- rgr_confint[-c(1:5),]
 rgr_scaled_coef <- cbind(rgr_scaled_coef, rgr_confint)
+
+write.csv(rgr_scaled_coef, "model_output_data/rgr_fixed_coef.csv")
+```
+
+```{r rgr-fixef-plot}
+
+rgr_scaled_coef <- read_csv("model_output_data/rgr_fixed_coef.csv")
+rgr_scaled_coef$var_names <- factor(rgr_scaled_coef$var_names, levels = c("Herbivory","Pct. light","Forest age: young","Distance","Intercept"))
 
 (rgr_scaled_coef_plot <- ggplot(filter(rgr_scaled_coef, var_names!="Intercept"), 
        aes(y = var_names, x = Estimate)) +
@@ -2132,8 +2159,6 @@ rgr_scaled_coef <- cbind(rgr_scaled_coef, rgr_confint)
   labs(x="", y="") +
   ggtitle("RGR means ± 95% CI")
   )
-
-write.csv(rgr_scaled_coef, "model_output_data/rgr_fixed_coef.csv")
 
 ```
 
@@ -2165,8 +2190,8 @@ The nonnative species autumn olive had the best performance in terms of relative
 
 # sjPlot::sjp.lmer(rgr_model, type = "ri.slope")
 
-rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", vars = "distance", show.intercept = T, show.loess.ci = T)
-rgr_distance <- rgr_sjplot$plot[[2]]
+rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", prnt.plot = F)
+rgr_distance <- rgr_sjplot$plot[[5]]
 (rgr_distance_lines <- rgr_distance +
   # geom_abline(intercept = rgr_summary$coefficients[1,1], slope = -(1/3))
   # geom_line() +
@@ -2180,17 +2205,46 @@ rgr_distance <- rgr_sjplot$plot[[2]]
 ```
 
 ```{r rgr-herbiv-by-species}
-rgr_rsri_sjplot <- sjPlot::sjp.lmer(rmod_herbiv3, type = "rs.ri", show.legend = T)# avg herbiv. incidence
+
+rgr_rsri_sjplot <- sjPlot::sjp.lmer(rmod_herbiv3, type = "rs.ri", show.legend = T, prnt.plot = F)# avg herbiv. incidence
 # sjPlot::sjp.lmer(rmod_herbiv4, type = "rs.ri")# cumulative herbiv. incidence
 
 rgr_rsri_plot <- rgr_rsri_sjplot$plot[[1]]
-rgr_rsri_plot + theme_classic()
+(rgr_rsri_plot <- rgr_rsri_plot + 
+  theme_classic() +
+  xlab("Avg. herbivory incidence") +
+  ylab("Relative growth rate (% / day)") +
+  ggtitle("") +
+  theme(legend.title = element_blank()) +
+  scale_color_brewer(palette = "BrBG")
+)
 
 ```
 
 
 ## Multipanel figure of growth model results
-```{r species-growth-diff-figure, fig.width=10}
+
+```{r growth-fixed-coefs-fig1, fig.width=8, fig.height=3}
+
+biomass_fixef_plot <- biomass_scaled_coef_plot + 
+  ggtitle("Biomass") +
+diam_fixef_plot <- diam_scaled_coef_plot + 
+  ggtitle("Diameter") +
+  theme(axis.text.y = element_blank())
+rgr_fixef_plot <- rgr_scaled_coef_plot + 
+  ggtitle("RGR") +
+  theme(axis.text.y = element_blank())
+
+cowplot::plot_grid(plotlist = list(
+  biomass_fixef_plot, diam_fixef_plot, rgr_fixef_plot
+), nrow = 1, rel_widths = c(1.6,1,1), scale = .93, labels = "auto", label_x = c(.4,.1,.1))
+
+# ggsave("figures/growth-scaled-coefs-fig.eps", width = 8, height = 3)
+
+```
+
+```{r species-growth-diff-fig2, fig.width=9, fig.height=10}
+
 biomass_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
 biomass_species_ranef_plot <- biomass_species_ranef_plot + 
   ggtitle("") +
@@ -2211,7 +2265,7 @@ rgr_species_ranef_plot <- rgr_species_ranef_plot +
 
 
 biomass_distance_lines <- biomass_distance_lines + 
-  theme(legend.position = c(0.6, 0.95),
+  theme(legend.position = "none",
         legend.direction = "horizontal",
         legend.background = element_blank()) +
   scale_color_brewer(palette = "BrBG") +
@@ -2225,31 +2279,18 @@ rgr_distance_lines <- rgr_distance_lines +
   scale_color_brewer(palette = "BrBG")
 
 cowplot::plot_grid(plotlist = list(
-  biomass_distance_lines, biomass_species_ranef_plot, 
-  diam_distance_lines, diam_species_ranef_plot, 
-  rgr_distance_lines, rgr_species_ranef_plot), 
-  nrow = 3, ncol = 2, rel_widths = c(1,1))
+  biomass_species_ranef_plot, biomass_distance_lines,  
+  diam_species_ranef_plot, diam_distance_lines, 
+  rgr_species_ranef_plot, rgr_distance_lines), 
+  nrow = 3, ncol = 2, rel_widths = c(1,2))
 
-ggsave(filename = "figures/distance-intercepts-opt2.png", width = 9, height = 9)
+# ggsave(filename = "figures/distance-intercepts-opt2.eps", width = 9, height = 10)
 
 ```
 
-```{r growth-fixed-coefs-figure}
+```{r growth-herbiv-species-fig3}
 
-biomass_scaled_coef_plot <- biomass_scaled_coef_plot + 
-  ggtitle("biomass")
-diam_scaled_coef_plot <- diam_scaled_coef_plot + 
-  ggtitle("diameter") +
-  theme(axis.text.y = element_blank())
-rgr_scaled_coef_plot <- rgr_scaled_coef_plot + 
-  ggtitle("rgr") +
-  theme(axis.text.y = element_blank(),
-        panel.background = element_rect(margin(r = 2)))
 
-cowplot::plot_grid(plotlist = list(
-  biomass_scaled_coef_plot, diam_scaled_coef_plot, rgr_scaled_coef_plot
-), nrow = 1, rel_widths = c(1.6,1,1))
-ggsave("figures/growth-scaled-coefs-fig.png", width = 9, height = 4.5)
 
 ```
 
