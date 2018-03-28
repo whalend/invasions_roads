@@ -2238,7 +2238,7 @@ rgr_rsri_plot <- rgr_rsri_sjplot$plot[[1]]
 
 ## Multipanel figure of growth model results
 
-```{r growth-fixed-coefs-fig1, fig.width=8, fig.height=3}
+```{r fig1-growth-fixed-coefs, fig.width=8, fig.height=3}
 
 biomass_fixef_plot <- biomass_scaled_coef_plot + 
   ggtitle("Biomass")
@@ -2260,7 +2260,7 @@ cowplot::plot_grid(plotlist = list(
 
 ```
 
-```{r species-growth-diff-fig2, fig.width=9, fig.height=10}
+```{r fig2-species-growth-diff, fig.width=9, fig.height=10}
 
 ## 
 biomass_species_ranef_plot$data$grp <- factor(
@@ -2316,7 +2316,7 @@ cowplot::plot_grid(plotlist = list(
 
 ```
 
-```{r growth-herbiv-species-fig3}
+```{r fig3-growth-herbiv-species, width = 5, height = 5}
 
 biomass_rsri_plot <- 
   biomass_herbiv_rsri_plot +
@@ -2452,7 +2452,7 @@ summary(germ_model_scaled)
 
 ```
 
-```{r germ-ranef-plot}
+```{r germ-species-ranef-plot}
 
 germ_ranef <- ranef(germ_model_scaled, condVar = T)
 germ_ranef_df <- as.data.frame(germ_ranef)
@@ -2471,6 +2471,9 @@ write.csv(germ_ranef_df, "model_output_data/germ_ranef.csv")
   labs(x="", y="") +
   ggtitle("Species germination intercepts"))
 
+```
+
+```{r germ-site-ranef-plot}
 (germ_site_ranef_plot <- ggplot(filter(germ_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
   geom_point() +
@@ -2485,7 +2488,8 @@ write.csv(germ_ranef_df, "model_output_data/germ_ranef.csv")
   ggtitle("Site germination intercepts"))
 ```
 
-```{r germ-fixef-plot-data, cache=T, eval=F}
+
+```{r germ-fixef-plot-data, eval=F}
 # germ_summary <- summary(germ_model)
 # str(germ_summary)
 var_names <- c("Intercept","Distance", "Forest age: young","Litter mass")
@@ -2519,9 +2523,12 @@ germ_confint <- as.data.frame(confint(germ_model_scaled))
 germ_confint <- germ_confint[-c(1:2),]
 germ_scaled_coef <- cbind(germ_scaled_coef, germ_confint)
 write_csv(germ_scaled_coef, "model_output_data/germ_fixed_coef.csv")
+
 ```
 
+
 ```{r germ-fixef-plot}
+
 germ_scaled_coef <- read_csv("model_output_data/germ_fixed_coef.csv")
 
 (germ_scaled_coef_plot <- ggplot(filter(germ_scaled_coef, var_names!="Intercept"), 
@@ -2541,10 +2548,12 @@ germ_scaled_coef <- read_csv("model_output_data/germ_fixed_coef.csv")
 
 ```
 
-```{r sjplot-germination}
-sjPlot::sjp.glmer(germ_model_scaled, type = "fe")
 
-germ_sjplot <- sjPlot::sjp.glmer(germ_model, type = "ri.slope", facet.grid = F)
+```{r sjplot-germination}
+
+# sjPlot::sjp.glmer(germ_model_scaled, type = "fe")
+
+germ_sjplot <- sjPlot::sjp.glmer(germ_model, type = "ri.slope", facet.grid = F, prnt.plot = F)
 
 germ_distance <- germ_sjplot$plot[[4]]
 (germ_distance_lines <- germ_distance +
@@ -2553,7 +2562,7 @@ germ_distance <- germ_sjplot$plot[[4]]
   theme_classic() +
   theme(legend.title = element_blank()) +
   # viridis::scale_color_viridis(discrete = T, begin = .01, end = .999, option = "inferno")
-  scale_color_brewer(palette = 7)
+  scale_color_brewer(palette = "BrBG")
 )
 
 germ_litter <- germ_sjplot$plot[[6]]
@@ -2563,7 +2572,7 @@ germ_litter <- germ_sjplot$plot[[6]]
   theme_classic() +
   theme(legend.title = element_blank()) +
   # viridis::scale_color_viridis(discrete = T, begin = .01, end = .99, option = "A")
-  scale_color_brewer(palette = 7)
+  scale_color_brewer(palette = "BrBG")
 )
 
 ```
@@ -2705,7 +2714,8 @@ lines(lowess(e2~surv_model_scaled@frame$scaled_litter_kg_m2))
 
 ```
 
-```{r surv-ranef-plot}
+### Survival model random intercepts
+```{r surv-species-ranef-plot}
 
 surv_ranef <- ranef(surv_model, condVar = T)
 surv_ranef_df <- as.data.frame(surv_ranef)
@@ -2726,8 +2736,10 @@ write.csv(surv_ranef_df, "model_output_data/survival_ranef.csv")
   ggtitle("Species survival probability intercepts"))
 
 # predict(surv_model)
+```
 
 
+```{r surv-site-ranef-plot}
 (surv_site_ranef_plot <- ggplot(filter(surv_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
   geom_point() +
@@ -2744,21 +2756,25 @@ write.csv(surv_ranef_df, "model_output_data/survival_ranef.csv")
 
 ```
 
-```{r surv-fixef-plot-data, cache=T, eval=F}
+
+```{r surv-fixef-plot-data, eval=F}
+
 surv_summary <- summary(surv_model_scaled)
 # str(surv_summary)
 var_names <- c("Intercept","Distance","Forest age: young","Litter mass")
 surv_fixed <- as.data.frame(surv_summary$coefficients)
 surv_fixed$var_names <- var_names
 surv_confint <- as.data.frame(confint(surv_model))
-surv_confint <- surv_confint[-c(1:2),]
+surv_confint <- surv_confint[-c(1,3),]
 surv_fixed <- cbind(surv_fixed, surv_confint)
 # str(surv_fixed)
 write_csv(surv_fixed, "model_output_data/survival_fixed_coef.csv")
 
 ```
 
+
 ```{r surv-fixef-plot}
+
 surv_fixed <- read_csv("model_output_data/survival_fixed_coef.csv")
 
 (surv_coef_plot <- ggplot(filter(surv_fixed, var_names!="Intercept"),
@@ -2805,9 +2821,10 @@ The estimated marginal and condiational R^2^ values reinforce that the fixed eff
 `r MuMIn::r.squaredGLMM(surv_model)`
 
 ```{r survival-sjplot}
+
 surv_model <- glmer(cbind(alive, dead) ~ distance + age + litter_kg_m2 + (1 | site_code) + (1 | common_name), data = survival_2006, family = "binomial")
 
-surv_sjplot <- sjPlot::sjp.glmer(surv_model, type = "ri.slope", facet.grid = F)
+surv_sjplot <- sjPlot::sjp.glmer(surv_model, type = "ri.slope", facet.grid = F, prnt.plot = F)
 surv_distance <- surv_sjplot$plot[[4]]
 (surv_distance_lines <- surv_distance +
   labs(y = "Predicted survival probability", x = "Distance (m)") +
@@ -2815,7 +2832,7 @@ surv_distance <- surv_sjplot$plot[[4]]
   theme_classic() +
   theme(legend.title = element_blank()) +
   # viridis::scale_color_viridis(discrete = T, begin = .01, end = .999, option = "inferno")
-  scale_color_brewer(palette = 7)
+  scale_color_brewer(palette = "BrBG")
 )
 
 ```
