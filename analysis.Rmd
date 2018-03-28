@@ -1810,7 +1810,7 @@ diam_ranef <- ranef(diam_model, condVar = T)
 diam_ranef_df <- as.data.frame(diam_ranef)
 write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
 
-(diam_species_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="common_name", term!="(Intercept)"), 
+(diam_species_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="common_name", term=="(Intercept)"), 
        aes(y = grp, x = condval)) +
   geom_point() +
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
@@ -1822,7 +1822,9 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
         ) +
   labs(x="", y="") +
   ggtitle("Diameter species intercepts"))
+
 ```
+
 
 ```{r diameter-site-ranef-plot}
 (diam_site_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="site_code"), 
@@ -1839,6 +1841,7 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
   ggtitle("Diameter site intercepts"))
 
 ```
+
 
 ```{r diameter-fixef-data, cache=T}
 # diam_summary <- summary(diam_model)
@@ -1903,9 +1906,10 @@ Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squar
 
 Seedling diameter increased with light availability and was greater in younger forests, but decreased with distance.
 
+
 ```{r sjplot-diameter}
 
-diam_sjplot_rislope <- sjPlot::sjp.lmer(diam_model, type = "ri.slope", prnt.plot = F, transform="exp")
+diam_sjplot_rislope <- sjPlot::sjp.lmer(diam_model, type = "ri.slope", prnt.plot = F)
 diam_distance <- diam_sjplot_rislope$plot[[5]]
 diam_distance$data$y <- exp(diam_distance$data$y)
 
@@ -1917,6 +1921,7 @@ diam_distance$data$y <- exp(diam_distance$data$y)
   theme_classic() +
   theme(legend.title = element_blank())
   )
+
 ```
 
 ```{r diam-herbiv-rsri-plot}
@@ -2072,7 +2077,8 @@ rgr_ranef <- ranef(rgr_model, condVar = T)
 rgr_ranef_df <- as.data.frame(rgr_ranef)
 write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 
-(rgr_species_ranef_plot <- ggplot(filter(rgr_ranef_df, grpvar=="common_name",term!="(Intercept)"), 
+(rgr_species_ranef_plot <- ggplot(
+  filter(rgr_ranef_df, grpvar=="common_name", term=="(Intercept)"), 
        aes(y = grp, x = condval)) +
   geom_point() +
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
@@ -2085,6 +2091,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
   labs(x="", y="") +
   ggtitle("RGR species intercepts"))
 ```
+
 
 ```{r rgr-site-ranef-plot}
 
@@ -2102,6 +2109,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
   ggtitle("RGR site intercepts"))
 
 ```
+
 
 ```{r rgr-fixef-data, eval=F}
 rgr_summary <- summary(rgr_model)
@@ -2140,6 +2148,7 @@ rgr_scaled_coef <- cbind(rgr_scaled_coef, rgr_confint)
 write.csv(rgr_scaled_coef, "model_output_data/rgr_fixed_coef.csv")
 ```
 
+
 ```{r rgr-fixef-plot}
 
 rgr_scaled_coef <- read_csv("model_output_data/rgr_fixed_coef.csv")
@@ -2161,6 +2170,7 @@ rgr_scaled_coef$var_names <- factor(rgr_scaled_coef$var_names, levels = c("Herbi
   )
 
 ```
+
 
 ```{r plot rgr model, eval=F}
 
@@ -2204,6 +2214,7 @@ rgr_distance <- rgr_sjplot$plot[[5]]
 
 ```
 
+
 ```{r rgr-herbiv-by-species}
 
 rgr_rsri_sjplot <- sjPlot::sjp.lmer(rmod_herbiv3, type = "rs.ri", show.legend = T, prnt.plot = F)# avg herbiv. incidence
@@ -2230,17 +2241,20 @@ rgr_rsri_plot <- rgr_rsri_sjplot$plot[[1]]
 ```{r growth-fixed-coefs-fig1, fig.width=8, fig.height=3}
 
 biomass_fixef_plot <- biomass_scaled_coef_plot + 
-  ggtitle("Biomass") +
+  ggtitle("Biomass")
+
 diam_fixef_plot <- diam_scaled_coef_plot + 
   ggtitle("Diameter") +
   theme(axis.text.y = element_blank())
+
 rgr_fixef_plot <- rgr_scaled_coef_plot + 
   ggtitle("RGR") +
   theme(axis.text.y = element_blank())
 
+
 cowplot::plot_grid(plotlist = list(
   biomass_fixef_plot, diam_fixef_plot, rgr_fixef_plot
-), nrow = 1, rel_widths = c(1.6,1,1), scale = .93, labels = "auto", label_x = c(.4,.1,.1))
+), nrow = 1, rel_widths = c(1.7,1,1), scale = .93, labels = "auto", label_x = c(.4,.1,.1))
 
 # ggsave("figures/growth-scaled-coefs-fig.eps", width = 8, height = 3)
 
@@ -2248,43 +2262,54 @@ cowplot::plot_grid(plotlist = list(
 
 ```{r species-growth-diff-fig2, fig.width=9, fig.height=10}
 
-biomass_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
+## 
+biomass_species_ranef_plot$data$grp <- factor(
+  biomass_species_ranef_plot$data$grp, 
+  levels = c("Spicebush", "Redbud", "Dogwood", "Privet", "Honeysuckle", "Autumn olive"))
 biomass_species_ranef_plot <- biomass_species_ranef_plot + 
   ggtitle("") +
   geom_point(aes(color = grp), size = 3, show.legend = F) +
-  scale_color_brewer(palette = "BrBG")
+  scale_color_brewer(palette = "BrBG", direction = -1)
   
-diam_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
+diam_species_ranef_plot$data$grp <- factor(
+  biomass_species_ranef_plot$data$grp, 
+  levels = c("Spicebush", "Redbud", "Dogwood", "Privet", "Honeysuckle", "Autumn olive"))
 diam_species_ranef_plot <- diam_species_ranef_plot + 
   ggtitle("") +
   geom_point(aes(color = grp), size = 3, show.legend = F) +
-  scale_color_brewer(palette = "BrBG")
+  scale_color_brewer(palette = "BrBG", direction = -1)
 
-rgr_species_ranef_plot$data$grp <- factor(biomass_species_ranef_plot$data$grp, c("Autumn olive","Honeysuckle", "Privet", "Dogwood", "Redbud", "Spicebush"))
+rgr_species_ranef_plot$data$grp <- factor(
+  biomass_species_ranef_plot$data$grp, 
+  levels = c("Spicebush", "Redbud", "Dogwood", "Privet", "Honeysuckle", "Autumn olive"))
 rgr_species_ranef_plot <- rgr_species_ranef_plot + 
   ggtitle("") +
   geom_point(aes(color = grp), size = 3, show.legend = F) +
-  scale_color_brewer(palette = "BrBG")
+  scale_color_brewer(palette = "BrBG", direction = -1)
 
-
-biomass_distance_lines <- biomass_distance_lines + 
+## Random intercept plots of distance marginal effect ####
+biomass_ri_distance <- biomass_distance_lines + 
   theme(legend.position = "none",
         legend.direction = "horizontal",
         legend.background = element_blank()) +
   scale_color_brewer(palette = "BrBG") +
   xlab("")
-diam_distance_lines <- diam_distance_lines + 
+
+diam_ri_distance <- diam_distance_lines + 
   theme(legend.position = "none") +
   scale_color_brewer(palette = "BrBG") +
   xlab("")
-rgr_distance_lines <- rgr_distance_lines + 
+
+rgr_ri_distance <- rgr_distance_lines + 
   theme(legend.position = "none") +
   scale_color_brewer(palette = "BrBG")
 
+
+## Multipanel plot of species random intercepts for growth ####
 cowplot::plot_grid(plotlist = list(
-  biomass_species_ranef_plot, biomass_distance_lines,  
-  diam_species_ranef_plot, diam_distance_lines, 
-  rgr_species_ranef_plot, rgr_distance_lines), 
+  biomass_species_ranef_plot, biomass_ri_distance,  
+  diam_species_ranef_plot, diam_ri_distance, 
+  rgr_species_ranef_plot, rgr_ri_distance), 
   nrow = 3, ncol = 2, rel_widths = c(1,2))
 
 # ggsave(filename = "figures/distance-intercepts-opt2.eps", width = 9, height = 10)
@@ -2302,13 +2327,14 @@ biomass_rsri_plot <-
   scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush"))
   
 diameter_rsri_plot <- diam_rsri_plot +
-  theme(legend.position = "none")
+  theme(legend.position = "none") +
+  scale_color_brewer(palette = "BrBG")
 # rgr_rsri_plot
 
 cowplot::plot_grid(biomass_rsri_plot, diameter_rsri_plot, 
                    nrow=2)
 
-ggsave("figures/growth-rsri-plot-fig3.eps", width = 5, height = 5)
+# ggsave("figures/growth-rsri-plot-fig3.eps", width = 5, height = 5)
 
 ```
 
