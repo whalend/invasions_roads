@@ -551,8 +551,10 @@ $(document).ready(function () {
 <p>The random intercepts for each species show that native species generated less biomass than non-native species, with spicebush and dogwood performing particularly poorly. For the non-native species, privet and autumn olive were especially good at amassing biomass, with honeysuckle performing slightly less well.</p>
 <p>Site-level biomass production was greater at CH, PR, LD, and SR, while lower at DG, FR, and GR. The intercepts for the other five sites all had confidence error estimates crossing zero, with absolute values of the intercepts &lt;0.12.</p>
 <p>I’m exploring making plots of the marginal effects for each group in the random effects, particulalry for species, with special interest in the relationship with distance (edge effects).</p>
-<p><strong>Plot the marginal effect of distance on biomass for each species</strong> <img src="analysis_files/figure-html/marginal-biomass-distance-plot-1.png" width="2100" /></p>
-<p><strong>Plot the random-slope-random-intercept for the effect of herbivory on the biomass for each species</strong> <img src="analysis_files/figure-html/biomass-herbiv-rsri-plot-1.png" width="2100" /></p>
+<p><strong>Plot the marginal effect of distance on biomass for each species</strong></p>
+<p><img src="analysis_files/figure-html/marginal-biomass-distance-plot-1.png" width="2100" /></p>
+<p><strong>Plot the random-slope-random-intercept for the effect of herbivory on the biomass for each species</strong></p>
+<p><img src="analysis_files/figure-html/biomass-herbiv-rsri-plot-1.png" width="2100" /></p>
 <p><del>What about fitting a separate models for each species? I don’t think this is necessary unless we want to be able to say something specific about the relationship between the response and specific predictors for each species. I think it is reasonable to assume that the plants generally respond similarly to things like soil moisture and light availability.</del></p>
 </section>
 </section>
@@ -598,7 +600,7 @@ $(document).ready(function () {
 <p><img src="analysis_files/figure-html/final%20diameter%20model-1.png" width="2100" /><img src="analysis_files/figure-html/final%20diameter%20model-2.png" width="2100" /><img src="analysis_files/figure-html/final%20diameter%20model-3.png" width="2100" /><img src="analysis_files/figure-html/final%20diameter%20model-4.png" width="2100" /><img src="analysis_files/figure-html/final%20diameter%20model-5.png" width="2100" /></p>
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
-## Formula: log(avg_diameter) ~ scaled_distance + scaled_pct_light + age +  
+## Formula: log(avg_diameter) ~ scaled_distance + scaled_pct_light + f_age +  
 ##     scaled_herbiv_incidence + (1 | site_code) + (scaled_herbiv_incidence |  
 ##     common_name)
 ##    Data: site_grouped_data
@@ -622,22 +624,22 @@ $(document).ready(function () {
 ## (Intercept)               0.95266    0.06122  15.10000  15.561 1.00e-10
 ## scaled_distance          -0.05850    0.03555 378.50000  -1.646   0.1007
 ## scaled_pct_light          0.13136    0.02741 387.70000   4.792 2.35e-06
-## ageYoung forest           0.18744    0.07466  10.10000   2.511   0.0308
+## f_age1                    0.18744    0.07466  10.10000   2.511   0.0308
 ## scaled_herbiv_incidence   0.07557    0.04645   4.70000   1.627   0.1687
 ##                            
 ## (Intercept)             ***
 ## scaled_distance            
 ## scaled_pct_light        ***
-## ageYoung forest         *  
+## f_age1                  *  
 ## scaled_herbiv_incidence    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) scld_d scld_p_ agYngf
+##             (Intr) scld_d scld_p_ f_age1
 ## scald_dstnc -0.231                      
 ## scld_pct_lg -0.017  0.113               
-## ageYongfrst -0.613  0.000 -0.022        
+## f_age1      -0.613  0.000 -0.022        
 ## scld_hrbv_n -0.242  0.034 -0.026  -0.007</code></pre>
 <p><img src="analysis_files/figure-html/diameter-species-ranef-plot-1.png" width="2100" /></p>
 <p><strong>Random effects for species and site on diameter growth response</strong></p>
@@ -646,7 +648,7 @@ $(document).ready(function () {
 <p><img src="analysis_files/figure-html/diameter-fixef-plot-1.png" width="2100" /></p>
 <p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1717468, 0.3856731 AIC: 82.8482168</p>
 <p>Seedling diameter increased with light availability, was greater in younger forests, (not significantly) decreased with distance, and (not significantly) increased with herbivory.</p>
-<p><strong>Plot marginal effect of distance on diameter growth for each species</strong> <img src="analysis_files/figure-html/sjplot-diameter-1.png" width="2100" /></p>
+<p><strong>Plot marginal effect of distance on diameter growth for each species</strong> <img src="analysis_files/figure-html/marginal-diameter-distance-plot-1.png" width="2100" /></p>
 <p><strong>Plot the random-slope-random-intercept for the marginal effect of herbivory on the diameter of each species</strong> <img src="analysis_files/figure-html/diam-herbiv-rsri-plot-1.png" width="2100" /></p>
 </section>
 <section id="relative-growth-rate-model" class="level2">
@@ -702,7 +704,8 @@ $(document).ready(function () {
 <p><img src="analysis_files/figure-html/rgr-fixef-plot-1.png" width="2100" /></p>
 <p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1682798, 0.3970171</p>
 <p>The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.</p>
-<p><strong>Plot marginal effect of distance on relative growth rate for each species</strong> <img src="analysis_files/figure-html/sjplot-rgr-1.png" width="2100" /></p>
+<p><strong>Plot marginal effect of distance on relative growth rate for each species</strong></p>
+<p><img src="analysis_files/figure-html/sjplot-rgr-1.png" width="2100" /></p>
 <p><strong>Plot the random-slope-random-intercept for the marginal effect of herbiory on the relative growth rate of each species</strong> <img src="analysis_files/figure-html/rgr-herbiv-by-species-1.png" width="2100" /></p>
 </section>
 </section>
@@ -710,7 +713,7 @@ $(document).ready(function () {
 <h2>Multipanel figures of growth model results: figures 1-3</h2>
 <p><img src="analysis_files/figure-html/fig1-growth-fixed-coefs-1.png" width="2400" /></p>
 <p><strong>Fig. 1.:</strong> Coefficient estimates (and 95% confidence intervals) of scaled coefficients for distance, forest successional age, percent available light, and herbivory on biomass, diameter, and relative growth rate (height).</p>
-<p><img src="analysis_files/figure-html/fig2-species-growth-diff-1.png" width="2700" /></p>
+<p><img src="analysis_files/figure-html/fig2-species-growth-diff-1.png" width="1800" /></p>
 <p><strong>Fig. 2.:</strong> Differences between group intercepts and overall model intercepts (a, c, e) and the marginal effect of distance on growth metrics for each species (b, d, f).</p>
 <p>Data table to check intercept values on the figure.</p>
 <table>
@@ -1013,8 +1016,8 @@ $(document).ready(function () {
 <h2>Germination and survival results</h2>
 <p>Germination and survival differed in response to main effects, were species dependent, and for some species showed opposing patterns. Germination probability was significantly greater with increasing distance from forest edge, trended to be lower in young forest, and greater with higher litter mass. In contrast, survival was not significantly influenced by explanatory variables (Fig. 4 a &amp; b). Species differences accounted for much of the variation in germination and survival, though most species did not show equal success in both responses. Autumn olive had the highest germination but the lowest seedling survival. Dogwood showed a similar pattern of relatively greater germination but lower survival. Privet had the opposite pattern of greater survival, though not significantly different from the average, and lower germination. Redbud and spicebush both had low germination and survival near the overall average. Honeysuckle stands out as having the greatest survival and above average germination, trailing only autumn olive.</p>
 <p>Germination probability for the nonnative autumn olive and honeysuckle, and native dogwood was greater than the overall average; privet, redbud, and spicebush had below average germination, with spicebush being the lowest. In contrast, the transplanted autumn olive and dogwood seedlings had the lowest survival probability, while honeysuckle, privet, spicebush, and redbud seedlings all showed above average survival. Honeysuckle seedlings were particularly likely to persist to the end of the experiment.</p>
-<p><img src="analysis_files/figure-html/germ-survival-fixef-1.png" width="2100" /></p>
-<p><img src="analysis_files/figure-html/germ-survival-ranef-fig5-1.png" width="2100" /></p>
+<p><img src="analysis_files/figure-html/fig4-germ-survival-fixef-1.png" width="2100" /></p>
+<p><img src="analysis_files/figure-html/fig5-germ-survival-ranef-1.png" width="2100" /></p>
 </section>
 <section id="site-level-effects" class="level2">
 <h2>Site-level effects</h2>
