@@ -1588,7 +1588,7 @@ write_csv(biomass_scaled_coef, "model_output_data/biomass_fixed_coef.csv")
 ```{r biomass-fixef-plot}
 
 biomass_scaled_coef <- read_csv("model_output_data/biomass_fixed_coef.csv")
-biomass_scaled_coef$var_names <- factor(biomass_fixed$var_names, levels = c("Herbivory","Pct. light","Forest age: young","Distance","Intercept"))
+biomass_scaled_coef$var_names <- factor(biomass_scaled_coef$var_names, levels = c("Herbivory","Pct. light","Forest age: young","Distance","Intercept"))
 
 (biomass_scaled_coef_plot <- ggplot(filter(biomass_scaled_coef, var_names!="Intercept"), 
        aes(y = var_names, x = Estimate)) +
@@ -2243,7 +2243,7 @@ rgr_distance <- rgr_sjplot$plot[[5]]
 **Plot the random-slope-random-intercept for the marginal effect of herbiory on the relative growth rate of each species**
 ```{r rgr-herbiv-by-species}
 
-rgr_rsri_sjplot <- sjPlot::sjp.lmer(rmod_herbiv3, type = "rs.ri", show.legend = T, prnt.plot = F)# avg herbiv. incidence
+rgr_rsri_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "rs.ri", show.legend = T, prnt.plot = F)# avg herbiv. incidence
 # sjPlot::sjp.lmer(rmod_herbiv4, type = "rs.ri")# cumulative herbiv. incidence
 
 rgr_rsri_plot <- rgr_rsri_sjplot$plot[[1]]
@@ -2388,7 +2388,7 @@ cowplot::plot_grid(biomass_rsri_plot, diameter_rsri_plot,
 
 ```
 
-**Fig. 3.:** Random-slope-intercept plots for the effect of herbivory on the biomass (a) and diameter (b) of each species. The different slopes illustrate species specific responses to herbivory, where some increase growth while others maintain or have less growth.
+**Fig. 3.:** Random-slope-intercept plots for the marginal effect of herbivory on the biomass (a) and diameter (b) of each species. The different slopes illustrate species specific responses to herbivory, where some increase growth while others maintain or have less growth.
 
 
 ## Growth performance results
@@ -2582,6 +2582,7 @@ write_csv(germ_scaled_coef, "model_output_data/germ_fixed_coef.csv")
 ```{r germ-fixef-plot}
 
 germ_scaled_coef <- read_csv("model_output_data/germ_fixed_coef.csv")
+germ_scaled_coef$var_names <- factor(germ_scaled_coef$var_names, levels = c("Litter mass","Forest age: young","Distance","Intercept"))
 
 (germ_scaled_coef_plot <- ggplot(filter(germ_scaled_coef, var_names!="Intercept"), 
        aes(y = var_names, x = Estimate)) +
@@ -2600,6 +2601,7 @@ germ_scaled_coef <- read_csv("model_output_data/germ_fixed_coef.csv")
 
 ```
 
+**Plot marginal effects of distance and litter on germination for each species**
 
 ```{r sjplot-germination}
 
@@ -2741,7 +2743,7 @@ survival_2006$obs_id <- seq_along(survival_2006$age)
 surv_model <- glmer(cbind(alive,dead) ~ distance + age + litter_kg_m2 + (1|site_code) + (1|common_name) + (1|obs_id), data = survival_2006, family = "binomial")
 summary(surv_model)
 
-surv_model_scaled <- glmer(cbind(alive,dead) ~ scaled_distance + age + scaled_litter_kg_m2 + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
+surv_model_scaled <- glmer(cbind(alive,dead) ~ scaled_distance + scaled_pct_light + age + scaled_litter_kg_m2 + (1|site_code) + (1|common_name), data = survival_2006, family = "binomial")
 
 summary(surv_model_scaled)
 plot(surv_model_scaled)
@@ -2770,6 +2772,7 @@ lines(lowess(e2~surv_model_scaled@frame$scaled_litter_kg_m2))
 ```
 
 ### Survival model random intercepts
+
 ```{r surv-species-ranef-plot}
 
 surv_ranef <- ranef(surv_model, condVar = T)
@@ -2793,8 +2796,10 @@ write.csv(surv_ranef_df, "model_output_data/survival_ranef.csv")
 # predict(surv_model)
 ```
 
+**Plots of random effects intercepts of species (above) and site (below) for the survival response**
 
 ```{r surv-site-ranef-plot}
+
 (surv_site_ranef_plot <- ggplot(filter(surv_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
   geom_point() +
@@ -2828,9 +2833,13 @@ write_csv(surv_fixed, "model_output_data/survival_fixed_coef.csv")
 ```
 
 
+**Plot main effects of distance, forest age, and litter mass on survival**
+Because no main effects were statistically significant during model fitting we used the same explanatory variables as germination to compare and contrast these two components of establishment.
+
 ```{r surv-fixef-plot}
 
 surv_fixed <- read_csv("model_output_data/survival_fixed_coef.csv")
+surv_fixed$var_names <- factor(surv_fixed$var_names, levels = c("Litter mass","Forest age: young","Distance","Intercept"))
 
 (surv_coef_plot <- ggplot(filter(surv_fixed, var_names!="Intercept"),
        aes(y = var_names, x = Estimate)) +
@@ -2875,6 +2884,9 @@ The estimated marginal and condiational R^2^ values reinforce that the fixed eff
 
 `r MuMIn::r.squaredGLMM(surv_model)`
 
+
+**Plot marginal effect of distance on survival**
+
 ```{r survival-sjplot}
 
 surv_model <- glmer(cbind(alive, dead) ~ distance + age + litter_kg_m2 + (1 | site_code) + (1 | common_name), data = survival_2006, family = "binomial")
@@ -2894,11 +2906,30 @@ surv_distance <- surv_sjplot$plot[[4]]
 
 
 ## Germination and survival results
-The probability of germination increased with distance from edge, light availability, litter mass, and basal area, but the effect of basal area was moderated by forest successional age, with lower germination in young forests. Effects of measured site conditions on survival were relatively weak and predominantly due to interaction variables. Light availability had a significant positive effect on survival probability, but this decreased with distance from the edge (indicated by the negative interaction term). The positive interaction of distance and litter increased survival probability, although the main effects of distance and litter were statistically insignificant. The interaction of basal area and forest age was similar, but with a negative effect where seedlings at locations with lower basal area in younger forests had lower probability of survival. Variation in survival depended predominantly on species specific characteristics and unmeasured site characteristics as indicated by the variance accounted for by these random effects variables.
+
+Germination and survival differed in response to main effects, were species dependent, and for some species showed opposing patterns. Germination probability was significantly greater with increasing distance from forest edge, trended to be lower in young forest, and greater with higher litter mass. In contrast, survival was not significantly influenced by explanatory variables (Fig. 4 a & b). Species differences accounted for much of the variation in germination and survival, though most species did not show equal success in both responses. Autumn olive had the highest germination but the lowest seedling survival. Dogwood showed a similar pattern of relatively greater germination but lower survival. Privet had the opposite pattern of greater survival, though not significantly different from the average, and lower germination. Redbud and spicebush both had low germination and survival near the overall average. Honeysuckle stands out as having the greatest survival and above average germination, trailing only autumn olive.
+
 
 Germination probability for the nonnative autumn olive and honeysuckle, and native dogwood was greater than the overall average; privet, redbud, and spicebush had below average germination, with spicebush being the lowest. In contrast, the transplanted autumn olive and dogwood seedlings had the lowest survival probability, while honeysuckle, privet, spicebush, and redbud seedlings all showed above average survival. Honeysuckle seedlings were particularly likely to persist to the end of the experiment.
 
-```{r fig4-germ-survival}
+```{r germ-survival-fixef}
+
+germ_coef_plot <- germ_scaled_coef_plot +
+  ggtitle("Germination")
+
+surv_coef_plot <- surv_coef_plot +
+  ggtitle("Survival") +
+  theme(axis.text.y = element_blank())
+
+cowplot::plot_grid(germ_coef_plot, surv_coef_plot,
+                   rel_widths = c(1,.65), labels = "auto")
+
+ggsave("figures/germ-survival-fixef-fig4.eps", width = 6, height = 3)
+
+```
+
+
+```{r germ-survival-ranef-fig5}
 
 germ_species_ranef_plot$data$grp <- factor(
   germ_species_ranef_plot$data$grp, 
@@ -2925,10 +2956,11 @@ surv_dist_plot <- surv_distance_lines +
 
 
 cowplot::plot_grid(
-  germ_ranef_plot,germ_dist_plot,surv_ranef_plot,surv_dist_plot,
+  germ_ranef_plot, germ_dist_plot, surv_ranef_plot, surv_dist_plot,
   ncol = 2, nrow = 2, labels = "auto")
 
-ggsave("figures/fig4-germ-surv.eps", height = 6, width = 6)
+# ggsave("figures/germ-surv-ranef-fig5.eps", height = 6, width = 6)
+
 ```
 
 
@@ -3009,7 +3041,7 @@ AIC(herbiv_incidence_mod)
 ```
 
 
-```{r ordinal-herbivory-model}
+```{r ordinal-herbivory-model, eval=F}
 # install.packages("ordinal")
 library(ordinal)
 herbiv_noNA_data$f_herbiv <- as.factor(herbiv_noNA_data$herbivory)
