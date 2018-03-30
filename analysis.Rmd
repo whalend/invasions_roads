@@ -2063,7 +2063,7 @@ MuMIn::AICc(rmod_herbiv4); MuMIn::r.squaredGLMM(rmod_herbiv4)
 
 ```
 
-
+Final rgr model
 ```{r final rgr model}
 
 rgr_model <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data, REML = T)
@@ -2085,7 +2085,7 @@ rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age +
 
 ```
 
-
+### Plots of random effects from RGR model
 ```{r rgr-species-ranef-plot}
 
 rgr_ranef <- ranef(rgr_model_scaled, condVar = T)
@@ -2131,7 +2131,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 
 ```
 
-
+### Plot of fixed effects from RGR model
 ```{r rgr-fixef-data, eval=F}
 # rgr_summary <- summary(rgr_model)
 # str(rgr_summary)
@@ -2286,7 +2286,7 @@ cowplot::plot_grid(plotlist = list(
 **Fig. 1.:** Coefficient estimates (and 95% confidence intervals) of scaled coefficients for distance, forest successional age, percent available light, and herbivory on biomass, diameter, and relative growth rate (height). 
 
 
-```{r fig2-species-growth-diff, fig.width=9, fig.height=10}
+```{r fig2-species-growth-diff, fig.width=9, fig.height=10, fig.asp=.5}
 
 ## random intercepts for species
 biomass_species_ranef_plot$data$grp <- factor(
@@ -2303,7 +2303,8 @@ diam_species_ranef_plot$data$grp <- factor(
 diam_species_ranef_plot <- diam_species_ranef_plot + 
   ggtitle("") +
   geom_point(aes(color = grp), size = 3, show.legend = F) +
-  scale_color_brewer(palette = "BrBG", direction = -1)
+  scale_color_brewer(palette = "BrBG", direction = -1) +
+  scale_x_continuous(limits = c(-0.2, 0.2))
 
 rgr_species_ranef_plot$data$grp <- factor(
   biomass_species_ranef_plot$data$grp, 
@@ -2336,13 +2337,13 @@ cowplot::plot_grid(plotlist = list(
   biomass_species_ranef_plot, biomass_ri_distance,  
   diam_species_ranef_plot, diam_ri_distance, 
   rgr_species_ranef_plot, rgr_ri_distance), 
-  nrow = 3, ncol = 2, rel_widths = c(1,2))
+  nrow = 3, ncol = 2, rel_widths = c(1,2), labels = "auto")
 
-# ggsave(filename = "figures/distance-intercepts-opt2.eps", width = 9, height = 10)
+# ggsave(filename = "figures/distance-intercepts-fig2.eps", width = 9, height = 10)
 
 ```
 
-**Fig. 2.:** Random intercepts relative to the and the marginal effect of distance for growth metrics of each species.
+**Fig. 2.:** Differences between group intercepts and overall model intercepts (a, c, e) and the marginal effect of distance on growth metrics for each species (b, d, f).
 
 
 ```{r fig3-growth-herbiv-species, width = 5, height = 5}
@@ -2361,13 +2362,13 @@ diameter_rsri_plot <- diam_rsri_plot +
 # rgr_rsri_plot
 
 cowplot::plot_grid(biomass_rsri_plot, diameter_rsri_plot, 
-                   nrow=2)
+                   nrow=2, labels = "auto")
 
 # ggsave("figures/growth-rsri-plot-fig3.eps", width = 5, height = 5)
 
 ```
 
-**Fig. 3.:** 
+**Fig. 3.:** Random-slope-intercept plots for the effect of herbivory on the biomass (a) and diameter (b) of each species. The different slopes illustrate species specific responses to herbivory, where some increase growth while others maintain or have less growth.
 
 
 ## Growth performance results
@@ -2502,6 +2503,8 @@ write.csv(germ_ranef_df, "model_output_data/germ_ranef.csv")
   ggtitle("Species germination intercepts"))
 
 ```
+
+**Random intercepts for species (above) and site (below) for the germination probability**
 
 ```{r germ-site-ranef-plot}
 (germ_site_ranef_plot <- ggplot(filter(germ_ranef_df, grpvar=="site_code"), 
