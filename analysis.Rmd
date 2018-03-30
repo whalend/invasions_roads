@@ -2927,7 +2927,7 @@ Germination and survival differed in response to main effects, were species depe
 
 Germination probability for the nonnative autumn olive and honeysuckle, and native dogwood was greater than the overall average; privet, redbud, and spicebush had below average germination, with spicebush being the lowest. In contrast, the transplanted autumn olive and dogwood seedlings had the lowest survival probability, while honeysuckle, privet, spicebush, and redbud seedlings all showed above average survival. Honeysuckle seedlings were particularly likely to persist to the end of the experiment.
 
-```{r germ-survival-fixef}
+```{r fig4-germ-survival-fixef}
 
 germ_coef_plot <- germ_scaled_coef_plot +
   ggtitle("Germination")
@@ -2944,7 +2944,7 @@ ggsave("figures/germ-survival-fixef-fig4.eps", width = 6, height = 3)
 ```
 
 
-```{r germ-survival-ranef-fig5}
+```{r fig5-germ-survival-ranef}
 
 germ_species_ranef_plot$data$grp <- factor(
   germ_species_ranef_plot$data$grp, 
