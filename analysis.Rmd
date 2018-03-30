@@ -1439,6 +1439,13 @@ model_summary <- summary(biomass_model)
 
 ```
 
+
+```{r diagnostics with sjPlot}
+sjPlot::sjp.lmer(biomass_model, type = "re.qq")
+sjPlot::plot_model(biomass_model, type = "diag")
+```
+
+
 ```{r scale model data}
 ## For scaled models, dived by 2*sd, except for distance; rescale distance to be between 0 and 1.
 
@@ -1486,7 +1493,7 @@ summary(biomass_model_scaled)
 ```{r extract biomass model coefficients}
 
 # lattice::dotplot(fixef(biomass_model))
-biomass_ranef <- ranef(biomass_model, condVar = T)
+biomass_ranef <- ranef(biomass_model_scaled, condVar = T)
 # lattice::dotplot(biomass_ranef)
 biomass_ranef_df <- as.data.frame(biomass_ranef)
 write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
@@ -1512,9 +1519,13 @@ biomass_coefs <- coef(biomass_model)
         ) +
   labs(x="", y="") +
   ggtitle("Biomass species intercepts"))
+
 ```
 
+**Random intercepts for each species (above) and each site (below). These are the difference between the estimated intercept across all the groups and the intercept estimated for each group.**
+
 ```{r biomass-site-ranef-plot}
+
 (biomass_site_ranef_plot <- ggplot(filter(biomass_ranef_df, grpvar=="site_code"), 
        aes(y = grp, x = condval)) +
   geom_point() +
@@ -1529,9 +1540,11 @@ biomass_coefs <- coef(biomass_model)
   ggtitle("Biomass site intercepts"))  
 
 # lattice::qqmath(ranef(biomass_model, condVar = T))
+
 ```
 
-```{r biomass-fixef-data, cache=T}
+
+```{r biomass-fixef-data, eval=F}
 # biomass_fixef <- fixef(biomass_model)
 # str(biomass_fixef)
 # biomass_summary <- summary(biomass_model)
@@ -1571,6 +1584,7 @@ write_csv(biomass_scaled_coef, "model_output_data/biomass_fixed_coef.csv")
 
 ```
 
+
 ```{r biomass-fixef-plot}
 
 biomass_scaled_coef <- read_csv("model_output_data/biomass_fixed_coef.csv")
@@ -1607,7 +1621,7 @@ biomass_scaled_coef$var_names <- factor(biomass_fixed$var_names, levels = c("Her
 
 ```
 
-Conditional and marginal R^2^ of the biomass model `r MuMIn::r.squaredGLMM(biomass_model)`
+Conditional and marginal R^2^ of the biomass model `r MuMIn::r.squaredGLMM(biomass_model_scaled)`  AIC: `r MuMIn::AICc(biomass_model)`
 
 All species generated more aboveground biomass in young forests and at locations with greater light availability. Biomass production decreased with distance from the road/forest edge and (interestingly) with greater soil moisture, however, there was a significant interaction between distance and soil moisture indicating greater soil moisture at distances farther from the edge.
 
@@ -1617,16 +1631,15 @@ Site-level biomass production was greater at CH, PR, LD, and SR, while lower at 
 
 
 I'm exploring making plots of the marginal effects for each group in the random effects, particulalry for species, with special interest in the relationship with distance (edge effects). 
-```{r sjPlot-biomass}
 
-sjPlot::sjp.lmer(biomass_model, type = "re.qq")
-sjPlot::plot_model(biomass_model, type = "diag")
+```{r sjPlot-biomass}
 
 biomass_sjplot <- sjPlot::sjp.lmer(biomass_model, type = "ri.slope", prnt.plot = F)
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type = "eff")
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type)
 ```
 
+**Plot the marginal effect of distance on biomass for each species**
 ```{r marginal-biomass-distance-plot}
 # sjPlot::sjp.lmer(biomass_model, type = "fe.slope")
 biomass_distance <- biomass_sjplot$plot[[5]]
@@ -1643,6 +1656,8 @@ biomass_distance$data$y <- exp(biomass_distance$data$y)
 
 ```
 
+
+**Plot the random-slope-random-intercept for the effect of herbivory on the biomass for each species**
 ```{r biomass-herbiv-rsri-plot}
 
 biomass_rsri <- sjPlot::sjp.lmer(biomass_model, type = "rs.ri", show.legend = T, prnt.plot = F)
@@ -1664,7 +1679,6 @@ biomass_herbiv_rsri$data$y = exp(biomass_herbiv_rsri$data$y)
 )
 
 ```
-
 
 
 ~~What about fitting a separate models for each species? I don't think this is necessary unless we want to be able to say something specific about the relationship between the response and specific predictors for each species. I think it is reasonable to assume that the plants generally respond similarly to things like soil moisture and light availability.~~
@@ -1803,7 +1817,7 @@ summary(diam_model_scaled)
 
 ```{r diameter-species-ranef-plot}
 
-diam_ranef <- ranef(diam_model, condVar = T)
+diam_ranef <- ranef(diam_model_scaled, condVar = T)
 
 # lattice::dotplot(ranef(diam_model, condVar = T))
 # lattice::qqmath(ranef(biomass_model, condVar = T))
@@ -1825,6 +1839,7 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
 
 ```
 
+**Random effects for species and site on diameter growth response**
 
 ```{r diameter-site-ranef-plot}
 (diam_site_ranef_plot <- ggplot(filter(diam_ranef_df, grpvar=="site_code"), 
@@ -1843,7 +1858,7 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
 ```
 
 
-```{r diameter-fixef-data, cache=T}
+```{r diameter-fixef-data, eval=F}
 # diam_summary <- summary(diam_model)
 # str(diam_summary)
 var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Herbivory")
@@ -1880,6 +1895,8 @@ write_csv(diam_scaled_coef, "model_output_data/diam_fixed_coef.csv")
 
 ```
 
+**Coefficient estimates (±95% confidence intervals) on the diameter growth response**
+
 ```{r diameter-fixef-plot}
 
 diam_scaled_coef <- read_csv("model_output_data/diam_fixed_coef.csv")
@@ -1902,11 +1919,11 @@ diam_scaled_coef$var_names <- factor(diam_scaled_coef$var_names, levels = c("Her
 
 ```
 
-Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squaredGLMM(diam_model_scaled)`
+Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squaredGLMM(diam_model_scaled)`  AIC: `r MuMIn::AICc(diam_model_scaled)`
 
-Seedling diameter increased with light availability and was greater in younger forests, but decreased with distance.
+Seedling diameter increased with light availability, was greater in younger forests, (not significantly) decreased with distance, and (not significantly) increased with herbivory.
 
-
+**Plot marginal effect of distance on diameter growth for each species**
 ```{r sjplot-diameter}
 
 diam_sjplot_rislope <- sjPlot::sjp.lmer(diam_model, type = "ri.slope", prnt.plot = F)
@@ -1922,8 +1939,12 @@ diam_distance$data$y <- exp(diam_distance$data$y)
   theme(legend.title = element_blank())
   )
 
+# m1 <- lmer(log(avg_diameter) ~ distance + avg_pct_light + age + (1 | site_code) + (distance | common_name), site_grouped_data)
+## I was going to investigate the rs-ri of distance and species, but the model failed to converge
+
 ```
 
+**Plot the random-slope-random-intercept for the marginal effect of herbivory on the diameter of each species**
 ```{r diam-herbiv-rsri-plot}
 # sjPlot::sjp.lmer(diam_model_h4, type = "rs.ri", show.legend = T)
 diam_sjplot_rsri <- sjPlot::sjp.lmer(diam_model, type = "rs.ri", show.legend = T, prnt.plot = F) 
@@ -2042,7 +2063,6 @@ MuMIn::AICc(rmod_herbiv4); MuMIn::r.squaredGLMM(rmod_herbiv4)
 
 ```
 
-Do we actually want to test/know what the slope/intercept interaction is between distance and species as a rondom component??
 
 ```{r final rgr model}
 
@@ -2260,6 +2280,9 @@ cowplot::plot_grid(plotlist = list(
 
 ```
 
+**Fig. 1.:** Coefficient estimates (and 95% confidence intervals) of scaled coefficients for distance, forest successional age, percent available light, and herbivory on biomass, diameter, and relative growth rate (height). 
+
+
 ```{r fig2-species-growth-diff, fig.width=9, fig.height=10}
 
 ## random intercepts for species
@@ -2316,6 +2339,9 @@ cowplot::plot_grid(plotlist = list(
 
 ```
 
+**Fig. 2.:** Random intercepts relative to the and the marginal effect of distance for growth metrics of each species.
+
+
 ```{r fig3-growth-herbiv-species, width = 5, height = 5}
 
 biomass_rsri_plot <- 
@@ -2338,6 +2364,7 @@ cowplot::plot_grid(biomass_rsri_plot, diameter_rsri_plot,
 
 ```
 
+**Fig. 3.:** 
 
 
 ## Growth performance results
