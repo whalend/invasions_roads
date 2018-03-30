@@ -1499,7 +1499,7 @@ biomass_ranef_df <- as.data.frame(biomass_ranef)
 write_csv(biomass_ranef_df, "model_output_data/biomass_ranef.csv")
 
 # intercept <- biomass_summary$coefficients[1,1]
-biomass_coefs <- coef(biomass_model)
+# biomass_coefs <- coef(biomass_model)
 
 ```
 
@@ -1513,9 +1513,10 @@ biomass_coefs <- coef(biomass_model)
   geom_vline(xintercept = 0, color = "gray70") +
   theme_classic() +
   # theme_bw() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
+  theme(
+    # axis.text.y = element_text(size = 12),
+    # axis.text.x = element_text(size = 12),
+    plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
   ggtitle("Biomass species intercepts"))
@@ -1632,24 +1633,24 @@ Site-level biomass production was greater at CH, PR, LD, and SR, while lower at 
 
 I'm exploring making plots of the marginal effects for each group in the random effects, particulalry for species, with special interest in the relationship with distance (edge effects). 
 
-```{r sjPlot-biomass}
+**Plot the marginal effect of distance on biomass for each species**
 
-biomass_sjplot <- sjPlot::sjp.lmer(biomass_model, type = "ri.slope", prnt.plot = F)
+```{r marginal-biomass-distance-plot}
+
+biomass_sjplot <- sjPlot::sjp.lmer(biomass_model_scaled, type = "ri.slope", prnt.plot = F)
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type = "eff")
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type)
-```
 
-**Plot the marginal effect of distance on biomass for each species**
-```{r marginal-biomass-distance-plot}
 # sjPlot::sjp.lmer(biomass_model, type = "fe.slope")
 biomass_distance <- biomass_sjplot$plot[[5]]
+biomass_distance$data$x <- biomass_distance$data$x*60
 biomass_distance$data$y <- exp(biomass_distance$data$y)
 # biomass_distance <- biomass_distance$data
 (biomass_distance_lines <- biomass_distance +
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = "BrBG") +
-  labs(y = "Biomass (g)", x = "Distance (m)", title = "") +
+  labs(y = "Predicted biomass (g)", x = "Distance (m)", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
 )
@@ -1658,12 +1659,15 @@ biomass_distance$data$y <- exp(biomass_distance$data$y)
 
 
 **Plot the random-slope-random-intercept for the effect of herbivory on the biomass for each species**
+
 ```{r biomass-herbiv-rsri-plot}
 
 biomass_rsri <- sjPlot::sjp.lmer(biomass_model, type = "rs.ri", show.legend = T, prnt.plot = F)
 
 biomass_herbiv_rsri <- biomass_rsri$plot[[1]]
+# biomass_herbiv_rsri$data$x <- biomass_herbiv_rsri$data$x*(2*sd(site_grouped_data$avg_h_incidence, na.rm=T)) + mean(site_grouped_data$avg_h_incidence, na.rm=T)
 biomass_herbiv_rsri$data$y = exp(biomass_herbiv_rsri$data$y)
+## Effectively no difference in the plots whether using the unscaled data model or back-transforming the scaled explanatory variables.
 
 (biomass_herbiv_rsri_plot <- ggplot(biomass_herbiv_rsri$data,
                                     aes(x,y,color=grp)) +
@@ -1705,6 +1709,7 @@ lattice::dotplot(ranef(ao_biomass, condVar = T))
 
 
 ## Diameter model
+
 ```{r find diameter model, eval=F}
 # find random component ----
 hist(log(site_grouped_data$avg_diameter))
@@ -1810,7 +1815,7 @@ plot(diam_model@frame$avg_h_incidence, E2)
 
 
 # model with scaled predictors ----
-diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1|site_code) + (scaled_herbiv_incidence|common_name), data = site_grouped_data)
+diam_model_scaled <- lmer(log(avg_diameter) ~ scaled_distance + scaled_pct_light + f_age + scaled_herbiv_incidence + (1|site_code) + (scaled_herbiv_incidence|common_name), data = site_grouped_data)
 summary(diam_model_scaled)
 
 ```
@@ -1830,9 +1835,10 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
   geom_vline(xintercept = 0, color = "gray70") +
   theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
+  theme(
+    # axis.text.y = element_text(size = 12),
+    # axis.text.x = element_text(size = 12),
+    plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
   ggtitle("Diameter species intercepts"))
@@ -1848,9 +1854,10 @@ write_csv(diam_ranef_df, "model_output_data/diam_ranef.csv")
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
   geom_vline(xintercept = 0, color = "gray70") +
   theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
+  theme(
+    # axis.text.y = element_text(size = 12),
+    # axis.text.x = element_text(size = 12),
+    plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
   ggtitle("Diameter site intercepts"))
@@ -1924,17 +1931,19 @@ Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squar
 Seedling diameter increased with light availability, was greater in younger forests, (not significantly) decreased with distance, and (not significantly) increased with herbivory.
 
 **Plot marginal effect of distance on diameter growth for each species**
-```{r sjplot-diameter}
+```{r marginal-diameter-distance-plot}
 
-diam_sjplot_rislope <- sjPlot::sjp.lmer(diam_model, type = "ri.slope", prnt.plot = F)
+diam_sjplot_rislope <- sjPlot::sjp.lmer(diam_model_scaled, type = "ri.slope", prnt.plot = F)
 diam_distance <- diam_sjplot_rislope$plot[[5]]
+
+diam_distance$data$x <- diam_distance$data$x*60
 diam_distance$data$y <- exp(diam_distance$data$y)
 
 (diam_distance_lines <- diam_distance +
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = "BrBG") +
-  labs(y = "Diameter (mm)", x = "Distance", title = "") +
+  labs(y = "Predicted diameter (mm)", x = "Distance", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
   )
@@ -2105,9 +2114,10 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
   geom_vline(xintercept = 0, color = "gray70") +
   theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
+  theme(
+    # axis.text.y = element_text(size = 12),
+    # axis.text.x = element_text(size = 12),
+    plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
   ggtitle("RGR species intercepts"))
@@ -2124,9 +2134,10 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
   geom_errorbarh(aes(xmin = condval - 2*condsd, xmax = condval + 2*condsd), height = 0) +
   geom_vline(xintercept = 0, color = "gray70") +
   theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
+  theme(
+    # axis.text.y = element_text(size = 12),
+    # axis.text.x = element_text(size = 12),
+    plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
   ggtitle("RGR site intercepts"))
@@ -2186,9 +2197,10 @@ rgr_scaled_coef$var_names <- factor(rgr_scaled_coef$var_names, levels = c("Herbi
   geom_point(size = 2) +
   geom_errorbarh(aes(xmin = `2.5 %`, xmax = `97.5 %`), height = 0) +
   theme_classic() +
-  theme(axis.text.y = element_text(size = 12),
-        axis.text.x = element_text(size = 12),
-        plot.title = element_text(hjust = .5, size = 18)
+  theme(
+    # axis.text.y = element_text(size = 12),
+    # axis.text.x = element_text(size = 12),
+    plot.title = element_text(hjust = .5, size = 18)
         ) +
   labs(x="", y="") +
   ggtitle("RGR means ± 95% CI")
@@ -2222,12 +2234,15 @@ Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squar
 The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.
 
 **Plot marginal effect of distance on relative growth rate for each species**
+
 ```{r sjplot-rgr}
 
 # sjPlot::sjp.lmer(rgr_model, type = "ri.slope")
 
-rgr_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "ri.slope", prnt.plot = F)
+rgr_sjplot <- sjPlot::sjp.lmer(rgr_model_scaled, type = "ri.slope", prnt.plot = F)
 rgr_distance <- rgr_sjplot$plot[[5]]
+rgr_distance$data$x <- rgr_distance$data$x*60
+
 (rgr_distance_lines <- rgr_distance +
   # geom_abline(intercept = rgr_summary$coefficients[1,1], slope = -(1/3))
   # geom_line() +
@@ -2289,7 +2304,7 @@ cowplot::plot_grid(plotlist = list(
 **Fig. 1.:** Coefficient estimates (and 95% confidence intervals) of scaled coefficients for distance, forest successional age, percent available light, and herbivory on biomass, diameter, and relative growth rate (height). 
 
 
-```{r fig2-species-growth-diff, fig.width=9, fig.height=10, fig.asp=.5}
+```{r fig2-species-growth-diff, fig.width=6, fig.height=7.5}
 
 ## random intercepts for species
 biomass_species_ranef_plot$data$grp <- factor(
@@ -2340,9 +2355,9 @@ cowplot::plot_grid(plotlist = list(
   biomass_species_ranef_plot, biomass_ri_distance,  
   diam_species_ranef_plot, diam_ri_distance, 
   rgr_species_ranef_plot, rgr_ri_distance), 
-  nrow = 3, ncol = 2, rel_widths = c(1,2), labels = "auto")
+  nrow = 3, ncol = 2, rel_widths = c(1,1), labels = "auto")
 
-# ggsave(filename = "figures/distance-intercepts-fig2.eps", width = 9, height = 10)
+# ggsave(filename = "figures/distance-intercepts-fig2.eps", width = 6, height = 7.5)
 
 ```
 
