@@ -2086,6 +2086,7 @@ rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age +
 ```
 
 ### Plots of random effects from RGR model
+
 ```{r rgr-species-ranef-plot}
 
 rgr_ranef <- ranef(rgr_model_scaled, condVar = T)
@@ -2110,6 +2111,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
         ) +
   labs(x="", y="") +
   ggtitle("RGR species intercepts"))
+
 ```
 
 **Random intercepts of species (above) and site (below) for the relative growth rate response**
@@ -2132,6 +2134,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 ```
 
 ### Plot of fixed effects from RGR model
+
 ```{r rgr-fixef-data, eval=F}
 # rgr_summary <- summary(rgr_model)
 # str(rgr_summary)
@@ -2345,6 +2348,23 @@ cowplot::plot_grid(plotlist = list(
 
 **Fig. 2.:** Differences between group intercepts and overall model intercepts (a, c, e) and the marginal effect of distance on growth metrics for each species (b, d, f).
 
+Data table to check intercept values on the figure.
+
+```{r fig2 data table check}
+
+ranef_df <- rbind(filter(biomass_ranef_df, grpvar=="common_name",term=="(Intercept)") %>% 
+                    mutate(response = "biomass"),
+      filter(diam_ranef_df, grpvar=="common_name",term=="(Intercept)") %>% 
+        mutate(response = "diameter"),
+      filter(rgr_ranef_df, grpvar=="common_name",term=="(Intercept)") %>% 
+        mutate(response = "rgr")) %>% 
+  select(grp:response)
+
+kable(ranef_df, digits = 3)
+
+```
+
+
 
 ```{r fig3-growth-herbiv-species, width = 5, height = 5}
 
@@ -2372,7 +2392,7 @@ cowplot::plot_grid(biomass_rsri_plot, diameter_rsri_plot,
 
 
 ## Growth performance results
-Seedling growth metrics of biomass, diameter, and relative growth rate of height  all responded similarly to edge effects, moisture and light availability, and forest successional age. Growth increased with light availability and was greater in young forests and decreased with distance from edge and moisture availability. The nonnative species generally performed better than the native species, however, there was species specific variability among growth metrics. The nonnative species privet, autumn olive, and honeysuckle had the best performance in terms of above-ground biomass relative to the overall average, while the native dogwood and spicebush generated relatively small amounts of biomass. The average biomass produced by the native redbud was close to the overall average across all the species. Privet also showed the greatest increase in diameter relative to the other species, while dogwood and especially spicebush had relatively small increases in diameter. Autumn olive and privet had the two highest relative growth rates in height and spicebush had the lowest. Relative growth rates of redbud, dogwood, and honeysuckle were similar, and near the overall average across all species.
+Seedling growth (biomass, diameter, and relative growth rate of height) all responded similarly to edge effects, light availability, and forest successional age. Overall, herbivory was statistically insignificant but the effect was species dependent. Growth increased with light availability, was greater in young forests, and decreased with distance from the forest edge (Fig. 1). Although the nonnative species generally outperformed the native species there were species specific differences among growth metrics after accounting for distance from edge, forest age, light availability, and herbivory. The nonnative autumn olive, honeysuckle, and especially privet produced more above-ground biomass relative to the overall average, while the native dogwood and especially spicebush generated relatively small amounts of biomass (Fig. 2a). The biomass of the native redbud was near the overall average across all species. Privet also had the greatest diameter follwed by honeysuckle, while dogwood and especially spicebush had relatively small diameters (Fig. 2c). The diameters of the native redbud and nonnative autumn olive were near the overall average. Autumn olive had the highest relative growth rate in height followed by privet, and spicebush had the lowest. Relative growth rates of native redbud and dogwood and nonnative honeysuckle were near the overall average across all species (Fig. 2e).
 
 ## Percent germination model
 
@@ -2382,7 +2402,6 @@ Logistic regression with number of trials (seeds germinated:seeds recovered)
 
 hist((germination_data$pct_germinated))
 names(germination_data)
-
 
 # find random component ----
 germ_mod1 <- glm(cbind(seeds_germinated,seeds_present) ~ distance*avg_pct_light + distance*age + avg_basal_area*age + distance*litter_kg_m2 + distance*pct_moisture, family = "binomial", data = filter(germination_data, is.na(seeds_germinated)=="FALSE"))
