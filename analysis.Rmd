@@ -2088,7 +2088,7 @@ rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age +
 
 ```{r rgr-species-ranef-plot}
 
-rgr_ranef <- ranef(rgr_model, condVar = T)
+rgr_ranef <- ranef(rgr_model_scaled, condVar = T)
 
 # coef(rgr_model)$common_name
 
@@ -2112,6 +2112,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
   ggtitle("RGR species intercepts"))
 ```
 
+**Random intercepts of species (above) and site (below) for the relative growth rate response**
 
 ```{r rgr-site-ranef-plot}
 
@@ -2132,7 +2133,7 @@ write.csv(rgr_ranef_df, "model_output_data/rgr_ranef.csv")
 
 
 ```{r rgr-fixef-data, eval=F}
-rgr_summary <- summary(rgr_model)
+# rgr_summary <- summary(rgr_model)
 # str(rgr_summary)
 var_names <- c("Intercept","Distance","Pct. light","Forest age: young","Herbivory")
 # rgr_fixed <- as.data.frame(rgr_summary$coefficients)
@@ -2168,6 +2169,7 @@ rgr_scaled_coef <- cbind(rgr_scaled_coef, rgr_confint)
 write.csv(rgr_scaled_coef, "model_output_data/rgr_fixed_coef.csv")
 ```
 
+**Scaled coefficient estimates (relative effects) ±95% confidence intervals for effects of distance, forest age, available light, and herbivory on relative growth rate**
 
 ```{r rgr-fixef-plot}
 
@@ -2216,6 +2218,7 @@ Conditional and marginal R^2^ estimated for the diameter model `r MuMIn::r.squar
 
 The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.
 
+**Plot marginal effect of distance on relative growth rate for each species**
 ```{r sjplot-rgr}
 
 # sjPlot::sjp.lmer(rgr_model, type = "ri.slope")
@@ -2226,7 +2229,7 @@ rgr_distance <- rgr_sjplot$plot[[5]]
   # geom_abline(intercept = rgr_summary$coefficients[1,1], slope = -(1/3))
   # geom_line() +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
-  scale_color_brewer(palette = 7) +
+  scale_color_brewer(palette = "BrBG") +
   labs(y = "Relative growth rate (% / day)", x = "Distance", title = "") +
   theme_classic() +
   theme(legend.title = element_blank())
@@ -2234,7 +2237,7 @@ rgr_distance <- rgr_sjplot$plot[[5]]
 
 ```
 
-
+**Plot the random-slope-random-intercept for the marginal effect of herbiory on the relative growth rate of each species**
 ```{r rgr-herbiv-by-species}
 
 rgr_rsri_sjplot <- sjPlot::sjp.lmer(rmod_herbiv3, type = "rs.ri", show.legend = T, prnt.plot = F)# avg herbiv. incidence
@@ -2256,7 +2259,7 @@ rgr_rsri_plot <- rgr_rsri_sjplot$plot[[1]]
 ```
 
 
-## Multipanel figure of growth model results
+## Multipanel figures of growth model results: figures 1-3
 
 ```{r fig1-growth-fixed-coefs, fig.width=8, fig.height=3}
 
