@@ -118,7 +118,7 @@ $(document).ready(function () {
 
 
 <h1 class="title toc-ignore">Edge effects on species establishement, growth and survival in an experimental plant invasion</h1>
-<h4 class="date"><em>22 March, 2018</em></h4>
+<h4 class="date"><em>30 March, 2018</em></h4>
 
 </div>
 
@@ -150,10 +150,16 @@ $(document).ready(function () {
 <li><a href="#model-coefficients">Model coefficients</a></li>
 </ul></li>
 <li><a href="#diameter-model">Diameter model</a></li>
-<li><a href="#relative-growth-rate-model">Relative growth rate model</a></li>
+<li><a href="#relative-growth-rate-model">Relative growth rate model</a><ul>
+<li><a href="#plots-of-random-effects-from-rgr-model">Plots of random effects from RGR model</a></li>
+<li><a href="#plot-of-fixed-effects-from-rgr-model">Plot of fixed effects from RGR model</a></li>
+</ul></li>
+<li><a href="#multipanel-figures-of-growth-model-results-figures-1-3">Multipanel figures of growth model results: figures 1-3</a></li>
 <li><a href="#growth-performance-results">Growth performance results</a></li>
 <li><a href="#percent-germination-model">Percent germination model</a></li>
-<li><a href="#seedling-survival-model">Seedling survival model</a></li>
+<li><a href="#seedling-survival-model">Seedling survival model</a><ul>
+<li><a href="#survival-model-random-intercepts">Survival model random intercepts</a></li>
+</ul></li>
 <li><a href="#germination-and-survival-results">Germination and survival results</a></li>
 <li><a href="#site-level-effects">Site-level effects</a></li>
 <li><a href="#herbivory-model">Herbivory model</a></li>
@@ -238,26 +244,26 @@ $(document).ready(function () {
 <section id="trees" class="level2">
 <h2>Trees</h2>
 <p>A 10-BAF wedge prism was used to quantify basal area. We identified and measured the DBH of the five nearest trees that were counted as “in” using the wedge prism.</p>
-<p><img src="analysis_files/figure-html/trees-1.png" width="4200" /><img src="analysis_files/figure-html/trees-2.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/trees-1.png" width="2100" /><img src="analysis_files/figure-html/trees-2.png" width="2100" /></p>
 <p>Basal area essentially defines young (&lt;40 years) vs. mature forest (&gt;60 years), although the difference is much smaller at the edge (i.e. 0 m).</p>
 </section>
 <section id="light-availability" class="level2">
 <h2>Light availability</h2>
 <p>In the summer of 2005, photosynthetically active radiation (PAR) was measured as photosynthetic photon flux density (PPFD) at five locations at each distance at each site along a 5 m long transect parallel to the road. From these measurements, we calculated the percent available light at each location as the ratio of the PAR value to the PAR value measured in open sun.</p>
-<p><img src="analysis_files/figure-html/light-1.png" width="4200" /><img src="analysis_files/figure-html/light-2.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/light-1.png" width="2100" /><img src="analysis_files/figure-html/light-2.png" width="2100" /></p>
 <p>Light availability decreases with distance to road with no overall difference between forest age, however, there is substantial variation within and between forest age depending on the specific distance. Averaged across forest age, light availability was greater at the forest edge (0 m) compared to other distances. At mature forest sites, light availability was greatest at the forest edge (0 m), but at young forest sites it was greatest at 20 m from the edge.</p>
 <p>Basically this is a noisy and non-linear relationship. What I would generally expect is relatively high light availability at the edge, then a rapid decline to a steady-state as you move into the forest.</p>
 </section>
 <section id="soil-moisture" class="level2">
 <h2>Soil moisture</h2>
 <p>In the summer of 2005, we also collected 125 cm<sup>3</sup> mineral soil samples at the center of each 5 m transect to measure gravimetric water content.</p>
-<p><img src="analysis_files/figure-html/soil-1.png" width="4200" /><img src="analysis_files/figure-html/soil-2.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/soil-1.png" width="2100" /><img src="analysis_files/figure-html/soil-2.png" width="2100" /></p>
 <p>Overall, soil moisture incarease further from the edge (p = .055), with a stronger relationship at young forest sites than mature forest sites (not significant except at 60 m). Still, the effective difference in the average soil moisture is only a couple percentage points.</p>
 </section>
 <section id="litter" class="level2">
 <h2>Litter</h2>
 <p>We collected leaf litter from within a 25 cm x 25 cm PVC frame at each of the six distances from roads at each site in December 2008</p>
-<p><img src="analysis_files/figure-html/litter-1.png" width="4200" /><img src="analysis_files/figure-html/litter-2.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/litter-1.png" width="2100" /><img src="analysis_files/figure-html/litter-2.png" width="2100" /></p>
 <p>Litter is greater in mature forests than young forests, but decreases with distance from edge after 5 meters in mature forests and increases with distance from edge in young forests. Litter may be especially important for modeling germination.</p>
 <hr />
 </section>
@@ -267,7 +273,7 @@ $(document).ready(function () {
 <p>For all of these, the solid-fill symbols should be the non-native species.</p>
 <section id="experiment-1-seed-germination" class="level2">
 <h2>Experiment 1: Seed germination</h2>
-<p><img src="analysis_files/figure-html/germination-1.png" width="4200" /><img src="analysis_files/figure-html/germination-2.png" width="4200" /><img src="analysis_files/figure-html/germination-3.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/germination-1.png" width="2100" /><img src="analysis_files/figure-html/germination-2.png" width="2100" /><img src="analysis_files/figure-html/germination-3.png" width="2100" /></p>
 <p>Although the relationship between germination and distance from edge was non-linaer, germination was greater overall for non-native than native species and tended to increase with distance for both groups in mature forests. In young forests, germination of native species had a small negative relationship with distance from edge. The greater germination success of non-native species was driven by autumnn olive, which had the highest average germination rate in each forest age (mature: 67.191358, young: 44.0744631).</p>
 <table>
 <caption>Average germination (%) of seeds for each species in each forest age.</caption>
@@ -334,7 +340,7 @@ $(document).ready(function () {
 ##  [5] &quot;species&quot;        &quot;status&quot;         &quot;habitat_type&quot;   &quot;f_habitat&quot;     
 ##  [9] &quot;common_name&quot;    &quot;avg_basal_area&quot; &quot;avg_pct_light&quot;  &quot;litter_kg_m2&quot;  
 ## [13] &quot;pct_moisture&quot;   &quot;year&quot;           &quot;survival&quot;</code></pre>
-<p><img src="analysis_files/figure-html/survival-1.png" width="4200" /><img src="analysis_files/figure-html/survival-2.png" width="4200" /><img src="analysis_files/figure-html/survival-3.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/survival-1.png" width="2100" /><img src="analysis_files/figure-html/survival-2.png" width="2100" /><img src="analysis_files/figure-html/survival-3.png" width="2100" /></p>
 <table>
 <caption>Proportion of seedlings of each species surviving to 2006</caption>
 <thead>
@@ -396,39 +402,25 @@ $(document).ready(function () {
 </section>
 <section id="seedling-height" class="level3">
 <h3>Seedling height</h3>
-<p><img src="analysis_files/figure-html/seedling_height-1.png" width="4200" /><img src="analysis_files/figure-html/seedling_height-2.png" width="4200" /><img src="analysis_files/figure-html/seedling_height-3.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/seedling_height-1.png" width="2100" /><img src="analysis_files/figure-html/seedling_height-2.png" width="2100" /><img src="analysis_files/figure-html/seedling_height-3.png" width="2100" /></p>
 </section>
 <section id="seedling-diameter" class="level3">
 <h3>Seedling diameter</h3>
-<p><img src="analysis_files/figure-html/seedling_diameter-1.png" width="4200" /><img src="analysis_files/figure-html/seedling_diameter-2.png" width="4200" /><img src="analysis_files/figure-html/seedling_diameter-3.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/seedling_diameter-1.png" width="2100" /><img src="analysis_files/figure-html/seedling_diameter-2.png" width="2100" /><img src="analysis_files/figure-html/seedling_diameter-3.png" width="2100" /></p>
 </section>
 <section id="seedling-biomass" class="level3">
 <h3>Seedling biomass</h3>
-<p><img src="analysis_files/figure-html/seedling_biomass-1.png" width="4200" /><img src="analysis_files/figure-html/seedling_biomass-2.png" width="4200" /><img src="analysis_files/figure-html/seedling_biomass-3.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/seedling_biomass-1.png" width="2100" /><img src="analysis_files/figure-html/seedling_biomass-2.png" width="2100" /><img src="analysis_files/figure-html/seedling_biomass-3.png" width="2100" /></p>
 </section>
 <section id="seedling-relative-growth-rate-height" class="level3">
 <h3>Seedling relative growth rate (height)</h3>
-<p><img src="analysis_files/figure-html/rel_growth-1.png" width="4200" /><img src="analysis_files/figure-html/rel_growth-2.png" width="4200" /><img src="analysis_files/figure-html/rel_growth-3.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/rel_growth-1.png" width="2100" /><img src="analysis_files/figure-html/rel_growth-2.png" width="2100" /><img src="analysis_files/figure-html/rel_growth-3.png" width="2100" /></p>
 </section>
 <section id="seedling-herbivory" class="level3">
 <h3>Seedling herbivory</h3>
-<pre><code>## # A tibble: 20,160 x 12
-##    site… site… age   dist… spec… stat… habi… f_ha… comm… year  herb… surv…
-##    &lt;chr&gt; &lt;chr&gt; &lt;chr&gt; &lt;int&gt; &lt;chr&gt; &lt;fct&gt; &lt;dbl&gt; &lt;fct&gt; &lt;fct&gt; &lt;chr&gt; &lt;int&gt; &lt;int&gt;
-##  1 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      1     1
-##  2 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      1     1
-##  3 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      1     1
-##  4 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      1     1
-##  5 Cica… CH    Youn…     0 D     Nati…     0 0-5 m Dogw… 2004      0     1
-##  6 Cica… CH    Youn…     0 D     Nati…     0 0-5 m Dogw… 2004      0     1
-##  7 Cica… CH    Youn…     0 D     Nati…     0 0-5 m Dogw… 2004      0     1
-##  8 Cica… CH    Youn…     0 D     Nati…     0 0-5 m Dogw… 2004      0     1
-##  9 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      2     1
-## 10 Cica… CH    Youn…     0 R     Nati…     0 0-5 m Redb… 2004      2     1
-## # ... with 20,150 more rows</code></pre>
-<p><img src="analysis_files/figure-html/herbivory-1.png" width="4200" /><img src="analysis_files/figure-html/herbivory-2.png" width="4200" /><img src="analysis_files/figure-html/herbivory-3.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/herbivory-1.png" width="2100" /><img src="analysis_files/figure-html/herbivory-2.png" width="2100" /><img src="analysis_files/figure-html/herbivory-3.png" width="2100" /></p>
 <p>We’ve settled on doing a model to try and explain herbivory. First, I’m looking at whether there was any clear pattern in herbivory from year to year.</p>
-<p><img src="analysis_files/figure-html/herbiv-by-year-1.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/herbiv-by-year-1.png" width="2100" /></p>
 <p>In young forests, herbivory increased with distance from edge for both native and non-native species, but decreased with distance from edge for native species in mature forests. There was no relationship between distance from edge and herbivory for non-native species in mature forests. Herbivory was greater on native than non-native species in both forest types.</p>
 <p>Herbivory was categorized as leaf-loss, where 0 = no herbivory, 1 = ≤25%, 2 = 26-50%, 3 = 51-75%, 4 = 76-99%, and 5 = 100% leaf removal by herbivores.</p>
 <p>What kind of herbivory might this be: Defoliators.</p>
@@ -457,216 +449,110 @@ $(document).ready(function () {
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
 ## Formula: 
-## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_herbivory_04 +  
-##     (1 | site_code) + (1 | common_name)
+## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_h_incidence +  
+##     (1 | site_code) + (avg_h_incidence | common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 828.7
+## REML criterion at convergence: 825.2
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -3.1361 -0.5542 -0.0557  0.5871  3.2175 
+## -3.3318 -0.5318 -0.0400  0.5916  3.0967 
 ## 
 ## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.13764  0.3710  
-##  common_name (Intercept) 0.04428  0.2104  
-##  Residual                0.39638  0.6296  
+##  Groups      Name            Variance Std.Dev. Corr 
+##  site_code   (Intercept)     0.1549   0.3935        
+##  common_name (Intercept)     0.1793   0.4234        
+##              avg_h_incidence 0.1535   0.3918   -0.87
+##  Residual                    0.3908   0.6252        
 ## Number of obs: 399, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                    Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)       -0.551535   0.194547  18.200000  -2.835 0.010893 *  
-## distance          -0.005048   0.001516 379.600000  -3.330 0.000954 ***
-## avg_pct_light      0.013127   0.002319 389.100000   5.660 2.94e-08 ***
-## f_age1             0.610356   0.223894   9.900000   2.726 0.021549 *  
-## avg_herbivory_04  -0.074450   0.041274 372.600000  -1.804 0.072067 .  
+##                   Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)      -0.862891   0.278443   9.500000  -3.099  0.01199 *  
+## distance         -0.004517   0.001521 376.400000  -2.970  0.00317 ** 
+## avg_pct_light     0.013307   0.002312 386.800000   5.754 1.77e-08 ***
+## f_age1            0.558324   0.236221  10.000000   2.364  0.03974 *  
+## avg_h_incidence   0.297297   0.232947   4.100000   1.276  0.26905    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) distnc avg_p_ f_age1
-## distance    -0.210                     
-## avg_pct_lgh -0.249  0.110              
-## f_age1      -0.560  0.007 -0.019       
-## avg_hrbv_04 -0.222  0.004  0.025 -0.062</code></pre>
-<pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
-##   to degrees of freedom [lmerMod]
-## Formula: 
-## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_h_incidence_05 +  
-##     (1 | site_code) + (1 | common_name)
-##    Data: site_grouped_data
-## 
-## REML criterion at convergence: 780.4
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -3.3922 -0.5452 -0.0282  0.5774  3.3355 
-## 
-## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.14914  0.3862  
-##  common_name (Intercept) 0.05772  0.2402  
-##  Residual                0.38458  0.6201  
-## Number of obs: 380, groups:  site_code, 12; common_name, 6
-## 
-## Fixed effects:
-##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)         -0.855374   0.217865  22.900000  -3.926  0.00068 ***
-## distance            -0.004875   0.001535 360.700000  -3.176  0.00162 ** 
-## avg_pct_light        0.013120   0.002329 369.800000   5.634  3.5e-08 ***
-## f_age1               0.615474   0.232250   9.900000   2.650  0.02459 *  
-## avg_h_incidence_05   0.300944   0.115000 365.300000   2.617  0.00924 ** 
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) distnc avg_p_ f_age1
-## distance    -0.201                     
-## avg_pct_lgh -0.211  0.117              
-## f_age1      -0.544  0.004 -0.021       
-## avg_h_nc_05 -0.392  0.028 -0.023  0.040</code></pre>
-<pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
-##   to degrees of freedom [lmerMod]
-## Formula: 
-## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_h_incidence_06 +  
-##     (1 | site_code) + (1 | common_name)
-##    Data: site_grouped_data
-## 
-## REML criterion at convergence: 764.9
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -3.3164 -0.5285 -0.0163  0.5972  3.1811 
-## 
-## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.14792  0.3846  
-##  common_name (Intercept) 0.06809  0.2609  
-##  Residual                0.37975  0.6162  
-## Number of obs: 374, groups:  site_code, 12; common_name, 6
-## 
-## Fixed effects:
-##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)         -0.817683   0.220857  22.300000  -3.702 0.001219 ** 
-## distance            -0.005625   0.001553 354.900000  -3.623 0.000334 ***
-## avg_pct_light        0.012715   0.002348 363.800000   5.415 1.11e-07 ***
-## f_age1               0.593144   0.231220   9.800000   2.565 0.028549 *  
-## avg_h_incidence_06   0.274227   0.115548 356.800000   2.373 0.018160 *  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) distnc avg_p_ f_age1
-## distance    -0.178                     
-## avg_pct_lgh -0.198  0.131              
-## f_age1      -0.524  0.007 -0.016       
-## avg_h_nc_06 -0.379 -0.032 -0.057  0.008</code></pre>
-<pre><code>## [1] 781.3155</code></pre>
-<pre><code>##       R2m       R2c 
-## 0.2132277 0.4984883</code></pre>
-<pre><code>## [1] 841.6625</code></pre>
-<pre><code>##       R2m       R2c 
-## 0.2012321 0.4677353</code></pre>
-<pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
-##   to degrees of freedom [lmerMod]
-## Formula: 
-## log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_h_incidence_06 +  
-##     (1 | site_code) + (1 | common_name)
-##    Data: site_grouped_data
-## 
-## REML criterion at convergence: 764.9
-## 
-## Scaled residuals: 
-##     Min      1Q  Median      3Q     Max 
-## -3.3164 -0.5285 -0.0163  0.5972  3.1811 
-## 
-## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.14792  0.3846  
-##  common_name (Intercept) 0.06809  0.2609  
-##  Residual                0.37975  0.6162  
-## Number of obs: 374, groups:  site_code, 12; common_name, 6
-## 
-## Fixed effects:
-##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)         -0.817683   0.220857  22.300000  -3.702 0.001219 ** 
-## distance            -0.005625   0.001553 354.900000  -3.623 0.000334 ***
-## avg_pct_light        0.012715   0.002348 363.800000   5.415 1.11e-07 ***
-## f_age1               0.593144   0.231220   9.800000   2.565 0.028549 *  
-## avg_h_incidence_06   0.274227   0.115548 356.800000   2.373 0.018160 *  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Correlation of Fixed Effects:
-##             (Intr) distnc avg_p_ f_age1
-## distance    -0.178                     
-## avg_pct_lgh -0.198  0.131              
-## f_age1      -0.524  0.007 -0.016       
-## avg_h_nc_06 -0.379 -0.032 -0.057  0.008</code></pre>
-<p><img src="analysis_files/figure-html/final-biomass-model-1.png" width="4200" /><img src="analysis_files/figure-html/final-biomass-model-2.png" width="4200" /><img src="analysis_files/figure-html/final-biomass-model-3.png" width="4200" /><img src="analysis_files/figure-html/final-biomass-model-4.png" width="4200" /></p>
+## distance    -0.167                     
+## avg_pct_lgh -0.153  0.114              
+## f_age1      -0.419  0.000 -0.018       
+## avg_h_ncdnc -0.700  0.032 -0.030 -0.005</code></pre>
+<p><img src="analysis_files/figure-html/final-biomass-model-1.png" width="2100" /><img src="analysis_files/figure-html/final-biomass-model-2.png" width="2100" /><img src="analysis_files/figure-html/final-biomass-model-3.png" width="2100" /><img src="analysis_files/figure-html/final-biomass-model-4.png" width="2100" /></p>
+<p><img src="analysis_files/figure-html/diagnostics%20with%20sjPlot-1.png" width="2100" /></p>
+<pre><code>## [[1]]</code></pre>
+<p><img src="analysis_files/figure-html/diagnostics%20with%20sjPlot-2.png" width="2100" /></p>
+<pre><code>## 
+## [[2]]</code></pre>
+<p><img src="analysis_files/figure-html/diagnostics%20with%20sjPlot-3.png" width="2100" /></p>
+<pre><code>## 
+## [[3]]</code></pre>
+<p><img src="analysis_files/figure-html/diagnostics%20with%20sjPlot-4.png" width="2100" /></p>
+<pre><code>## 
+## [[4]]</code></pre>
+<p><img src="analysis_files/figure-html/diagnostics%20with%20sjPlot-5.png" width="2100" /></p>
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
 ## Formula: log(avg_biomass) ~ scaled_distance + scaled_pct_light + f_age +  
-##     scaled_herbiv_incidence + (1 | site_code) + (1 | common_name)
+##     scaled_herbiv_incidence + (1 | site_code) + (scaled_herbiv_incidence |  
+##     common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 750.7
+## REML criterion at convergence: 811.6
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -3.3164 -0.5285 -0.0163  0.5972  3.1811 
+## -3.3318 -0.5318 -0.0400  0.5916  3.0967 
 ## 
 ## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.14792  0.3846  
-##  common_name (Intercept) 0.06809  0.2609  
-##  Residual                0.37975  0.6162  
-## Number of obs: 374, groups:  site_code, 12; common_name, 6
+##  Groups      Name                    Variance Std.Dev. Corr 
+##  site_code   (Intercept)             0.15487  0.3935        
+##  common_name (Intercept)             0.05110  0.2261        
+##              scaled_herbiv_incidence 0.03647  0.1910   -0.39
+##  Residual                            0.39084  0.6252        
+## Number of obs: 399, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
 ##                          Estimate Std. Error        df t value Pr(&gt;|t|)
-## (Intercept)              -0.36735    0.19849  14.90000  -1.851 0.084170
-## scaled_distance          -0.33753    0.09317 354.90000  -3.623 0.000334
-## scaled_pct_light          0.38868    0.07178 363.80000   5.415 1.11e-07
-## f_age1                    0.59314    0.23122   9.80000   2.565 0.028549
-## scaled_herbiv_incidence   0.18216    0.07675 356.80000   2.373 0.018160
+## (Intercept)              -0.39061    0.19511  14.90000  -2.002  0.06387
+## scaled_distance          -0.27099    0.09123 376.40000  -2.970  0.00317
+## scaled_pct_light          0.40678    0.07069 386.80000   5.754 1.77e-08
+## f_age1                    0.55832    0.23622  10.00000   2.364  0.03974
+## scaled_herbiv_incidence   0.14488    0.11352   4.10000   1.276  0.26905
 ##                            
 ## (Intercept)             .  
-## scaled_distance         ***
+## scaled_distance         ** 
 ## scaled_pct_light        ***
 ## f_age1                  *  
-## scaled_herbiv_incidence *  
+## scaled_herbiv_incidence    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) scld_d scld_p_ f_age1
-## scald_dstnc -0.182                      
-## scld_pct_lg -0.015  0.131               
-## f_age1      -0.584  0.007 -0.016        
-## scld_hrbv_n -0.004 -0.032 -0.057   0.008</code></pre>
+## scald_dstnc -0.185                      
+## scld_pct_lg -0.014  0.114               
+## f_age1      -0.607  0.000 -0.018        
+## scld_hrbv_n -0.148  0.032 -0.030  -0.005</code></pre>
 </section>
 <section id="model-coefficients" class="level3">
 <h3>Model coefficients</h3>
-<p><img src="analysis_files/figure-html/biomass-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/biomass-ranef-plot-2.png" width="4200" /></p>
-<p><img src="analysis_files/figure-html/biomass-fixef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/biomass-fixef-plot-2.png" width="4200" /></p>
-<p>Conditional and marginal R<sup>2</sup> of the biomass model 0.2132277, 0.4984883</p>
+<p><img src="analysis_files/figure-html/biomass-species-ranef-plot-1.png" width="2100" /></p>
+<p><strong>Random intercepts for each species (above) and each site (below). These are the difference between the estimated intercept across all the groups and the intercept estimated for each group.</strong></p>
+<p><img src="analysis_files/figure-html/biomass-site-ranef-plot-1.png" width="2100" /></p>
+<p><img src="analysis_files/figure-html/biomass-fixef-plot-1.png" width="2100" /></p>
+<p>Conditional and marginal R<sup>2</sup> of the biomass model 0.197436, 0.482019 AIC: 845.757346</p>
 <p>All species generated more aboveground biomass in young forests and at locations with greater light availability. Biomass production decreased with distance from the road/forest edge and (interestingly) with greater soil moisture, however, there was a significant interaction between distance and soil moisture indicating greater soil moisture at distances farther from the edge.</p>
 <p>The random intercepts for each species show that native species generated less biomass than non-native species, with spicebush and dogwood performing particularly poorly. For the non-native species, privet and autumn olive were especially good at amassing biomass, with honeysuckle performing slightly less well.</p>
 <p>Site-level biomass production was greater at CH, PR, LD, and SR, while lower at DG, FR, and GR. The intercepts for the other five sites all had confidence error estimates crossing zero, with absolute values of the intercepts &lt;0.12.</p>
-<p>I’m exploring making plots of the marginal effects for each group in the random effects, particulalry for species, with special interest in the relationship with distance (edge effects). <img src="analysis_files/figure-html/sjPlot-biomass-1.png" width="4200" /></p>
-<pre><code>## [[1]]</code></pre>
-<p><img src="analysis_files/figure-html/sjPlot-biomass-2.png" width="4200" /></p>
-<pre><code>## 
-## [[2]]</code></pre>
-<p><img src="analysis_files/figure-html/sjPlot-biomass-3.png" width="4200" /></p>
-<pre><code>## 
-## [[3]]</code></pre>
-<p><img src="analysis_files/figure-html/sjPlot-biomass-4.png" width="4200" /></p>
-<pre><code>## 
-## [[4]]</code></pre>
-<p><img src="analysis_files/figure-html/sjPlot-biomass-5.png" width="4200" /> <img src="analysis_files/figure-html/sjPlot-biomass-6.png" width="4200" /><img src="analysis_files/figure-html/sjPlot-biomass-7.png" width="4200" /><img src="analysis_files/figure-html/sjPlot-biomass-8.png" width="4200" /></p>
+<p>I’m exploring making plots of the marginal effects for each group in the random effects, particulalry for species, with special interest in the relationship with distance (edge effects).</p>
+<p><strong>Plot the marginal effect of distance on biomass for each species</strong> <img src="analysis_files/figure-html/marginal-biomass-distance-plot-1.png" width="2100" /></p>
+<p><strong>Plot the random-slope-random-intercept for the effect of herbivory on the biomass for each species</strong> <img src="analysis_files/figure-html/biomass-herbiv-rsri-plot-1.png" width="2100" /></p>
 <p><del>What about fitting a separate models for each species? I don’t think this is necessary unless we want to be able to say something specific about the relationship between the response and specific predictors for each species. I think it is reasonable to assume that the plants generally respond similarly to things like soil moisture and light availability.</del></p>
 </section>
 </section>
@@ -675,152 +561,284 @@ $(document).ready(function () {
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
 ## Formula: 
-## log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 +  
-##     (1 | site_code) + (1 | common_name)
+## log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence +  
+##     (1 | site_code) + (avg_h_incidence | common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 73.1
+## REML criterion at convergence: 75.9
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -2.8816 -0.5938 -0.0050  0.5799  3.5611 
+## -2.9310 -0.6075 -0.0299  0.5965  3.4089 
 ## 
 ## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.013953 0.11812 
-##  common_name (Intercept) 0.006426 0.08016 
-##  Residual                0.059316 0.24355 
-## Number of obs: 374, groups:  site_code, 12; common_name, 6
+##  Groups      Name            Variance Std.Dev. Corr 
+##  site_code   (Intercept)     0.01483  0.1218        
+##  common_name (Intercept)     0.02946  0.1716        
+##              avg_h_incidence 0.02873  0.1695   -0.96
+##  Residual                    0.05940  0.2437        
+## Number of obs: 399, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)         8.099e-01  7.321e-02  2.680e+01  11.063 1.70e-11 ***
-## distance           -1.411e-03  6.134e-04  3.556e+02  -2.300   0.0220 *  
-## avg_pct_light       4.114e-03  9.219e-04  3.632e+02   4.462 1.08e-05 ***
-## ageYoung forest     2.006e-01  7.280e-02  9.900e+00   2.756   0.0204 *  
-## avg_h_incidence_06  9.376e-02  4.520e-02  3.395e+02   2.074   0.0388 *  
+##                   Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)      7.577e-01  1.036e-01  8.800e+00   7.313 5.06e-05 ***
+## distance        -9.749e-04  5.924e-04  3.785e+02  -1.646   0.1007    
+## avg_pct_light    4.297e-03  8.967e-04  3.877e+02   4.792 2.35e-06 ***
+## ageYoung forest  1.874e-01  7.466e-02  1.010e+01   2.511   0.0308 *  
+## avg_h_incidence  1.551e-01  9.532e-02  4.700e+00   1.627   0.1687    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) distnc avg_p_ agYngf
-## distance    -0.212                     
-## avg_pct_lgh -0.234  0.130              
-## ageYongfrst -0.499  0.008 -0.020       
-## avg_h_nc_06 -0.447 -0.032 -0.060  0.010</code></pre>
-<p><img src="analysis_files/figure-html/final%20diameter%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20diameter%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20diameter%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20diameter%20model-4.png" width="4200" /><img src="analysis_files/figure-html/final%20diameter%20model-5.png" width="4200" /></p>
+## distance    -0.178                     
+## avg_pct_lgh -0.161  0.113              
+## ageYongfrst -0.354  0.000 -0.022       
+## avg_h_ncdnc -0.799  0.034 -0.026 -0.007</code></pre>
+<p><img src="analysis_files/figure-html/final%20diameter%20model-1.png" width="2100" /><img src="analysis_files/figure-html/final%20diameter%20model-2.png" width="2100" /><img src="analysis_files/figure-html/final%20diameter%20model-3.png" width="2100" /><img src="analysis_files/figure-html/final%20diameter%20model-4.png" width="2100" /><img src="analysis_files/figure-html/final%20diameter%20model-5.png" width="2100" /></p>
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
 ## Formula: log(avg_diameter) ~ scaled_distance + scaled_pct_light + age +  
-##     scaled_herbiv_incidence + (1 | site_code) + (1 | common_name)
+##     scaled_herbiv_incidence + (1 | site_code) + (scaled_herbiv_incidence |  
+##     common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 58.8
+## REML criterion at convergence: 62.3
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -2.8816 -0.5938 -0.0050  0.5799  3.5611 
+## -2.9310 -0.6075 -0.0299  0.5965  3.4089 
 ## 
 ## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.013953 0.11812 
-##  common_name (Intercept) 0.006426 0.08016 
-##  Residual                0.059316 0.24355 
-## Number of obs: 374, groups:  site_code, 12; common_name, 6
+##  Groups      Name                    Variance Std.Dev. Corr 
+##  site_code   (Intercept)             0.014825 0.12176       
+##  common_name (Intercept)             0.004222 0.06497       
+##              scaled_herbiv_incidence 0.006824 0.08261  -0.66
+##  Residual                            0.059404 0.24373       
+## Number of obs: 399, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
 ##                          Estimate Std. Error        df t value Pr(&gt;|t|)
-## (Intercept)               0.95930    0.06266  15.10000  15.309 1.30e-10
-## scaled_distance          -0.08464    0.03681 355.60000  -2.300   0.0220
-## scaled_pct_light          0.12575    0.02818 363.20000   4.462 1.08e-05
-## ageYoung forest           0.20064    0.07280   9.90000   2.756   0.0204
-## scaled_herbiv_incidence   0.06228    0.03003 339.50000   2.074   0.0388
+## (Intercept)               0.95266    0.06122  15.10000  15.561 1.00e-10
+## scaled_distance          -0.05850    0.03555 378.50000  -1.646   0.1007
+## scaled_pct_light          0.13136    0.02741 387.70000   4.792 2.35e-06
+## ageYoung forest           0.18744    0.07466  10.10000   2.511   0.0308
+## scaled_herbiv_incidence   0.07557    0.04645   4.70000   1.627   0.1687
 ##                            
 ## (Intercept)             ***
-## scaled_distance         *  
+## scaled_distance            
 ## scaled_pct_light        ***
 ## ageYoung forest         *  
-## scaled_herbiv_incidence *  
+## scaled_herbiv_incidence    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) scld_d scld_p_ agYngf
-## scald_dstnc -0.228                      
-## scld_pct_lg -0.019  0.130               
-## ageYongfrst -0.583  0.008 -0.020        
-## scld_hrbv_n -0.005 -0.032 -0.060   0.010</code></pre>
-<p><img src="analysis_files/figure-html/diameter-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/diameter-ranef-plot-2.png" width="4200" /></p>
-<p><img src="analysis_files/figure-html/diameter-fixef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/diameter-fixef-plot-2.png" width="4200" /></p>
-<p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1772482, 0.3876369</p>
-<p>Seedling diameter increased with light availability and was greater in younger forests, but decreased with distance.</p>
-<p><img src="analysis_files/figure-html/sjplot-diameter-1.png" width="4200" /><img src="analysis_files/figure-html/sjplot-diameter-2.png" width="4200" /><img src="analysis_files/figure-html/sjplot-diameter-3.png" width="4200" /></p>
+## scald_dstnc -0.231                      
+## scld_pct_lg -0.017  0.113               
+## ageYongfrst -0.613  0.000 -0.022        
+## scld_hrbv_n -0.242  0.034 -0.026  -0.007</code></pre>
+<p><img src="analysis_files/figure-html/diameter-species-ranef-plot-1.png" width="2100" /></p>
+<p><strong>Random effects for species and site on diameter growth response</strong></p>
+<p><img src="analysis_files/figure-html/diameter-site-ranef-plot-1.png" width="2100" /></p>
+<p><strong>Coefficient estimates (±95% confidence intervals) on the diameter growth response</strong></p>
+<p><img src="analysis_files/figure-html/diameter-fixef-plot-1.png" width="2100" /></p>
+<p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1717468, 0.3856731 AIC: 82.8482168</p>
+<p>Seedling diameter increased with light availability, was greater in younger forests, (not significantly) decreased with distance, and (not significantly) increased with herbivory.</p>
+<p><strong>Plot marginal effect of distance on diameter growth for each species</strong> <img src="analysis_files/figure-html/sjplot-diameter-1.png" width="2100" /></p>
+<p><strong>Plot the random-slope-random-intercept for the marginal effect of herbivory on the diameter of each species</strong> <img src="analysis_files/figure-html/diam-herbiv-rsri-plot-1.png" width="2100" /></p>
 </section>
 <section id="relative-growth-rate-model" class="level2">
 <h2>Relative growth rate model</h2>
 <p>The units of relative growth rate are percent change per day (I think).</p>
-<p>Do we actually want to test/know what the slope/intercept interaction is between distance and species as a rondom component??</p>
+<p>Final rgr model</p>
 <pre><code>## Linear mixed model fit by REML t-tests use Satterthwaite approximations
 ##   to degrees of freedom [lmerMod]
-## Formula: 
-## log(avg_diameter) ~ distance + avg_pct_light + age + avg_h_incidence_06 +  
-##     (1 | site_code) + (1 | common_name)
+## Formula: avg_rgr_ht ~ distance + avg_pct_light + age + avg_h_incidence +  
+##     (1 | site_code) + (avg_h_incidence | common_name)
 ##    Data: site_grouped_data
 ## 
-## REML criterion at convergence: 73.1
+## REML criterion at convergence: 271.8
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -2.8816 -0.5938 -0.0050  0.5799  3.5611 
+## -3.4195 -0.5723 -0.0043  0.6231  2.7870 
 ## 
 ## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.013953 0.11812 
-##  common_name (Intercept) 0.006426 0.08016 
-##  Residual                0.059316 0.24355 
-## Number of obs: 374, groups:  site_code, 12; common_name, 6
+##  Groups      Name            Variance  Std.Dev. Corr
+##  site_code   (Intercept)     2.826e-02 0.16812      
+##  common_name (Intercept)     7.807e-03 0.08836      
+##              avg_h_incidence 5.882e-05 0.00767  1.00
+##  Residual                    9.774e-02 0.31264      
+## Number of obs: 399, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
-##                      Estimate Std. Error         df t value Pr(&gt;|t|)    
-## (Intercept)         8.099e-01  7.321e-02  2.680e+01  11.063 1.70e-11 ***
-## distance           -1.411e-03  6.134e-04  3.556e+02  -2.300   0.0220 *  
-## avg_pct_light       4.114e-03  9.219e-04  3.632e+02   4.462 1.08e-05 ***
-## ageYoung forest     2.006e-01  7.280e-02  9.900e+00   2.756   0.0204 *  
-## avg_h_incidence_06  9.376e-02  4.520e-02  3.395e+02   2.074   0.0388 *  
+##                   Estimate Std. Error         df t value Pr(&gt;|t|)    
+## (Intercept)      2.941e+00  1.027e-01  1.820e+01  28.652  &lt; 2e-16 ***
+## distance        -2.208e-03  7.529e-04  3.796e+02  -2.933 0.003564 ** 
+## avg_pct_light    4.210e-03  1.151e-03  3.892e+02   3.659 0.000288 ***
+## ageYoung forest  2.733e-01  1.021e-01  9.900e+00   2.677 0.023392 *  
+## avg_h_incidence  5.706e-02  7.945e-02  2.883e+02   0.718 0.473257    
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
 ##             (Intr) distnc avg_p_ agYngf
-## distance    -0.212                     
-## avg_pct_lgh -0.234  0.130              
-## ageYongfrst -0.499  0.008 -0.020       
-## avg_h_nc_06 -0.447 -0.032 -0.060  0.010</code></pre>
-<p><img src="analysis_files/figure-html/final%20rgr%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20rgr%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20rgr%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20rgr%20model-4.png" width="4200" /><img src="analysis_files/figure-html/final%20rgr%20model-5.png" width="4200" /></p>
-<pre><code>##              (Intercept)     distance avg_pct_light ageYoung forest
-## Autumn olive   0.8341711 -0.001410739   0.004113719       0.2006376
-## Honeysuckle    0.8577471 -0.001410739   0.004113719       0.2006376
-## Privet         0.9002381 -0.001410739   0.004113719       0.2006376
-## Dogwood        0.7319488 -0.001410739   0.004113719       0.2006376
-## Redbud         0.8264401 -0.001410739   0.004113719       0.2006376
-## Spicebush      0.7086994 -0.001410739   0.004113719       0.2006376
-##              avg_h_incidence_06
-## Autumn olive         0.09376174
-## Honeysuckle          0.09376174
-## Privet               0.09376174
-## Dogwood              0.09376174
-## Redbud               0.09376174
-## Spicebush            0.09376174</code></pre>
-<p><img src="analysis_files/figure-html/rgr-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/rgr-ranef-plot-2.png" width="4200" /></p>
-<p><img src="analysis_files/figure-html/rgr-fixef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/rgr-fixef-plot-2.png" width="4200" /></p>
-<p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1772482, 0.3876369</p>
+## distance    -0.209                     
+## avg_pct_lgh -0.200  0.109              
+## ageYongfrst -0.495  0.007 -0.018       
+## avg_h_ncdnc -0.531  0.024 -0.052 -0.006</code></pre>
+<p><img src="analysis_files/figure-html/final%20rgr%20model-1.png" width="2100" /><img src="analysis_files/figure-html/final%20rgr%20model-2.png" width="2100" /><img src="analysis_files/figure-html/final%20rgr%20model-3.png" width="2100" /><img src="analysis_files/figure-html/final%20rgr%20model-4.png" width="2100" /><img src="analysis_files/figure-html/final%20rgr%20model-5.png" width="2100" /></p>
+<section id="plots-of-random-effects-from-rgr-model" class="level3">
+<h3>Plots of random effects from RGR model</h3>
+<p><img src="analysis_files/figure-html/rgr-species-ranef-plot-1.png" width="2100" /></p>
+<p><strong>Random intercepts of species (above) and site (below) for the relative growth rate response</strong></p>
+<p><img src="analysis_files/figure-html/rgr-site-ranef-plot-1.png" width="2100" /></p>
+</section>
+<section id="plot-of-fixed-effects-from-rgr-model" class="level3">
+<h3>Plot of fixed effects from RGR model</h3>
+<p><strong>Scaled coefficient estimates (relative effects) ±95% confidence intervals for effects of distance, forest age, available light, and herbivory on relative growth rate</strong></p>
+<p><img src="analysis_files/figure-html/rgr-fixef-plot-1.png" width="2100" /></p>
+<p>Conditional and marginal R<sup>2</sup> estimated for the diameter model 0.1682798, 0.3970171</p>
 <p>The nonnative species autumn olive had the best performance in terms of relative growth rate (height), followed by privet. The native redbud and, and nonnative honeysuckle, had similar baseline performance in relative growth rate. Spicebush had the lowest relative growth rate. The effects of the explanatory variables on relative growth rate were all in the same directions as for diameter and biomass.</p>
-<p><img src="analysis_files/figure-html/sjplot-rgr-1.png" width="4200" /><img src="analysis_files/figure-html/sjplot-rgr-2.png" width="4200" /><img src="analysis_files/figure-html/sjplot-rgr-3.png" width="4200" /><img src="analysis_files/figure-html/sjplot-rgr-4.png" width="4200" /></p>
-<p><img src="analysis_files/figure-html/gridded-dot-line-plots-1.png" width="4200" /></p>
+<p><strong>Plot marginal effect of distance on relative growth rate for each species</strong> <img src="analysis_files/figure-html/sjplot-rgr-1.png" width="2100" /></p>
+<p><strong>Plot the random-slope-random-intercept for the marginal effect of herbiory on the relative growth rate of each species</strong> <img src="analysis_files/figure-html/rgr-herbiv-by-species-1.png" width="2100" /></p>
+</section>
+</section>
+<section id="multipanel-figures-of-growth-model-results-figures-1-3" class="level2">
+<h2>Multipanel figures of growth model results: figures 1-3</h2>
+<p><img src="analysis_files/figure-html/fig1-growth-fixed-coefs-1.png" width="2400" /></p>
+<p><strong>Fig. 1.:</strong> Coefficient estimates (and 95% confidence intervals) of scaled coefficients for distance, forest successional age, percent available light, and herbivory on biomass, diameter, and relative growth rate (height).</p>
+<p><img src="analysis_files/figure-html/fig2-species-growth-diff-1.png" width="2700" /></p>
+<p><strong>Fig. 2.:</strong> Differences between group intercepts and overall model intercepts (a, c, e) and the marginal effect of distance on growth metrics for each species (b, d, f).</p>
+<p>Data table to check intercept values on the figure.</p>
+<table>
+<thead>
+<tr class="header">
+<th style="text-align: left;">grp</th>
+<th style="text-align: right;">condval</th>
+<th style="text-align: right;">condsd</th>
+<th style="text-align: left;">response</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;">Autumn olive</td>
+<td style="text-align: right;">0.165</td>
+<td style="text-align: right;">0.100</td>
+<td style="text-align: left;">biomass</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Honeysuckle</td>
+<td style="text-align: right;">0.124</td>
+<td style="text-align: right;">0.096</td>
+<td style="text-align: left;">biomass</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Privet</td>
+<td style="text-align: right;">0.245</td>
+<td style="text-align: right;">0.098</td>
+<td style="text-align: left;">biomass</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dogwood</td>
+<td style="text-align: right;">-0.139</td>
+<td style="text-align: right;">0.104</td>
+<td style="text-align: left;">biomass</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Redbud</td>
+<td style="text-align: right;">-0.096</td>
+<td style="text-align: right;">0.124</td>
+<td style="text-align: left;">biomass</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Spicebush</td>
+<td style="text-align: right;">-0.298</td>
+<td style="text-align: right;">0.096</td>
+<td style="text-align: left;">biomass</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Autumn olive</td>
+<td style="text-align: right;">0.010</td>
+<td style="text-align: right;">0.032</td>
+<td style="text-align: left;">diameter</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Honeysuckle</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: right;">0.029</td>
+<td style="text-align: left;">diameter</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Privet</td>
+<td style="text-align: right;">0.070</td>
+<td style="text-align: right;">0.029</td>
+<td style="text-align: left;">diameter</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dogwood</td>
+<td style="text-align: right;">-0.048</td>
+<td style="text-align: right;">0.035</td>
+<td style="text-align: left;">diameter</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Redbud</td>
+<td style="text-align: right;">0.006</td>
+<td style="text-align: right;">0.046</td>
+<td style="text-align: left;">diameter</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Spicebush</td>
+<td style="text-align: right;">-0.083</td>
+<td style="text-align: right;">0.030</td>
+<td style="text-align: left;">diameter</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Autumn olive</td>
+<td style="text-align: right;">0.109</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: left;">rgr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Honeysuckle</td>
+<td style="text-align: right;">-0.026</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: left;">rgr</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Privet</td>
+<td style="text-align: right;">0.067</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: left;">rgr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Dogwood</td>
+<td style="text-align: right;">-0.022</td>
+<td style="text-align: right;">0.045</td>
+<td style="text-align: left;">rgr</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;">Redbud</td>
+<td style="text-align: right;">0.013</td>
+<td style="text-align: right;">0.044</td>
+<td style="text-align: left;">rgr</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;">Spicebush</td>
+<td style="text-align: right;">-0.140</td>
+<td style="text-align: right;">0.044</td>
+<td style="text-align: left;">rgr</td>
+</tr>
+</tbody>
+</table>
+<p><img src="analysis_files/figure-html/fig3-growth-herbiv-species-1.png" width="2100" /></p>
+<p><strong>Fig. 3.:</strong> Random-slope-intercept plots for the marginal effect of herbivory on the biomass (a) and diameter (b) of each species. The different slopes illustrate species specific responses to herbivory, where some increase growth while others maintain or have less growth.</p>
 </section>
 <section id="growth-performance-results" class="level2">
 <h2>Growth performance results</h2>
-<p>Seedling growth metrics of biomass, diameter, and relative growth rate of height all responded similarly to edge effects, moisture and light availability, and forest successional age. Growth increased with light availability and was greater in young forests and decreased with distance from edge and moisture availability. The nonnative species generally performed better than the native species, however, there was species specific variability among growth metrics. The nonnative species privet, autumn olive, and honeysuckle had the best performance in terms of above-ground biomass relative to the overall average, while the native dogwood and spicebush generated relatively small amounts of biomass. The average biomass produced by the native redbud was close to the overall average across all the species. Privet also showed the greatest increase in diameter relative to the other species, while dogwood and especially spicebush had relatively small increases in diameter. Autumn olive and privet had the two highest relative growth rates in height and spicebush had the lowest. Relative growth rates of redbud, dogwood, and honeysuckle were similar, and near the overall average across all species.</p>
+<p>Seedling growth (biomass, diameter, and relative growth rate of height) all responded similarly to edge effects, light availability, and forest successional age. Overall, herbivory was statistically insignificant but the effect was species dependent. Growth increased with light availability, was greater in young forests, and decreased with distance from the forest edge (Fig. 1). Although the nonnative species generally outperformed the native species there were species specific differences among growth metrics after accounting for distance from edge, forest age, light availability, and herbivory. The nonnative autumn olive, honeysuckle, and especially privet produced more above-ground biomass relative to the overall average, while the native dogwood and especially spicebush generated relatively small amounts of biomass (Fig. 2a). The biomass of the native redbud was near the overall average across all species. Privet also had the greatest diameter follwed by honeysuckle, while dogwood and especially spicebush had relatively small diameters (Fig. 2c). The diameters of the native redbud and nonnative autumn olive were near the overall average. Autumn olive had the highest relative growth rate in height followed by privet, and spicebush had the lowest. Relative growth rates of native redbud and dogwood and nonnative honeysuckle were near the overall average across all species (Fig. 2e).</p>
 </section>
 <section id="percent-germination-model" class="level2">
 <h2>Percent germination model</h2>
@@ -860,7 +878,7 @@ $(document).ready(function () {
 ## distance    -0.145              
 ## ageYongfrst -0.277  0.004       
 ## littr_kg_m2 -0.467  0.082  0.253</code></pre>
-<p><img src="analysis_files/figure-html/final%20germination%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-4.png" width="4200" /><img src="analysis_files/figure-html/final%20germination%20model-5.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/final%20germination%20model-1.png" width="2100" /><img src="analysis_files/figure-html/final%20germination%20model-2.png" width="2100" /><img src="analysis_files/figure-html/final%20germination%20model-3.png" width="2100" /><img src="analysis_files/figure-html/final%20germination%20model-4.png" width="2100" /><img src="analysis_files/figure-html/final%20germination%20model-5.png" width="2100" /></p>
 <pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
 ##   Approximation) [glmerMod]
 ##  Family: binomial  ( logit )
@@ -895,9 +913,12 @@ $(document).ready(function () {
 ## scald_dstnc -0.127              
 ## ageYongfrst -0.201  0.004       
 ## scld_ltt__2 -0.090  0.082  0.253</code></pre>
-<p><img src="analysis_files/figure-html/germ-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/germ-ranef-plot-2.png" width="4200" /></p>
-<p><img src="analysis_files/figure-html/germ-fixef-plot-1.png" width="4200" /></p>
-<p><img src="analysis_files/figure-html/sjplot-germination-1.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-2.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-3.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-4.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-5.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-6.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-7.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-8.png" width="4200" /><img src="analysis_files/figure-html/sjplot-germination-9.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/germ-species-ranef-plot-1.png" width="2100" /></p>
+<p><strong>Random intercepts for species (above) and site (below) for the germination probability</strong></p>
+<p><img src="analysis_files/figure-html/germ-site-ranef-plot-1.png" width="2100" /></p>
+<p><img src="analysis_files/figure-html/germ-fixef-plot-1.png" width="2100" /></p>
+<p><strong>Plot marginal effects of distance and litter on germination for each species</strong></p>
+<p><img src="analysis_files/figure-html/sjplot-germination-1.png" width="2100" /><img src="analysis_files/figure-html/sjplot-germination-2.png" width="2100" /></p>
 </section>
 <section id="seedling-survival-model" class="level2">
 <h2>Seedling survival model</h2>
@@ -941,54 +962,64 @@ $(document).ready(function () {
 <pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
 ##   Approximation) [glmerMod]
 ##  Family: binomial  ( logit )
-## Formula: 
-## cbind(alive, dead) ~ scaled_distance + age + scaled_litter_kg_m2 +  
-##     (1 | site_code) + (1 | common_name)
+## Formula: cbind(alive, dead) ~ scaled_distance + scaled_pct_light + age +  
+##     scaled_litter_kg_m2 + (1 | site_code) + (1 | common_name)
 ##    Data: survival_2006
 ## 
 ##      AIC      BIC   logLik deviance df.resid 
-##    998.8   1023.1   -493.4    986.8      413 
+##   1000.0   1028.2   -493.0    986.0      412 
 ## 
 ## Scaled residuals: 
 ##     Min      1Q  Median      3Q     Max 
-## -7.0152 -0.7619  0.3999  0.7006  3.0638 
+## -6.9157 -0.7926  0.4011  0.7040  2.9495 
 ## 
 ## Random effects:
 ##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.6959   0.8342  
-##  common_name (Intercept) 1.5121   1.2297  
+##  site_code   (Intercept) 0.7098   0.8425  
+##  common_name (Intercept) 1.5140   1.2304  
 ## Number of obs: 419, groups:  site_code, 12; common_name, 6
 ## 
 ## Fixed effects:
 ##                     Estimate Std. Error z value Pr(&gt;|z|)   
-## (Intercept)          1.78596    0.62285   2.867  0.00414 **
-## scaled_distance     -0.20750    0.19026  -1.091  0.27543   
-## ageYoung forest     -0.15033    0.50744  -0.296  0.76704   
-## scaled_litter_kg_m2  0.05921    0.08691   0.681  0.49567   
+## (Intercept)          1.77867    0.62501   2.846  0.00443 **
+## scaled_distance     -0.19566    0.19083  -1.025  0.30523   
+## scaled_pct_light     0.07872    0.08385   0.939  0.34787   
+## ageYoung forest     -0.14142    0.51208  -0.276  0.78241   
+## scaled_litter_kg_m2  0.08054    0.09026   0.892  0.37224   
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
 ## Correlation of Fixed Effects:
-##             (Intr) scld_d agYngf
-## scald_dstnc -0.126              
-## ageYongfrst -0.411  0.010       
-## scld_ltt__2 -0.062  0.001  0.156</code></pre>
-<p><img src="analysis_files/figure-html/final%20survival%20model-1.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-2.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-3.png" width="4200" /><img src="analysis_files/figure-html/final%20survival%20model-4.png" width="4200" /></p>
-<p><img src="analysis_files/figure-html/surv-ranef-plot-1.png" width="4200" /><img src="analysis_files/figure-html/surv-ranef-plot-2.png" width="4200" /></p>
-<p><img src="analysis_files/figure-html/surv-fixef-plot-1.png" width="4200" /></p>
+##             (Intr) scld_d scld__ agYngf
+## scald_dstnc -0.126                     
+## scld_pct_lg -0.010  0.063              
+## ageYongfrst -0.413  0.011  0.019       
+## scld_ltt__2 -0.062  0.014  0.255  0.154</code></pre>
+<p><img src="analysis_files/figure-html/final%20survival%20model-1.png" width="2100" /><img src="analysis_files/figure-html/final%20survival%20model-2.png" width="2100" /><img src="analysis_files/figure-html/final%20survival%20model-3.png" width="2100" /><img src="analysis_files/figure-html/final%20survival%20model-4.png" width="2100" /></p>
+<section id="survival-model-random-intercepts" class="level3">
+<h3>Survival model random intercepts</h3>
+<p><img src="analysis_files/figure-html/surv-species-ranef-plot-1.png" width="2100" /></p>
+<p><strong>Plots of random effects intercepts of species (above) and site (below) for the survival response</strong></p>
+<p><img src="analysis_files/figure-html/surv-site-ranef-plot-1.png" width="2100" /></p>
+<p><strong>Plot main effects of distance, forest age, and litter mass on survival</strong> Because no main effects were statistically significant during model fitting we used the same explanatory variables as germination to compare and contrast these two components of establishment.</p>
+<p><img src="analysis_files/figure-html/surv-fixef-plot-1.png" width="2100" /></p>
 <p>The estimated marginal and condiational R<sup>2</sup> values reinforce that the fixed effects don’t explain the variance in seedling survival:</p>
 <p>0.0037321, 0.3908736</p>
-<p><img src="analysis_files/figure-html/survival-sjplot-1.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-2.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-3.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-4.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-5.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-6.png" width="4200" /><img src="analysis_files/figure-html/survival-sjplot-7.png" width="4200" /></p>
+<p><strong>Plot marginal effect of distance on survival</strong></p>
+<p><img src="analysis_files/figure-html/survival-sjplot-1.png" width="2100" /></p>
+</section>
 </section>
 <section id="germination-and-survival-results" class="level2">
 <h2>Germination and survival results</h2>
-<p>The probability of germination increased with distance from edge, light availability, litter mass, and basal area, but the effect of basal area was moderated by forest successional age, with lower germination in young forests. Effects of measured site conditions on survival were relatively weak and predominantly due to interaction variables. Light availability had a significant positive effect on survival probability, but this decreased with distance from the edge (indicated by the negative interaction term). The positive interaction of distance and litter increased survival probability, although the main effects of distance and litter were statistically insignificant. The interaction of basal area and forest age was similar, but with a negative effect where seedlings at locations with lower basal area in younger forests had lower probability of survival. Variation in survival depended predominantly on species specific characteristics and unmeasured site characteristics as indicated by the variance accounted for by these random effects variables.</p>
+<p>Germination and survival differed in response to main effects, were species dependent, and for some species showed opposing patterns. Germination probability was significantly greater with increasing distance from forest edge, trended to be lower in young forest, and greater with higher litter mass. In contrast, survival was not significantly influenced by explanatory variables (Fig. 4 a &amp; b). Species differences accounted for much of the variation in germination and survival, though most species did not show equal success in both responses. Autumn olive had the highest germination but the lowest seedling survival. Dogwood showed a similar pattern of relatively greater germination but lower survival. Privet had the opposite pattern of greater survival, though not significantly different from the average, and lower germination. Redbud and spicebush both had low germination and survival near the overall average. Honeysuckle stands out as having the greatest survival and above average germination, trailing only autumn olive.</p>
 <p>Germination probability for the nonnative autumn olive and honeysuckle, and native dogwood was greater than the overall average; privet, redbud, and spicebush had below average germination, with spicebush being the lowest. In contrast, the transplanted autumn olive and dogwood seedlings had the lowest survival probability, while honeysuckle, privet, spicebush, and redbud seedlings all showed above average survival. Honeysuckle seedlings were particularly likely to persist to the end of the experiment.</p>
+<p><img src="analysis_files/figure-html/germ-survival-fixef-1.png" width="2100" /></p>
+<p><img src="analysis_files/figure-html/germ-survival-ranef-fig5-1.png" width="2100" /></p>
 </section>
 <section id="site-level-effects" class="level2">
 <h2>Site-level effects</h2>
 <p>Growth was relativley poor for all the metrics at the DG, FR, and GR, and tended to be greatest at the CH and PR sites. In addition to the CH and PR sites, seedlings at the LD and SR sites tended to perform well in terms of biomass; seedling diameters at the TC and SR sites were also greater than average, but lagged well-behind the CH site; relative-growth-rate tended to be greater than average at the BB and LD, but the PR site was the best for this variable. In terms of survival, the CH site was the most favorable, while seedling survival was similar and above average at the TC, DU, and PR sites. Probability of germination was close to the average across most of the site, but exceptionally greater at the DB site, and exceptionally lower at the DU site.</p>
-<p><img src="analysis_files/figure-html/gridded-site-ranef-fig-1.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/gridded-site-ranef-fig-1.png" width="2100" /></p>
 </section>
 <section id="herbivory-model" class="level2">
 <h2>Herbivory model</h2>
@@ -1003,7 +1034,7 @@ $(document).ready(function () {
 <li>5 = 100% leaf removal by herbivores</li>
 </ul>
 <p>The internet has some suggestions on how to do this for mixed-effects models: <a href="https://stats.stackexchange.com/questions/238581/how-to-use-ordinal-logistic-regression-with-random-effects?noredirect=1&amp;lq=1"></a></p>
-<p>The <code>ordinal</code> package has the <code>clmm</code> and <code>clmm2</code>, with will probably suffice for my purposes. I just need to get a decent inference off the data. Two other packages implement Bayesian MCMC frameworsks: <a href="https://cran.r-project.org/package=MCMCglmm">MCMCglmm</a> and <a href="https://cran.r-project.org/package=brms">brms</a>.</p>
+<p>The <code>ordinal</code> package has the <code>clmm</code> and <code>clmm2</code>, which will probably suffice for my purposes. I just need to get a decent inference off the data. Two other packages implement Bayesian MCMC frameworsks: <a href="https://cran.r-project.org/package=MCMCglmm">MCMCglmm</a> and <a href="https://cran.r-project.org/package=brms">brms</a>.</p>
 <p>Other studies have looked at incidence, i.e., presence/absence of herbivory at each observation, so we could take that approach.</p>
 <pre><code>##   site_name          site_code             age               distance    
 ##  Length:5040        Length:5040        Length:5040        Min.   : 0.00  
@@ -1050,7 +1081,7 @@ $(document).ready(function () {
 ##  Dogwood     :494                      Mean   :1.088   Mean   :0.707      
 ##  Redbud      :720                      3rd Qu.:1.000   3rd Qu.:1.000      
 ##  Spicebush   :750                      Max.   :5.000   Max.   :1.000</code></pre>
-<p><img src="analysis_files/figure-html/ordinal-vs-incidence-1.png" width="4200" /><img src="analysis_files/figure-html/ordinal-vs-incidence-2.png" width="4200" /></p>
+<p><img src="analysis_files/figure-html/ordinal-vs-incidence-1.png" width="2100" /><img src="analysis_files/figure-html/ordinal-vs-incidence-2.png" width="2100" /></p>
 <pre><code>## Generalized linear mixed model fit by maximum likelihood (Laplace
 ##   Approximation) [glmerMod]
 ##  Family: binomial  ( logit )
@@ -1095,40 +1126,6 @@ $(document).ready(function () {
 ## agYfrs:2005  0.101 -0.001 -0.407 -0.721 -0.300  0.005         
 ## agYfrs:2006  0.101  0.005 -0.393 -0.294 -0.707  0.000  0.440</code></pre>
 <pre><code>## [1] 4472.969</code></pre>
-<pre><code>## Cumulative Link Mixed Model fitted with the Laplace approximation
-## 
-## formula: f_herbiv ~ distance + age * year + status + (1 | site_code) +  
-##     (1 | common_name)
-## data:    herbiv_noNA_data
-## 
-##  link  threshold nobs logLik   AIC     niter      max.grad cond.H 
-##  logit flexible  4062 -4879.14 9786.28 1113(3340) 1.06e-02 3.3e+05
-## 
-## Random effects:
-##  Groups      Name        Variance Std.Dev.
-##  site_code   (Intercept) 0.05269  0.2296  
-##  common_name (Intercept) 0.28432  0.5332  
-## Number of groups:  site_code 12,  common_name 6 
-## 
-## Coefficients:
-##                            Estimate Std. Error z value Pr(&gt;|z|)    
-## distance                 -0.0001806  0.0014249  -0.127 0.899139    
-## ageYoung forest           0.4289984  0.1658279   2.587 0.009681 ** 
-## year2005                  0.3427562  0.1015191   3.376 0.000735 ***
-## year2006                  0.3998139  0.1027399   3.892 9.96e-05 ***
-## statusNon-native         -1.3415312  0.4401605  -3.048 0.002305 ** 
-## ageYoung forest:year2005 -0.6863718  0.1439552  -4.768 1.86e-06 ***
-## ageYoung forest:year2006 -0.3468326  0.1448112  -2.395 0.016617 *  
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
-## 
-## Threshold coefficients:
-##     Estimate Std. Error z value
-## 0|1  -1.5302     0.3340  -4.582
-## 1|2   0.8605     0.3332   2.582
-## 2|3   2.1538     0.3355   6.419
-## 3|4   3.4150     0.3438   9.934
-## 4|5   4.0871     0.3544  11.532</code></pre>
 </section>
 </section>
 
