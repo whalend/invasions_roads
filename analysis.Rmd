@@ -741,8 +741,9 @@ ggplot(germination_distance_data, aes(distance, avg_germinated)) +
   xlab("Distance from road (m)")
 
 ggplot(germination_habitat_data, aes(f_habitat, avg_germinated)) +
-  geom_point(aes(shape = common_name), show.legend = T, size = 2.5) +
-  geom_line(aes(linetype = common_name, group = common_name)) +
+  geom_line(aes(color = common_name, group = common_name)) +
+  geom_point(aes(color = common_name), show.legend = T, size = 2.5) +
+  scale_color_brewer(palette = "BrBG") +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -751,7 +752,6 @@ ggplot(germination_habitat_data, aes(f_habitat, avg_germinated)) +
   ylab("Percent germination") +
   xlab("Distance from road")
 write_csv(germination_habitat_data, "model_output_data/germination_raw_fig.csv")
-
 
 ```
 
@@ -851,8 +851,9 @@ ggplot(survival_distance_data, aes(distance, pct_survival)) +
 
 ggplot(survival_habitat_data, aes(f_habitat, pct_survival)) +
   # geom_smooth(aes(linetype = common_name), method = "lm", se = F, show.legend = T, color = "grey50", size = .5) +
-  geom_point(aes(shape = common_name), size = 2.5, show.legend = F) +
-  geom_line(aes(linetype = common_name, group = common_name)) +
+  geom_line(aes(color = common_name, group = common_name)) +
+  geom_point(aes(color = common_name), size = 2.5, show.legend = T) +
+  scale_color_brewer(palette = "BrBG") +
   facet_grid(.~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -865,7 +866,9 @@ write_csv(survival_habitat_data, "model_output_data/survival_raw_fig.csv")
 # filter(surv, year == 2006) %>% 
 #   group_by(status, age) %>% 
 #   summarise(avg_pct_survival = mean(pct_survival))
+
 ```
+
 
 ```{r survival averages table, results='asis'}
 kable(surv %>%
@@ -960,9 +963,12 @@ ggplot(distance_grouped_data, aes(distance, avg_diameter)) +
   xlab("Distance from road (m)")
 
 ggplot(habitat_grouped_data, aes(f_habitat, avg_diameter)) +
-  geom_point(aes(shape = common_name), size = 2.5) +
-  geom_line(aes(linetype = common_name, group = common_name)) +
+  geom_line(aes(color = common_name, group = common_name)) +
+  # geom_smooth(aes(linetype = status), method = "lm", se = F) +
+  geom_errorbar(aes(ymin = avg_diameter - se_diameter, ymax = avg_diameter + se_diameter, color = common_name), width = 0, alpha = .5, size = .75) +
+  geom_point(aes(color = common_name), size = 2.5) +
   facet_wrap(~age) +
+  scale_color_brewer(palette = "BrBG") +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -1004,10 +1010,12 @@ ggplot(distance_grouped_data, aes(distance, avg_biomass)) +
   xlab("Distance from road (m)")
 
 ggplot(habitat_grouped_data, aes(f_habitat, avg_biomass)) +
-  geom_line(aes(linetype = common_name, group = common_name)) +
+  geom_line(aes(color = common_name, group = common_name)) +
   # geom_smooth(aes(linetype = status), method = "lm", se = F) +
-  geom_point(aes(shape = common_name), size = 2.5) +
+  geom_errorbar(aes(ymin = avg_biomass - se_biomass, ymax = avg_biomass + se_biomass, color = common_name), width = 0, alpha = .5, size = .75) +
+  geom_point(aes(color = common_name), size = 2.5) +
   facet_wrap(~age) +
+  scale_color_brewer(palette = "BrBG") +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -1048,9 +1056,12 @@ ggplot(distance_grouped_data, aes(distance, avg_rgr_ht)) +
 
 
 ggplot(habitat_grouped_data, aes(f_habitat, avg_rgr_ht)) +
-  geom_point(aes(shape = common_name)) +
-  geom_line(aes(linetype = common_name, group = common_name)) +
+  geom_line(aes(color = common_name, group = common_name)) +
+  # geom_smooth(aes(linetype = status), method = "lm", se = F) +
+  geom_errorbar(aes(ymin = avg_rgr_ht - se_rgr_ht, ymax = avg_rgr_ht + se_rgr_ht, color = common_name), width = 0, alpha = .5, size = .75) +
+  geom_point(aes(color = common_name), size = 2.5) +
   facet_wrap(~age) +
+  scale_color_brewer(palette = "BrBG") +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -1113,9 +1124,10 @@ ggplot(herbiv_distance_data, aes(distance, avg_herbivory)) +
   xlab("Distance from road (m)")
 
 ggplot(herbiv_habitat_data, aes(f_habitat, avg_herbivory)) +
-  geom_errorbar(aes(ymin = avg_herbivory - se_herbivory, ymax = avg_herbivory + se_herbivory), width = 0) +
-  geom_line(aes(linetype = common_name, group = common_name), show.legend = F) +
-  geom_point(aes(shape = common_name), size = 2.5) +
+  geom_errorbar(aes(ymin = avg_herbivory - se_herbivory, ymax = avg_herbivory + se_herbivory, color = common_name), width = 0, alpha = .5, size = .75) +
+  geom_line(aes(color = common_name, group = common_name), show.legend = F) +
+  geom_point(aes(color = common_name), size = 2.5) +
+  scale_color_brewer(palette = "BrBG") +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -1131,11 +1143,11 @@ We've settled on doing a model to try and explain herbivory. First, I'm looking 
 ```{r herbiv-by-year}
 
 ggplot(herbiv, aes(f_habitat, herbivory)) +
-  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "pointrange", size = .75, show.legend = T, position = "jitter") +
+  stat_summary(aes(color = common_name), fun.data = "mean_se", geom = "pointrange", size = .75, show.legend = T, position = position_jitter(width = .2)) +
   # geom_point(aes(shape = common_name)) +
   geom_smooth(aes(linetype = status), method = "loess", se = T, show.legend = F, color = "grey50", alpha = .2) +
   scale_linetype_manual(values = c(2,1)) +
-  scale_color_brewer(palette = "RdBu") +
+  scale_color_brewer(palette = "BrBG") +
   facet_grid(age~year) +
   theme_bw() +
   theme(strip.background = element_blank(),
