@@ -740,7 +740,7 @@ ggplot(germination_distance_data, aes(distance, avg_germinated)) +
   ylab("Percent germination") +
   xlab("Distance from road (m)")
 
-ggplot(germination_habitat_data, aes(f_habitat, avg_germinated)) +
+(germ_hab_fig <- ggplot(germination_habitat_data, aes(f_habitat, avg_germinated)) +
   geom_line(aes(color = common_name, group = common_name)) +
   geom_point(aes(color = common_name), show.legend = T, size = 2.5) +
   scale_color_brewer(palette = "BrBG") +
@@ -749,8 +749,10 @@ ggplot(germination_habitat_data, aes(f_habitat, avg_germinated)) +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
-  ylab("Percent germination") +
+  ylab("Germination (%)") +
   xlab("Distance from road")
+)
+
 write_csv(germination_habitat_data, "model_output_data/germination_raw_fig.csv")
 
 ```
@@ -849,7 +851,7 @@ ggplot(survival_distance_data, aes(distance, pct_survival)) +
   ggtitle("Average seedling survival to 2006")
 
 
-ggplot(survival_habitat_data, aes(f_habitat, pct_survival)) +
+(surv_hab_fig <- ggplot(survival_habitat_data, aes(f_habitat, pct_survival)) +
   # geom_smooth(aes(linetype = common_name), method = "lm", se = F, show.legend = T, color = "grey50", size = .5) +
   geom_line(aes(color = common_name, group = common_name)) +
   geom_point(aes(color = common_name), size = 2.5, show.legend = T) +
@@ -862,6 +864,8 @@ ggplot(survival_habitat_data, aes(f_habitat, pct_survival)) +
   ylab("Survival (%)") +
   xlab("Distance from edge") +
   ggtitle("Average seedling survival to 2006")
+)
+
 write_csv(survival_habitat_data, "model_output_data/survival_raw_fig.csv")
 # filter(surv, year == 2006) %>% 
 #   group_by(status, age) %>% 
@@ -962,7 +966,7 @@ ggplot(distance_grouped_data, aes(distance, avg_diameter)) +
   ylab("Diameter (mm)") +
   xlab("Distance from road (m)")
 
-ggplot(habitat_grouped_data, aes(f_habitat, avg_diameter)) +
+(diam_hab_fig <- ggplot(habitat_grouped_data, aes(f_habitat, avg_diameter)) +
   geom_line(aes(color = common_name, group = common_name)) +
   # geom_smooth(aes(linetype = status), method = "lm", se = F) +
   geom_errorbar(aes(ymin = avg_diameter - se_diameter, ymax = avg_diameter + se_diameter, color = common_name), width = 0, alpha = .5, size = .75) +
@@ -975,6 +979,8 @@ ggplot(habitat_grouped_data, aes(f_habitat, avg_diameter)) +
         legend.title = element_blank()) +
   ylab("Diameter (mm)") +
   xlab("Distance")
+)
+
 write_csv(habitat_grouped_data, "model_output_data/biomass_diam_rgr_raw_fig.csv")
 
 ```
@@ -1009,7 +1015,7 @@ ggplot(distance_grouped_data, aes(distance, avg_biomass)) +
   ylab("Biomass (g)") +
   xlab("Distance from road (m)")
 
-ggplot(habitat_grouped_data, aes(f_habitat, avg_biomass)) +
+(biomass_hab_fig <- ggplot(habitat_grouped_data, aes(f_habitat, avg_biomass)) +
   geom_line(aes(color = common_name, group = common_name)) +
   # geom_smooth(aes(linetype = status), method = "lm", se = F) +
   geom_errorbar(aes(ymin = avg_biomass - se_biomass, ymax = avg_biomass + se_biomass, color = common_name), width = 0, alpha = .5, size = .75) +
@@ -1022,6 +1028,7 @@ ggplot(habitat_grouped_data, aes(f_habitat, avg_biomass)) +
         legend.title = element_blank()) +
   ylab("Biomass (g)") +
   xlab("Distance")
+)
 
 ```
 
@@ -1055,7 +1062,7 @@ ggplot(distance_grouped_data, aes(distance, avg_rgr_ht)) +
   xlab("Distance from road (m)") 
 
 
-ggplot(habitat_grouped_data, aes(f_habitat, avg_rgr_ht)) +
+(rgr_hab_fig <- ggplot(habitat_grouped_data, aes(f_habitat, avg_rgr_ht)) +
   geom_line(aes(color = common_name, group = common_name)) +
   # geom_smooth(aes(linetype = status), method = "lm", se = F) +
   geom_errorbar(aes(ymin = avg_rgr_ht - se_rgr_ht, ymax = avg_rgr_ht + se_rgr_ht, color = common_name), width = 0, alpha = .5, size = .75) +
@@ -1067,7 +1074,8 @@ ggplot(habitat_grouped_data, aes(f_habitat, avg_rgr_ht)) +
         panel.grid = element_blank(),
         legend.title = element_blank()) +
   ylab("Relative growth rate (% / day)") +
-  xlab("Distance") 
+  xlab("Distance from edge")
+)
 
 ```
 
@@ -1143,12 +1151,12 @@ We've settled on doing a model to try and explain herbivory. First, I'm looking 
 ```{r herbiv-by-year}
 
 ggplot(herbiv, aes(f_habitat, herbivory)) +
-  stat_summary(aes(color = common_name), fun.data = "mean_se", geom = "pointrange", size = .75, show.legend = T, position = position_jitter(width = .2)) +
+  stat_summary(aes(color = common_name, shape = age), fun.data = "mean_se", geom = "pointrange", size = .6, show.legend = T, position = position_jitter(width = .2)) +
   # geom_point(aes(shape = common_name)) +
   geom_smooth(aes(linetype = status), method = "loess", se = T, show.legend = F, color = "grey50", alpha = .2) +
   scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "BrBG") +
-  facet_grid(age~year) +
+  facet_grid(.~year) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
@@ -1168,6 +1176,87 @@ What kind of herbivory might this be: Defoliators.
 There's not a particularly clear pattern in changes between years, just generally lower for the invasive species. I can still put year in as a factor to test it statistically. It looks like forest age will be important, and probably distance. Some species also appear to be more susceptible than others. I'm thinking a model along the lines of this to start:
 
 herbivory ~ distance + age + year + pct_light + litter
+
+### Raw data figures
+
+```{r performance-by-distance}
+cowplot::plot_grid(
+  germ_hab_fig +
+  xlab("") +
+  lims(y = c(0,100)) +
+  theme(legend.position = "top",
+        legend.direction = "horizontal",
+        legend.box.margin = margin(t = 0, r = 0, b = 0, l = 0),
+        axis.text = element_text(size = 10),
+        axis.text.x = element_blank(),
+        strip.text = element_text(size = 12),
+        axis.title = element_text(size = 12),
+        legend.text = element_text(size = 10),
+        plot.margin = unit(c(.2,.2,0,.2), units = "cm")
+        ) +
+        scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush")),
+  
+  surv_hab_fig +
+  # xlab("") +
+  ggtitle("") +
+  theme(axis.text = element_text(size = 10),
+        strip.text = element_blank(),
+        axis.title = element_text(size = 12),
+        # axis.text.x = element_blank(),
+        legend.position = "none",
+        plot.margin = unit(c(0,.2,.2,.2), units = "cm")
+        ),
+  
+  ncol = 1, rel_heights = c(1.3,1), labels = "auto"
+)
+ggsave("figures/germ-survival-raw.eps", width = 5, height = 5)
+
+cowplot::plot_grid(
+  
+  biomass_hab_fig +
+    xlab("") +
+    ggtitle("") +
+    lims(y = c(0,3.5)) +
+    scale_y_continuous(breaks = c(1,2,3), labels = c("1.0","2.0","3.0")) +
+    theme(axis.text = element_text(size = 10),
+          strip.text = element_text(size = 12),
+          axis.title = element_text(size = 12),
+          axis.text.x = element_blank(),
+          legend.position = "top",
+          legend.text = element_text(size = 10),
+          plot.margin = unit(c(.1,.2,-.2,.2), units = "cm")) +
+    scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush")),
+  
+  diam_hab_fig +
+    xlab("") +
+    ggtitle("") +
+    scale_y_continuous(limits = c(1.9,4.2)) +
+    theme(axis.text = element_text(size = 10),
+          strip.text = element_blank(),
+          axis.title = element_text(size = 12),
+          axis.text.x = element_blank(),
+          legend.position = "none",
+          plot.margin = unit(c(-.1,.2,.1,.2), units = "cm")),
+  
+  rgr_hab_fig +
+    # xlab("") +
+    ggtitle("") +
+    scale_y_continuous(breaks = c(2.5,3.0,3.5), 
+                       labels = c("2.5","3.0","3.5"), 
+                       limits = c(2.5,3.7)
+                       ) +
+    theme(axis.text = element_text(size = 10),
+          strip.text = element_blank(),
+          axis.title = element_text(size = 12),
+          # axis.text.x = element_blank(),
+          legend.position = "none",
+          plot.margin = unit(c(-.4,.2,.2,.2), units = "cm")),
+  
+  ncol = 1, rel_heights = c(1.3,1,1), labels = "auto"
+)
+ggsave("figures/growth-raw.eps", width = 4.5, height = 10)
+
+```
 
 
 # Modeling
