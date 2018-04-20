@@ -713,12 +713,12 @@ germination_habitat_data <- germination_data %>%
 
 
 ggplot(germination_data, aes(distance, pct_germinated)) +
-  stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5) +
   geom_smooth(aes(linetype = status), method = "loess", se = T, show.legend = F, color = "grey40", size = .8) +
+  stat_summary(aes(color = common_name), fun.data = "mean_se", geom = "pointrange", size = .75) +
   # scale_shape_manual(values = c(rep(16, 3), rep(17, 3))) +
   # scale_color_manual(values = c(brewer.pal(3, "RdBu"), brewer.pal(3, "RdBu"))) +
   scale_linetype_manual(values = c(2,1)) +
-  # scale_color_brewer(palette = "RdBu") +
+  scale_color_brewer(palette = "BrBG") +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -740,9 +740,17 @@ ggplot(germination_distance_data, aes(distance, avg_germinated)) +
   ylab("Percent germination") +
   xlab("Distance from road (m)")
 
-(germ_hab_fig <- ggplot(germination_habitat_data, aes(f_habitat, avg_germinated)) +
-  geom_line(aes(color = common_name, group = common_name)) +
-  geom_point(aes(color = common_name), show.legend = T, size = 2.5) +
+(germ_hab_fig <- ggplot(germination_data, aes(f_habitat, pct_germinated)) +
+  # geom_line(aes(color = common_name)) +
+  # geom_point(aes(color = common_name), show.legend = T, size = 2.5) +
+  stat_summary(aes(group = common_name, color = common_name), 
+               fun.y = mean, geom = "line", 
+               position = position_jitterdodge(jitter.width = .1),
+               show.legend = F) +
+  stat_summary(aes(color = common_name, group = common_name), 
+               fun.data = "mean_se", fun.y = "mean", 
+               geom = c("pointrange"), size = .75, show.legend = T, 
+               position = position_jitterdodge(jitter.width = .1)) +
   scale_color_brewer(palette = "BrBG") +
   facet_wrap(~age) +
   theme_bw() +
@@ -803,7 +811,7 @@ names(surv)
 # names(surv)
 survival_2006 <- surv %>% 
   filter(year==2006) %>% 
-  group_by(site_code, age, distance, common_name, status, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture) %>% 
+  group_by(site_code, age, distance, f_habitat, common_name, status, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture) %>% 
   summarise(alive = sum(survival),
             dead = length(survival) - alive) %>% 
   ungroup(.)
@@ -834,13 +842,13 @@ ggplot(survival_distance_data, aes(distance, pct_survival)) +
   ggtitle("Average seedling survival to 2006")
 
 
-ggplot(survival_distance_data, aes(distance, pct_survival)) +
+ggplot(survival_distance_data, aes(distance, 100*survival)) +
   # geom_smooth(aes(linetype = common_name), method = "lm", se = F, show.legend = T, color = "grey50", size = .5) +
-  geom_point(aes(shape = common_name), size = 2.5, show.legend = T) +
-  geom_line(aes(linetype = common_name)) +
-  # stat_summary(aes(shape = common_name), fun.data = "mean_se", geom = "point", size = 2.5, show.legend = F) +
+  # geom_line(aes(linetype = common_name)) +
+  # geom_point(aes(shape = common_name), size = 2.5, show.legend = T) +
+  stat_summary(aes(color = common_name), fun.data = "mean_se", geom = "pointrange", size = .75, show.legend = T) +
   # scale_linetype_manual(values = c(2,1)) +
-  # scale_color_brewer(palette = "RdBu") +
+  scale_color_brewer(palette = "BrBG") +
   facet_grid(.~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -851,10 +859,18 @@ ggplot(survival_distance_data, aes(distance, pct_survival)) +
   ggtitle("Average seedling survival to 2006")
 
 
-(surv_hab_fig <- ggplot(survival_habitat_data, aes(f_habitat, pct_survival)) +
+(surv_hab_fig <- ggplot(surv, aes(f_habitat, 100*survival)) +
   # geom_smooth(aes(linetype = common_name), method = "lm", se = F, show.legend = T, color = "grey50", size = .5) +
-  geom_line(aes(color = common_name, group = common_name)) +
-  geom_point(aes(color = common_name), size = 2.5, show.legend = T) +
+  # geom_line(aes(color = common_name, group = common_name)) +
+  stat_summary(aes(group = common_name, color = common_name), 
+               fun.y = mean, geom = "line", 
+               position = position_jitterdodge(jitter.width = .1),
+               show.legend = F) +
+  stat_summary(aes(color = common_name, group = common_name), 
+               fun.data = "mean_se", fun.y = "mean", 
+               geom = c("pointrange"), size = .75, show.legend = T, 
+               position = position_jitterdodge(jitter.width = .1)) +
+  # geom_point(aes(color = common_name), size = 2.5, show.legend = T) +
   scale_color_brewer(palette = "BrBG") +
   facet_grid(.~age) +
   theme_bw() +
@@ -1018,7 +1034,7 @@ ggplot(distance_grouped_data, aes(distance, avg_biomass)) +
 (biomass_hab_fig <- ggplot(habitat_grouped_data, aes(f_habitat, avg_biomass)) +
   geom_line(aes(color = common_name, group = common_name)) +
   # geom_smooth(aes(linetype = status), method = "lm", se = F) +
-  geom_errorbar(aes(ymin = avg_biomass - se_biomass, ymax = avg_biomass + se_biomass, color = common_name), width = 0, alpha = .5, size = .75) +
+  geom_errorbar(aes(ymin = avg_biomass - se_biomass, ymax = avg_biomass + se_biomass, color = common_name), width = 0, size = .75) +
   geom_point(aes(color = common_name), size = 2.5) +
   facet_wrap(~age) +
   scale_color_brewer(palette = "BrBG") +
@@ -1254,7 +1270,7 @@ cowplot::plot_grid(
   
   ncol = 1, rel_heights = c(1.3,1,1), labels = "auto"
 )
-ggsave("figures/growth-raw.eps", width = 4.5, height = 10)
+ggsave("figures/growth-raw.png", width = 4.5, height = 10)
 
 ```
 
