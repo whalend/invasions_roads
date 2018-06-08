@@ -82,7 +82,8 @@ seedling_data <- seedling_data %>%
   rename(age = forest_age) %>%
   mutate(habitat_type = if_else(distance<10,0,ifelse(distance>20, 2, 1)),
          # age = if_else(age=="young", "Young forest", "Mature forest"),
-         rgr_ht_days = (log(final_ht06)) - log((initial_ht))/822)
+         rgr_ht_days = (log(final_ht06)) - log((initial_ht))/822,
+         rgr_ht_year = (log(final_ht06)) - log((initial_ht))/3)
 ## This calculates relative growth rate per day
 ## There are 97 negative values in this growth rate. Values are sometimes very inconsistent from the spring 2006 measurement to the final measurement
 seedling_data$common_name <- "NA"
@@ -214,6 +215,8 @@ site_grouped_data <- seedling_data %>%
     se_diameter = sd(diameter06, na.rm = T)/sqrt(length(diameter06)),
     avg_rgr_ht = mean(rgr_ht_days, na.rm = T),
     se_rgr_ht = sd(rgr_ht_days, na.rm = T)/sqrt(length(rgr_ht_days)),
+    avg_rgr_ht_yr = mean(rgr_ht_year, na.rm = T),
+    se_rgr_ht_yr = sd(rgr_ht_year, na.rm = T)/sqrt(length(rgr_ht_year)),
     avg_height = mean(final_ht06, na.rm = T),
     se_height = sd(final_ht06, na.rm = T)/sqrt(length(final_ht06)),
     avg_num_leaves = mean(num_leaves, na.rm = T),
@@ -730,35 +733,38 @@ ggplot(germination_data, aes(distance, pct_germinated)) +
 # ggsave("figures/pct_germinated.png", dpi = 600, width = 7, height = 3.5)
 
 ggplot(germination_distance_data, aes(distance, avg_germinated)) +
-  geom_point(aes(shape = common_name), show.legend = T, size = 2.5) +
-  geom_line(aes(linetype = common_name)) +
+  geom_point(aes(color = common_name), show.legend = T, size = 2.5) +
+  # geom_line(aes(linetype = common_name)) +
   facet_wrap(~age) +
   theme_bw() +
+  scale_color_brewer(palette = "PuOr") +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
   ylab("Percent germination") +
   xlab("Distance from road (m)")
 
-(germ_hab_fig <- ggplot(germination_data, aes(f_habitat, pct_germinated)) +
+(germ_hab_fig <- ggplot(germination_data, aes(distance, pct_germinated)) +
   # geom_line(aes(color = common_name)) +
-  # geom_point(aes(color = common_name), show.legend = T, size = 2.5) +
-  stat_summary(aes(group = common_name, color = common_name), 
-               fun.y = mean, geom = "line", 
-               position = position_jitterdodge(jitter.width = .1),
-               show.legend = F) +
+  # geom_point(aes(color = common_name), show.legend = F, size = 1) +
+  # stat_summary(aes(group = common_name, color = common_name), 
+  #              fun.y = mean, geom = "line", 
+  #              # position = position_jitterdodge(jitter.width = 1),
+  #              show.legend = F) +
   stat_summary(aes(color = common_name, group = common_name), 
                fun.data = "mean_se", fun.y = "mean", 
-               geom = c("pointrange"), size = .5, show.legend = T, 
-               position = position_jitterdodge(jitter.width = .1)) +
+               position = position_jitter(width = .5),
+               geom = c("pointrange"), size = .5, show.legend = T 
+               ) +
   scale_color_brewer(palette = "BrBG") +
+  scale_x_continuous(breaks = c(0,5,10,20,40,60)) +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
   ylab("Germination (%)") +
-  xlab("Distance from road")
+  xlab("Distance from edge")
 )
 
 write_csv(germination_habitat_data, "model_output_data/germination_raw_fig.csv")
@@ -859,19 +865,20 @@ ggplot(survival_distance_data, aes(distance, 100*survival)) +
   ggtitle("Average seedling survival to 2006")
 
 
-(surv_hab_fig <- ggplot(surv, aes(f_habitat, 100*survival)) +
+(surv_hab_fig <- ggplot(surv, aes(distance, 100*survival)) +
   # geom_smooth(aes(linetype = common_name), method = "lm", se = F, show.legend = T, color = "grey50", size = .5) +
   # geom_line(aes(color = common_name, group = common_name)) +
-  stat_summary(aes(group = common_name, color = common_name), 
-               fun.y = mean, geom = "line", 
-               position = position_jitterdodge(jitter.width = .1),
-               show.legend = F) +
+  # stat_summary(aes(group = common_name, color = common_name), 
+  #              fun.y = mean, geom = "line", 
+  #              # position = position_jitterdodge(jitter.width = 1),
+  #              show.legend = F) +
   stat_summary(aes(color = common_name, group = common_name), 
                fun.data = "mean_se", fun.y = "mean", 
-               geom = c("pointrange"), size = .5, show.legend = T, 
-               position = position_jitterdodge(jitter.width = .1)) +
+               position = position_jitter(width = .5),
+               geom = c("pointrange"), size = .5, show.legend = T) +
   # geom_point(aes(color = common_name), size = 2.5, show.legend = T) +
   scale_color_brewer(palette = "BrBG") +
+    scale_x_continuous(breaks = c(0,5,10,20,40,60)) +
   facet_grid(.~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
@@ -955,23 +962,25 @@ ggplot(habitat_grouped_data, aes(f_habitat, avg_height)) +
 ### Seedling diameter
 ```{r seedling_diameter}
 
-(diam_hab_fig <- ggplot(seedling_data, aes(f_habitat, diameter06)) +
-  stat_summary(aes(group = common_name, color = common_name), 
-               fun.y = mean, geom = "line", 
-               # position = position_jitterdodge(jitter.width = .1),
-               show.legend = F) +
+(diam_hab_fig <- ggplot(seedling_data, aes(distance, diameter06)) +
+  # stat_summary(aes(group = common_name, color = common_name), 
+  #              fun.y = mean, geom = "line", 
+  #              # position = position_jitterdodge(jitter.width = .1),
+  #              show.legend = F) +
   stat_summary(aes(color = common_name, group = common_name), 
                fun.data = "mean_se", fun.y = "mean", 
                geom = c("pointrange"), size = .5,
-               # position = position_jitterdodge(jitter.width = .1),
+               position = position_jitter(width = .5),
                show.legend = T) +
   scale_color_brewer(palette = "BrBG") +
+  scale_x_continuous(breaks = c(0,5,10,20,40,60)) +
   facet_grid(.~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
-  ylab("Diameter (mm)") +
+  # ylab("Diameter (mm)") +
+  ylab(expression(paste("Diameter (mm)",{}^" "))) +
   xlab("Distance from edge")
 )
 
@@ -1009,37 +1018,51 @@ write_csv(habitat_grouped_data, "model_output_data/biomass_diam_rgr_raw_fig.csv"
 ### Seedling biomass
 ```{r seedling_biomass}
 
-(biomass_hab_fig <- ggplot(seedling_data, aes(f_habitat, tot_biomass)) +
-  stat_summary(aes(group = common_name, color = common_name), 
-               fun.y = mean, geom = "line", 
+(biomass_hab_fig <- ggplot(seedling_data, aes(distance, tot_biomass)) +
+  # stat_summary(aes(group = common_name, color = common_name), 
+               # fun.y = mean, geom = "line", 
                # position = position_jitterdodge(jitter.width = .1),
-               show.legend = F) +
+               # show.legend = F) +
   stat_summary(aes(color = common_name, group = common_name), 
                fun.data = "mean_se", fun.y = "mean", 
                geom = c("pointrange"), size = .5, 
-               # position = position_jitterdodge(jitter.width = .1),
+               position = position_jitter(width = .5),
                show.legend = T) +
+   # geom_smooth(aes(color = common_name, linetype = age, fill = common_name), method = "lm", alpha = .3, se = F) +
   scale_color_brewer(palette = "BrBG") +
+  scale_x_continuous(breaks = c(0,5,10,20,40,60), labels = c("0","5","10","20","40","60")) +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
-  ylab("Biomass (g)") +
-  xlab("Distance from road (m)")
+  ylab(expression(paste("Biomass (g)",{}^" "))) +
+  # ylab(expression(paste("RGR (% ", {year}^-1,")"))) +
+  xlab("Distance from edge (m)")
 )
 
-ggplot(distance_grouped_data, aes(distance, avg_biomass)) +
-  geom_line(aes(linetype = common_name, group = common_name)) +
+# xtabs(~age+distance+common_name, data = site_grouped_data)
+ggplot(site_grouped_data, aes(distance, avg_biomass)) +
+  # geom_line(aes(linetype = common_name, group = common_name)) +
   # geom_smooth(aes(linetype = status), method = "lm", se = F) +
-  geom_point(aes(shape = common_name), size = 2.5) +
-  facet_wrap(~age) +
+  # geom_point(aes(color = common_name), size = 1, alpha = .7) +
+  stat_summary(aes(color = common_name, group = common_name), 
+               fun.data = "mean_se", fun.y = "mean", 
+               geom = "pointrange", size = .5, 
+               position = position_jitter(width = .5),
+               show.legend = T) +
+  scale_x_continuous(breaks = c(0,5,10,20,40,60), labels = c("0","5","10","20","40","60")) +
+  # geom_errorbar(aes(ymin = avg_biomass - se_biomass, ymax = avg_biomass + se_biomass, color = common_name), width = 0) +
+  # geom_smooth(aes(color = common_name, linetype = age, fill = common_name), method = "lm", alpha = .3, se = T) +
+  facet_grid(.~age) +
+  scale_color_brewer(palette = "BrBG") +
+  scale_fill_brewer(palette = "BrBG") +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
   ylab("Biomass (g)") +
-  xlab("Distance from road (m)")
+  xlab("Distance from edge (m)")
 
 ggplot(habitat_grouped_data, aes(f_habitat, avg_biomass)) +
   geom_line(aes(color = common_name, group = common_name)) +
@@ -1061,25 +1084,28 @@ ggplot(habitat_grouped_data, aes(f_habitat, avg_biomass)) +
 ### Seedling relative growth rate (height)
 ```{r rel_growth}
 
-(rgr_hab_fig <- ggplot(seedling_data, aes(f_habitat, rgr_ht_days)) +
-  stat_summary(aes(group = common_name, color = common_name), 
-               fun.y = mean, geom = "line", 
+(rgr_hab_fig <- ggplot(seedling_data, aes(distance, rgr_ht_year)) +
+  # stat_summary(aes(group = common_name, color = common_name), 
+               # fun.y = mean, geom = "line", 
                # position = position_jitterdodge(jitter.width = .1),
-               show.legend = F) +
+               # show.legend = F) +
   stat_summary(aes(color = common_name, group = common_name), 
                fun.data = "mean_se", fun.y = "mean", 
                geom = c("pointrange"), size = .5,
-               # position = position_jitterdodge(jitter.width = .1),
+               position = position_jitter(width = .5),
                show.legend = T) +
   # geom_smooth(aes(linetype = status), method = "lm", se = F, show.legend = F, color = "grey50") +
   # scale_linetype_manual(values = c(2,1)) +
   scale_color_brewer(palette = "BrBG") +
+   scale_x_continuous(breaks = c(0,5,10,20,40,60)) +
   facet_wrap(~age) +
   theme_bw() +
   theme(strip.background = element_blank(),
         panel.grid = element_blank(),
         legend.title = element_blank()) +
-  ylab(expression(paste("Relative growth rate (% / day)"))) +
+  ylab(expression(RGR~"%"~year^{"-1"})) +
+  # ylab(expression(paste("RGR (% year",^{-1},")"))) +
+  # ylab("RGR (% / year)") +
   xlab("Distance from edge") 
 )
 
@@ -1213,8 +1239,10 @@ herbivory ~ distance + age + year + pct_light + litter
 ### Raw data figures
 
 ```{r performance-by-distance}
-cowplot::plot_grid(
-  germ_hab_fig +
+library(cowplot)
+
+plot_grid(
+  ggdraw(germ_hab_fig +
   xlab("") +
   lims(y = c(0,100)) +
   theme(legend.position = "top",
@@ -1227,70 +1255,86 @@ cowplot::plot_grid(
         legend.text = element_text(size = 10),
         plot.margin = unit(c(.2,.2,-.2,.2), units = "cm")
         ) +
-        scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush")),
+  scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush"))) +
+    draw_label("a", x = .09, y = .752, fontface = "bold") +
+    draw_label("b", x = .55, y = .752, fontface = "bold"),
   
-  surv_hab_fig +
+  ggdraw(surv_hab_fig +
   # xlab("") +
   ggtitle("") +
+  xlab("Distance (m)") +
   theme(axis.text = element_text(size = 10),
         strip.text = element_blank(),
         axis.title = element_text(size = 12),
         # axis.text.x = element_blank(),
         legend.position = "none",
         plot.margin = unit(c(-.2,.2,.2,.2), units = "cm")
-        ),
+        )) +
+    draw_label("c", x = .09, y = .981, fontface = "bold") +
+    draw_label("d", x = .55, y = .981, fontface = "bold"),
   
-  ncol = 1, rel_heights = c(1.3,1), labels = "auto"
+  ncol = 1, rel_heights = c(1.3,1)
 )
-ggsave("figures/germ-survival-raw.eps", width = 5, height = 5)
+ggsave("figures/germ-survival-raw.eps", width = 7, height = 7)
 
 cowplot::plot_grid(
   
-  biomass_hab_fig +
+  ggdraw(biomass_hab_fig +
     xlab("") +
     ggtitle("") +
-    lims(y = c(0,3.5)) +
-    scale_y_continuous(breaks = c(1,2,3), labels = c("1.0","2.0","3.0")) +
+    # lims(y = c(0,3.5)) +
+    # scale_y_continuous(breaks = c(1,2,3), labels = c("1.0","2.0","3.0")) +
     theme(axis.text = element_text(size = 10),
           strip.text = element_text(size = 12),
           axis.title = element_text(size = 12),
           axis.text.x = element_blank(),
           legend.position = "top",
           legend.text = element_text(size = 10),
-          plot.margin = unit(c(.1,.2,-.2,.2), units = "cm")) +
-    scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush")),
+          plot.margin = unit(c(.1,.2,-.2,.2), units = "cm")
+          ) +
+    scale_color_brewer(palette = "BrBG", breaks=c("Autumn olive","Dogwood","Honeysuckle","Redbud","Privet","Spicebush"))) +
+    draw_label("a", x = .095, y = .64, fontface = "bold") +
+    draw_label("b", x = .56, y = .64, fontface = "bold"),
   
-  diam_hab_fig +
+  ggdraw(diam_hab_fig +
     xlab("") +
     ggtitle("") +
-    scale_y_continuous(breaks = c(2.0,3.0,4.0),
-                       labels = c("2.0","3.0","4.0"),
-                       limits = c(NA,NA)
-                       ) +
+    # scale_y_continuous(breaks = c(2.0,3.0,4.0),
+    #                    labels = c("2.0","3.0","4.0"),
+    #                    limits = c(NA,NA)
+    #                    ) +
     theme(axis.text = element_text(size = 10),
           strip.text = element_blank(),
           axis.title = element_text(size = 12),
           axis.text.x = element_blank(),
           legend.position = "none",
-          plot.margin = unit(c(-.1,.2,.1,.2), units = "cm")),
+          plot.margin = unit(c(-.1,.2,.1,.2), units = "cm")
+          )) +
+    draw_label("c", x = .095, y = .91, fontface = "bold") +
+    draw_label("d", x = .56, y = .91, fontface = "bold"),
   
-  rgr_hab_fig +
+  ggdraw(rgr_hab_fig +
     # xlab("") +
     ggtitle("") +
-    scale_y_continuous(breaks = c(2.5,3.0,3.5), 
-                       labels = c("2.5","3.0","3.5"), 
+    xlab("Distance (m)") +
+    scale_y_continuous(breaks = c(1,2,3),
+                       labels = c("1","2","3"),
                        limits = c(NA,NA)
                        ) +
-    theme(axis.text = element_text(size = 10),
+    theme(axis.text = element_text(size = 9.5),
           strip.text = element_blank(),
           axis.title = element_text(size = 12),
           # axis.text.x = element_blank(),
           legend.position = "none",
-          plot.margin = unit(c(-.4,.2,.2,.13), units = "cm")),
+          # axis.title.y = element_text(vjust = 1),
+          plot.margin = unit(c(-.4,.2,.2,.13), units = "cm")
+          )) +
+    draw_label("e", x = .095, y = .95, fontface = "bold") +
+    draw_label("f", x = .56, y = .95, fontface = "bold"),
   
-  ncol = 1, rel_heights = c(1.3,1,1), labels = "auto"
+  ncol = 1, rel_heights = c(1.3,1,1), axis = "l", align = "v"
 )
-ggsave("figures/growth-raw.eps", width = 4.5, height = 10)
+ggsave("figures/growth-raw.eps", width = 6, height = 10)
 
 ```
 
@@ -1348,7 +1392,7 @@ GGally::ggpairs(select(site_grouped_data, distance, tree_richness, avg_basal_are
 
 # a ggplot style pairs plot----
 library(GGally)
-ggpairs(select(site_grouped_data, avg_biomass, distance, tree_richness, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture, age), aes(color = age, alpha = .2))
+ggpairs(select(site_grouped_data, avg_biomass, distance, tree_richness, avg_basal_area, avg_pct_light, litter_kg_m2, pct_moisture, age, status), aes(color = age, alpha = .2), binwidth = 15)
 #relatively strong correlation between basal area and litter; the major differences are related to forest age
 
 
@@ -1554,6 +1598,15 @@ MuMIn::AICc(m4.full); MuMIn::r.squaredGLMM(m4.full)
 # Check fitted biomass model ------- 
 biomass_model <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age +  avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data)
 # equivalent to bmod_herbiv7 in previous chunk
+
+m1 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age + avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data) 
+m2 <- lmer(log(avg_biomass) ~ distance + avg_pct_light + f_age + status + avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data)
+
+anova(m1,m2)
+
+summary(m1)
+summary(m2)
+
 summary(biomass_model)
 
 plot(biomass_model)
@@ -1621,6 +1674,11 @@ summary(biomass_model_scaled)
 # summary(scaled_biomass_model)
 
 # confint(biomass_model)
+
+arm::display(biomass_model)
+biomass_armstandardize_model <- arm::standardize(biomass_model)
+arm::display(biomass_armstandardize_model)
+
 
 ```
 
@@ -1743,6 +1801,11 @@ biomass_scaled_coef$var_names <- factor(biomass_scaled_coef$var_names, levels = 
   ggtitle("Biomass means ± 95% CI")
   )
 
+# lattice::dotplot(coef(biomass_armstandardize_model))
+
+# coef(biomass_armstandardize_model)
+
+
 # lattice::dotplot(coef(biomass_model_scaled))
 # species_coefs <- (coef(biomass_model)[[2]])
 
@@ -1778,14 +1841,20 @@ biomass_sjplot <- sjPlot::sjp.lmer(biomass_model_scaled, type = "ri.slope", prnt
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type = "eff")
 # sjPlot::plot_model(biomass_model, terms = c("distance", "f_age"), type)
 
+# biomass_sjplot$plot[[6]] +
+#   scale_color_brewer(palette = "BrBG") +
+#   theme_classic()
+
+# sjPlot::sjp.lmer(biomass_armstandardize_model, type = "ri.slope")
+
 # sjPlot::sjp.lmer(biomass_model, type = "fe.slope")
 biomass_distance <- biomass_sjplot$plot[[5]]
 biomass_distance$data$x <- biomass_distance$data$x*60
 biomass_distance$data$y <- exp(biomass_distance$data$y)
 # biomass_distance <- biomass_distance$data
 (biomass_distance_lines <- biomass_distance +
-  # geom_line() +
-  # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
+  geom_line(size = 1) +
+  # geom_point(data = site_grouped_data, aes(distance, avg_biomass)) +
   scale_color_brewer(palette = "BrBG") +
   labs(y = "Predicted biomass (g)", x = "Distance (m)", title = "") +
   theme_classic() +
@@ -1808,7 +1877,7 @@ biomass_herbiv_rsri$data$y = exp(biomass_herbiv_rsri$data$y)
 
 (biomass_herbiv_rsri_plot <- ggplot(biomass_herbiv_rsri$data,
                                     aes(x,y,color=grp)) +
-    geom_line() +
+    geom_line(size = 1) +
   # geom_path() +
   # geom_line() +
     
@@ -2077,7 +2146,7 @@ diam_distance$data$x <- diam_distance$data$x*60
 diam_distance$data$y <- exp(diam_distance$data$y)
 
 (diam_distance_lines <- diam_distance +
-  # geom_line() +
+  geom_line(size = 1) +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = "BrBG") +
   labs(y = "Predicted diameter (mm)", x = "Distance", title = "") +
@@ -2098,7 +2167,7 @@ diam_sjplot_rsri <- sjPlot::sjp.lmer(diam_model, type = "rs.ri", show.legend = T
 diam_rsri_plot <- diam_sjplot_rsri$plot[[1]]
 diam_rsri_plot$data$y <- exp(diam_rsri_plot$data$y)
 (diam_rsri_plot <- ggplot(diam_rsri_plot$data, aes(x,y,color = grp)) +
-  geom_line() +
+  geom_line(size = 1) +
   theme_classic() +
   scale_color_brewer(palette = "BrBG") +
   xlab("Average herbivory incidence") +
@@ -2212,7 +2281,7 @@ MuMIn::AICc(rmod_herbiv4); MuMIn::r.squaredGLMM(rmod_herbiv4)
 Final rgr model
 ```{r final rgr model}
 
-rgr_model <- lmer(avg_rgr_ht ~ distance + avg_pct_light + age + avg_h_incidence + (1|site_code) + (avg_h_incidence|common_name), data = site_grouped_data, REML = T)
+rgr_model <- lmer(avg_rgr_ht_yr ~ distance + avg_pct_light + age + avg_h_incidence + (1|site_code) + (1|common_name), data = site_grouped_data, REML = T)
 summary(rgr_model)
 
 # model diagnostics ----
@@ -2226,7 +2295,7 @@ plot(rgr_model@frame$avg_pct_light, E2)
 # maybe some pattern here with light availability, but difficult to make out
 plot(rgr_model@frame$avg_h_incidence, E2)
 
-rgr_model_scaled <- lmer(avg_rgr_ht ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1|site_code) + (scaled_herbiv_incidence|common_name), data = site_grouped_data)
+rgr_model_scaled <- lmer(avg_rgr_ht_yr ~ scaled_distance + scaled_pct_light + age + scaled_herbiv_incidence + (1|site_code) + (1|common_name), data = site_grouped_data)
 # summary(rgr_model_scaled)
 
 ```
@@ -2314,7 +2383,7 @@ rgr_scaled_summary <- summary(rgr_model_scaled)
 rgr_scaled_coef <- as.data.frame(rgr_scaled_summary$coefficients)
 rgr_scaled_coef$var_names <- var_names
 rgr_confint <- as.data.frame(confint(rgr_model_scaled))
-rgr_confint <- rgr_confint[-c(1:5),]
+rgr_confint <- rgr_confint[-c(1:3),]
 rgr_scaled_coef <- cbind(rgr_scaled_coef, rgr_confint)
 
 write.csv(rgr_scaled_coef, "model_output_data/rgr_fixed_coef.csv")
@@ -2382,7 +2451,7 @@ rgr_distance$data$x <- rgr_distance$data$x*60
 
 (rgr_distance_lines <- rgr_distance +
   # geom_abline(intercept = rgr_summary$coefficients[1,1], slope = -(1/3))
-  # geom_line() +
+  geom_line(size = 1) +
   # geom_point(data = site_grouped_data, aes(distance, log(avg_biomass))) +
   scale_color_brewer(palette = "BrBG") +
   labs(y = "Relative growth rate (% / day)", x = "Distance", title = "") +
@@ -2392,14 +2461,18 @@ rgr_distance$data$x <- rgr_distance$data$x*60
 
 ```
 
-**Plot the random-slope-random-intercept for the marginal effect of herbiory on the relative growth rate of each species**
-```{r rgr-herbiv-by-species}
+~~**Plot the random-slope-random-intercept for the marginal effect of herbiory on the relative growth rate of each species**~~
+
+Removed the random slope, random intercept with species and herbivory for this variable because there was no relationship.
+```{r rgr-herbiv-by-species, eval=F}
+
 
 rgr_rsri_sjplot <- sjPlot::sjp.lmer(rgr_model, type = "rs.ri", show.legend = T, prnt.plot = F)# avg herbiv. incidence
 # sjPlot::sjp.lmer(rmod_herbiv4, type = "rs.ri")# cumulative herbiv. incidence
 
 rgr_rsri_plot <- rgr_rsri_sjplot$plot[[1]]
 (rgr_rsri_plot <- rgr_rsri_plot + 
+  geom_line(size = 1) +
   theme_classic() +
   xlab("Avg. herbivory incidence") +
   ylab("Relative growth rate (% / day)") +
@@ -2470,19 +2543,23 @@ rgr_species_ranef_plot <- rgr_species_ranef_plot +
   scale_color_brewer(palette = "BrBG", direction = -1)
 
 ## Random intercept plots of distance marginal effect ####
-biomass_ri_distance <- biomass_distance_lines + 
+biomass_ri_distance <- biomass_distance_lines +
+  ylab("Biomass (g)") +
   theme(legend.position = "none",
         legend.direction = "horizontal",
         legend.background = element_blank()) +
   scale_color_brewer(palette = "BrBG") +
   xlab("")
 
-diam_ri_distance <- diam_distance_lines + 
+diam_ri_distance <- diam_distance_lines +
+  ylab("Diameter (mm)") +
   theme(legend.position = "none") +
   scale_color_brewer(palette = "BrBG") +
   xlab("")
 
-rgr_ri_distance <- rgr_distance_lines + 
+rgr_ri_distance <- rgr_distance_lines +
+  xlab("Distance (m)") +
+  ylab(expression(RGR~"%"~year^{"-1"})) +
   theme(legend.position = "none") +
   scale_color_brewer(palette = "BrBG")
 
@@ -2492,7 +2569,7 @@ cowplot::plot_grid(plotlist = list(
   biomass_species_ranef_plot, biomass_ri_distance,  
   diam_species_ranef_plot, diam_ri_distance, 
   rgr_species_ranef_plot, rgr_ri_distance), 
-  nrow = 3, ncol = 2, rel_widths = c(1,1), labels = "auto")
+  nrow = 3, ncol = 2, rel_widths = c(1,1), labels = "auto", align = "r", axis = "r")
 
 # ggsave(filename = "figures/distance-intercepts-fig2.eps", width = 6, height = 7.5)
 
