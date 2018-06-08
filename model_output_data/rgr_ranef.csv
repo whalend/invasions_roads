@@ -1,25 +1,19 @@
 "","grpvar","term","grp","condval","condsd"
-"1","site_code","(Intercept)","BB",0.0805427325937066,0.0570247955650338
-"2","site_code","(Intercept)","CH",0.160337172366373,0.0570470960522588
-"3","site_code","(Intercept)","DB",0.0422234409174393,0.0582009382539099
-"4","site_code","(Intercept)","DG",-0.125164795895777,0.0571388380056087
-"5","site_code","(Intercept)","DU",0.0015405903268282,0.057518000834271
-"6","site_code","(Intercept)","FR",-0.1603396501515,0.062065954312276
-"7","site_code","(Intercept)","GR",-0.362401059054607,0.0587822052309798
-"8","site_code","(Intercept)","HQ",0.0372788405950513,0.0645701456575432
-"9","site_code","(Intercept)","LD",0.0463104291767029,0.0588449498843723
-"10","site_code","(Intercept)","PR",0.204462509072676,0.0570735040562373
-"11","site_code","(Intercept)","SR",0.0384984605199139,0.0599477060746434
-"12","site_code","(Intercept)","TC",0.0367113295331392,0.0571816169705064
-"13","common_name","(Intercept)","Autumn olive",0.108804040667776,0.0454524557030478
-"14","common_name","(Intercept)","Honeysuckle",-0.0263229240144973,0.0445759373229996
-"15","common_name","(Intercept)","Privet",0.0667785942230169,0.0447824673013393
-"16","common_name","(Intercept)","Dogwood",-0.0224176687531777,0.0450490422741418
-"17","common_name","(Intercept)","Redbud",0.0130220649025214,0.0435975757207698
-"18","common_name","(Intercept)","Spicebush",-0.139864107025595,0.0442984657840718
-"19","common_name","scaled_herbiv_incidence","Autumn olive",0.00433262696943942,0.00180993770265923
-"20","common_name","scaled_herbiv_incidence","Honeysuckle",-0.00104819094768686,0.0017750343374046
-"21","common_name","scaled_herbiv_incidence","Privet",0.00265915435250543,0.0017832584561842
-"22","common_name","scaled_herbiv_incidence","Dogwood",-0.000892681886039027,0.00179387359427515
-"23","common_name","scaled_herbiv_incidence","Redbud",0.000518544616984655,0.00173607552817593
-"24","common_name","scaled_herbiv_incidence","Spicebush",-0.00556945310520186,0.0017639852930361
+"1","site_code","(Intercept)","BB",0.0529666908974978,0.060806212787563
+"2","site_code","(Intercept)","CH",0.202096905084148,0.060806212787563
+"3","site_code","(Intercept)","DB",0.027291405003199,0.0618578413328905
+"4","site_code","(Intercept)","DG",-0.133034296430728,0.060806212787563
+"5","site_code","(Intercept)","DU",0.0218702311853742,0.0613132828378581
+"6","site_code","(Intercept)","FR",-0.12347400442285,0.0656103629274046
+"7","site_code","(Intercept)","GR",-0.402347541337598,0.0624049211874913
+"8","site_code","(Intercept)","HQ",0.0205596262421224,0.0680425912253474
+"9","site_code","(Intercept)","LD",0.0298772793125903,0.0624410806725796
+"10","site_code","(Intercept)","PR",0.253026836783445,0.060806212787563
+"11","site_code","(Intercept)","SR",0.0417672852075736,0.0636228572421296
+"12","site_code","(Intercept)","TC",0.00939958247518933,0.060806212787563
+"13","common_name","(Intercept)","Autumn olive",0.180877479167023,0.050957318823671
+"14","common_name","(Intercept)","Honeysuckle",-0.0375227896435179,0.0495682446224939
+"15","common_name","(Intercept)","Privet",0.00621104804945785,0.0495702030538562
+"16","common_name","(Intercept)","Dogwood",0.0721875971626597,0.0507361301664034
+"17","common_name","(Intercept)","Redbud",-0.154600205555813,0.0495702030538562
+"18","common_name","(Intercept)","Spicebush",-0.0671531291795762,0.0495702030538562
